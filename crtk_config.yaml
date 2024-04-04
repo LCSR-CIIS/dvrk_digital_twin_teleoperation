@@ -1,0 +1,32 @@
+# AMBF CRTK configuration file template 
+# Author: Hisashi Ishida
+# Date: 01.10.2024
+
+# Interfaces used for this plugin
+interface:
+- /ambf/env/psm2
+
+# For Interface "/ambf/env/psm2"
+/ambf/env/psm2:
+  measured_js:
+    joints:
+    - base link-yaw link
+    - yaw link-pitch end link
+    - pitch end link-main insertion link
+    - main insertion link-tool roll link
+    - tool roll link-tool pitch link
+    - tool pitch link-tool yaw link
+    - tool yaw link-tool gripper left link
+    - tool yaw link-tool gripper right link
+
+  servo_jp:
+    # Name of joints in AMBF
+    joints:
+    - base link-yaw link
+    - yaw link-pitch end link
+    - pitch end link-main insertion link
+    - main insertion link-tool roll link
+    - tool roll link-tool pitch link
+    - tool pitch link-tool yaw link
+    - tool yaw link-tool gripper left link
+    - tool yaw link-tool gripper right link
