@@ -10,7 +10,7 @@ import sys
 class image_blender:
     def __init__(self, ral, source_topic, overlay_topic, result_topic):
         self.ral = ral
-        self.alpha = 0.8
+        self.alpha = 0.5
         self.bridge = CvBridge()
 
         self.source = np.array([0])
@@ -61,7 +61,7 @@ if __name__ == '__main__':
     # parse arguments
     parser = argparse.ArgumentParser(description = __doc__,
                                      formatter_class = argparse.RawTextHelpFormatter)
-    parser.add_argument('-s', '--source', type = str, default='/jhu_daVinci/left/decklink/jhu_daVinci_left/image_raw',
+    parser.add_argument('-s', '--source', type = str, default='/jhu_daVinci/decklink/left/image_rect_color',
                         help = 'ROS topic for source image')
     parser.add_argument('-o', '--overlay', type = str, default='/ambf/env/cameras/cameraL/ImageData',
                         help = 'ROS topic for overlay image')
