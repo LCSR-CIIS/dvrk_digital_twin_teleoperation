@@ -14,3 +14,5 @@ To start the camera:
 ```
 roslaunch dvrk_video jhu_daVinci_video.launch 
 ```
+
+Camera resitration repo: https://github.com/jabarragann/dvrk-camera-registration

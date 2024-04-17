@@ -128,6 +128,7 @@ class dvrk_teleoperation_ambf:
         self.from_disabled = True
 
         self.running = True
+        self.sleep_rate = self.ral.create_rate(int(1/expected_interval))
 
         self.ambf_client = Client()
         self.ambf_client.connect()
@@ -295,82 +296,69 @@ class dvrk_teleoperation_ambf:
         
         # ambf startup
         cameraframe_obj = self.ambf_client.get_obj_handle('/CameraFrame')
-        cameraleft_obj = self.ambf_client.get_obj_handle('/cameraL')
-        psmbase_obj = self.ambf_client.get_obj_handle('psm2/baselink')
-        self.psmtool_obj = self.ambf_client.get_obj_handle('psm2/toolyawlink')
-        self.psmbase_obj = self.ambf_client.get_obj_handle('psm2/baselink')
-        self.psmbase_pub = rospy.Publisher('ambf_psmbase', geometry_msgs.msg.PoseStamped, queue_size=10)
-        self.psmtool_pub = rospy.Publisher('ambf_psmtool', geometry_msgs.msg.PoseStamped, queue_size=10)
+        cameraleft_obj = self.ambf_client.get_obj_handle('/ambf/env/cameras/cameraL')
+        self.psmtool_obj = self.ambf_client.get_obj_handle('/ambf/env/psm2/toolyawlink')
+        self.psmbase_obj = self.ambf_client.get_obj_handle('/ambf/env/psm2/baselink')
+        # self.psmbase_pub = rospy.Publisher('ambf_psmbase', geometry_msgs.msg.PoseStamped, queue_size=10)
+        # self.psmtool_pub = rospy.Publisher('ambf_psmtool', geometry_msgs.msg.PoseStamped, queue_size=10)
+        # self.cameraframe_pub = rospy.Publisher('ambf_cameraframe', geometry_msgs.msg.PoseStamped, queue_size=10)
+        # self.cameraleft_pub = rospy.Publisher('ambf_cameraleft', geometry_msgs.msg.PoseStamped, queue_size=10)
 
         T_w_c_real = rospy.wait_for_message('/ECM/measured_cp', geometry_msgs.msg.PoseStamped)
-        T_c_psmbase = rospy.wait_for_message(f'/SUJ/{self.puppet.name()}/measured_cp', geometry_msgs.msg.PoseStamped)
+        # T_c_psmbase = rospy.wait_for_message(f'/SUJ/{self.puppet.name()}/measured_cp', geometry_msgs.msg.PoseStamped)
         psm_fk = rospy.wait_for_message(f'/{self.puppet.name()}/local/measured_cp', geometry_msgs.msg.PoseStamped)
-        psm_js = rospy.wait_for_message(f'/{self.puppet.name()}/measured_js', sensor_msgs.msg.JointState)
+        # psm_js = rospy.wait_for_message(f'/{self.puppet.name()}/measured_js', sensor_msgs.msg.JointState)
         psm_jaw_js = rospy.wait_for_message(f'/{self.puppet.name()}/jaw/measured_js', sensor_msgs.msg.JointState)
 
-        self.T_psmbase_c = crtk.msg_conversions.FrameFromPoseMsg(T_c_psmbase.pose).Inverse()
+        T_hand_eye = PyKDL.Frame(PyKDL.Rotation(-0.32674255580065165, 0.568234128321799, -0.7552147228697446, 
+                                                .8211675143378299, 0.5662785683984294, 0.07079898564849585,
+                                                0.4678923119961363, -0.5970247552513976, -0.6516427134495721),
+                                 PyKDL.Vector(-0.0892852902484451, -0.04913451881188382, 0.00877117039982906))
 
-        y_pi = PyKDL.Frame(PyKDL.Rotation.RotY(math.pi), PyKDL.Vector())
-        T_w_c_virtual_frame = crtk.msg_conversions.FrameFromPoseMsg(T_w_c_real.pose) * y_pi.Inverse()
-        T_w_c_virtual = crtk.msg_conversions.FrameToPoseMsg(T_w_c_virtual_frame)
+        T_w_c_virtual_frame = crtk.msg_conversions.FrameFromPoseMsg(T_w_c_real.pose)
+        cameraframe_obj.set_pos(T_w_c_real.pose.position.x, T_w_c_real.pose.position.y, T_w_c_real.pose.position.z)
+        cameraframe_obj.set_rot([T_w_c_real.pose.orientation.x, T_w_c_real.pose.orientation.y, T_w_c_real.pose.orientation.z, T_w_c_real.pose.orientation.w])
+        
+        # hard-coded from hand-eye calibration 
+        T_ext = PyKDL.Frame(PyKDL.Rotation(-0.99875061, 0.03992935, -0.030047648,
+                                           -0.039027081, -0.99878656, -0.030038183,
+                                           -0.031210593, -0.028827982, 0.99909702),
+                            PyKDL.Vector(0.0037492396, 0.011333806, -0.016384585))
+        T_cv_ambf = PyKDL.Frame(PyKDL.Rotation( 0,  1,  0,
+                                                0,  0,  -1,
+                                               -1,  0,  0),
+                                PyKDL.Vector())
+        T_cf_cl = crtk.msg_conversions.FrameToPoseMsg(T_ext * T_cv_ambf)
+        cameraleft_obj.set_pos(T_cf_cl.position.x, T_cf_cl.position.y, T_cf_cl.position.z)
+        cameraleft_obj.set_rot([T_cf_cl.orientation.x, T_cf_cl.orientation.y, T_cf_cl.orientation.z, T_cf_cl.orientation.w])
 
-        cameraframe_obj.set_pos(T_w_c_virtual.position.x, T_w_c_virtual.position.y, T_w_c_virtual.position.z)
-        cameraframe_obj.set_rot([T_w_c_virtual.orientation.x, T_w_c_virtual.orientation.y, T_w_c_virtual.orientation.z, T_w_c_virtual.orientation.w])
-        # hard-coded from hand-eye calibration
-        cameraleft_obj.set_pos(0.0037492396, 0.011333806, -0.016384585)
-        cameraleft_obj.set_rot([-0.509364166, -0.474894011, -0.504937756, 0.509962437])
-        T_w_psmbase = crtk.msg_conversions.FrameToPoseMsg(
-            T_w_c_virtual_frame * y_pi * self.T_psmbase_c.Inverse())
-        psmbase_obj.set_pos(T_w_psmbase.position.x, T_w_psmbase.position.y, T_w_psmbase.position.z)
-        psmbase_obj.set_rot([T_w_psmbase.orientation.x, T_w_psmbase.orientation.y, T_w_psmbase.orientation.z, T_w_psmbase.orientation.w])
-
-        # T_w_c_frame = PyKDL.Frame()
-        # T_w_c_pos = cameraframe_obj.get_pos()
-        # T_w_c_rot = cameraframe_obj.get_rot()
-        # T_w_c_frame.p = PyKDL.Vector(T_w_c_pos.x, T_w_c_pos.y, T_w_c_pos.z)
-        # T_w_c_frame.M = PyKDL.Rotation.Quaternion(T_w_c_rot.x, T_w_c_rot.y, T_w_c_rot.z, T_w_c_rot.w)
-        # T_w_c = rospy.wait_for_message('/ECM/measured_cp', geometry_msgs.msg.PoseStamped)
-
-        # fk_mat = compute_FK(psm_js.position, 6)
-        # self.puppet_virtual_servo_cp = PyKDL.Frame(PyKDL.Rotation(fk_mat[0,0],fk_mat[0,1],fk_mat[0,2],fk_mat[1,0],fk_mat[1,1],fk_mat[1,2],fk_mat[2,0],fk_mat[2,1],fk_mat[2,2]),
-        #                                            PyKDL.Vector(fk_mat[0,3],fk_mat[1,3],fk_mat[2,3]))
+        T_w_psmbase = crtk.msg_conversions.FrameToPoseMsg(T_w_c_virtual_frame * T_ext * T_hand_eye)
+        self.psmbase_obj.set_pos(T_w_psmbase.position.x, T_w_psmbase.position.y, T_w_psmbase.position.z)
+        self.psmbase_obj.set_rot([T_w_psmbase.orientation.x, T_w_psmbase.orientation.y, T_w_psmbase.orientation.z, T_w_psmbase.orientation.w])
+        
+        self.T_psmbase_c_frame = crtk.msg_conversions.FrameFromPoseMsg(T_w_psmbase).Inverse() * T_w_c_virtual_frame
         self.puppet_virtual_servo_cp = crtk.msg_conversions.FrameFromPoseMsg(psm_fk.pose)
         self.puppet_virtual.servo_cp(self.puppet_virtual_servo_cp)
         self.puppet_virtual.jaw.servo_jp(psm_jaw_js.position)
 
+        # Testing
+        # self.cameraleft_obj = cameraleft_obj
+        # self.cameraframe_obj = cameraframe_obj
+
         print('Initialization finished')
 
     def run_all_states(self):
-        try:
-            master_measured_cp = self.master.measured_cp()
-            self.master_measured_cp = master_measured_cp
-        except RuntimeWarning as w:
-            print(w)
-
+        self.master_measured_cp = self.master.measured_cp()
         if self.master_use_measured_cv:
-            try:
-                master_measured_cv = self.master.measured_cv()
-                self.master_measured_cv = master_measured_cv
-            except RuntimeWarning as w:
-                print(w)
+            self.master_measured_cv = self.master.measured_cv()
+        self.master_setpoint_cp = self.master.setpoint_cp()
+        self.puppet_setpoint_cp = self.puppet.setpoint_cp()
 
-        try:
-            master_setpoint_cp = self.master.setpoint_cp()
-            self.master_setpoint_cp = master_setpoint_cp
-        except RuntimeWarning as w:
-            print(w)
-        
-        try:
-            puppet_setpoint_cp = self.puppet.setpoint_cp()
-            self.puppet_setpoint_cp = puppet_setpoint_cp
-        except RuntimeWarning as w:
-            print(w)
-
-        try:
-            puppet_virtual_setpoint_cp = self.puppet_virtual.setpoint_cp()
-            self.puppet_virtual_setpoint_cp = puppet_virtual_setpoint_cp
-        except RuntimeWarning as w:
-            print(w)
+        # try:
+        #     puppet_virtual_setpoint_cp = self.puppet_virtual.setpoint_cp()
+        #     self.puppet_virtual_setpoint_cp = puppet_virtual_setpoint_cp
+        # except RuntimeWarning as w:
+        #     print(w)
             
         # TODO: add base frame (?)
 
@@ -386,24 +374,45 @@ class dvrk_teleoperation_ambf:
                 self.set_desired_state(self.state.DISABLED)
                 print(f'ERROR: {self.ral.node_name()}: puppet ({self.master.name()}) is not in state \"READY\" anymore')
 
-        # Testing only
-        T_w_psmtool_pos = self.psmtool_obj.get_pos()
-        T_w_psmtool_rot = self.psmtool_obj.get_rot()
+    #     # Testing only
+    #     T_w_psmtool_pos = self.psmtool_obj.get_pos()
+    #     T_w_psmtool_rot = self.psmtool_obj.get_rot()
 
-        T_w_psmbase_pos = self.psmbase_obj.get_pos()
-        T_w_psmbase_rot = self.psmbase_obj.get_rot()
+    #     T_w_psmbase_pos = self.psmbase_obj.get_pos()
+    #     T_w_psmbase_rot = self.psmbase_obj.get_rot()
 
-        p = geometry_msgs.msg.PoseStamped()
-        p.header.frame_id = 'Cart'
-        p.header.stamp = rospy.Time.now()
-        p.pose.position = T_w_psmtool_pos
-        p.pose.orientation = T_w_psmtool_rot
-        self.psmtool_pub.publish(p)
+    #     T_w_cf_pos = self.cameraframe_obj.get_pos()
+    #     T_w_cf_rot = self.cameraframe_obj.get_rot()
 
-        p.header.stamp = rospy.Time.now()
-        p.pose.position = T_w_psmbase_pos
-        p.pose.orientation = T_w_psmbase_rot
-        self.psmbase_pub.publish(p)
+    #     T_cf_cl_pos = self.cameraleft_obj.get_pos()
+    #     T_cf_cl_rot = self.cameraleft_obj.get_rot()
+
+    #     p = geometry_msgs.msg.PoseStamped()
+    #     p.header.frame_id = 'Cart'
+    #     p.header.stamp = rospy.Time.now()
+    #     p.pose.position = T_w_cf_pos
+    #     p.pose.orientation = T_w_cf_rot
+    #     self.cameraframe_pub.publish(p)
+
+    #     p.header.frame_id = 'ECM'
+    #     p.header.stamp = rospy.Time.now()
+    #     p.pose.position = T_cf_cl_pos
+    #     p.pose.orientation = T_cf_cl_rot
+    #     self.cameraleft_pub.publish(p)
+
+    #    # p = geometry_msgs.msg.PoseStamped()
+    #     p.header.frame_id = 'Cart'
+    #     p.header.stamp = rospy.Time.now()
+    #     p.pose.position = T_w_psmtool_pos
+    #     p.pose.orientation = T_w_psmtool_rot
+    #     self.psmtool_pub.publish(p)
+
+    #     p.header.stamp = rospy.Time.now()
+    #     p.pose.position = T_w_psmbase_pos
+    #     p.pose.orientation = T_w_psmbase_rot
+    #     self.psmbase_pub.publish(p)
+
+        self.sleep_rate.sleep()
 
 
     def transition_disabled(self):
@@ -478,11 +487,7 @@ class dvrk_teleoperation_ambf:
         if not self.operator_is_active:
             gripper_range = 0
             if callable(getattr(self.master.gripper, "measured_js", None)):
-                try:
-                    master_gripper_measured_js = self.master.gripper.measured_js()
-                    self.master_gripper_measured_js = master_gripper_measured_js
-                except RuntimeWarning as w:
-                    print(w)
+                self.master_gripper_measured_js = self.master.gripper.measured_js()
                 gripper = self.master_gripper_measured_js[0][0]
                 if gripper > self.operator_gripper_max:
                     self.operator_gripper_max = gripper
@@ -608,15 +613,11 @@ class dvrk_teleoperation_ambf:
                 # TODO: Can't really add velocity to servo_cp?
 
                 self.puppet.servo_cp(puppet_cartesian_goal)
-                self.puppet_virtual.servo_cp(self.T_psmbase_c * puppet_cartesian_goal)
+                self.puppet_virtual.servo_cp(self.T_psmbase_c_frame * puppet_cartesian_goal)
                 
                 if not self.jaw_ignore:
                     if callable(getattr(self.master.gripper, "measured_js", None)):
-                        try:
-                            master_gripper_measured_js = self.master.gripper.measured_js()
-                            self.master_gripper_measured_js = master_gripper_measured_js
-                        except RuntimeWarning as w:
-                            print(w)
+                        self.master_gripper_measured_js = self.master.gripper.measured_js()
                         current_gripper = self.master_gripper_measured_js[0][0]
                         # see if we caught up
                         if not self.jaw_caught_up_after_clutch:
@@ -922,7 +923,6 @@ class psm_ambf(object):
     def servo_cp(self, cp):
         jp = compute_IK(cp)
         self.command_jp[0:6] = jp[0:6]
-        self.command_jp[2] = self.command_jp[2]
         self.servo_jp(self.command_jp)
     
     def hold(self):
@@ -950,8 +950,8 @@ if __name__ == '__main__':
     args = parser.parse_args(argv)
 
     ral = crtk.ral('dvrk_python_teleoperation')
-    mtm = mtm_teleop(ral, args.mtm, args.interval)
-    psm = psm_teleop(ral, args.psm, args.interval)
-    psm_virtual = psm_ambf(ral, '/ambf/env/psm2', args.interval)
+    mtm = mtm_teleop(ral, args.mtm, 2*args.interval)
+    psm = psm_teleop(ral, args.psm, 2*args.interval)
+    psm_virtual = psm_ambf(ral, '/ambf/env/psm2', 2*args.interval)
     application = dvrk_teleoperation_ambf(ral, mtm, psm, psm_virtual, args.clutch, args.interval, operator_present_topic=args.operator, config_file_name="")
     ral.spin_and_execute(application.run)
