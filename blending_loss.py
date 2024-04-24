@@ -19,6 +19,7 @@ class image_blender:
         self.result = np.array([0])
         self.result_img = sensor_msgs.msg.Image()
         self.update = False
+        self.comm_loss = False
 
         self._fig = plt.figure()
         self._ax = self._fig.add_subplot(111)
