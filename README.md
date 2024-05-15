@@ -2,7 +2,7 @@
 
 from the desired `surgical_robotics_challenge` directory, to launch AMBF simulation and CRTK interface:
 ```
-ambf_simulator --launch_file launch.yaml -l 0,1,4,5 --override_max_comm_freq 200 -p 200 -t 1 --plugins ~/ambf_crtk_plugin/build/libambf_crtk_plugin.so --conf ~/dvrk_ambf_teleoperation/crtk_config.yaml
+ambf_simulator --launch_file launch.yaml -l 0,1,4,5,6 --override_max_comm_freq 200 -p 200 -t 1 --plugins ~/ambf_crtk_plugin/build/libambf_crtk_plugin.so --conf ~/dvrk_ambf_teleoperation/crtk_config.yaml
 ```
 
 To run the dVRK console:
@@ -14,5 +14,11 @@ To start the camera:
 ```
 roslaunch dvrk_video jhu_daVinci_video.launch 
 ```
+
+Rectify:
+```
+ROS_NAMESPACE=/jhu_daVinci/decklink/ rosrun stereo_image_proc stereo_image_proc
+```
+
 
 Camera resitration repo: https://github.com/jabarragann/dvrk-camera-registration

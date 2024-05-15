@@ -1,0 +1,21 @@
+# This is the base file for Coordination Application
+world config: ./ADF/world/world_stereo.yaml
+color config: ./ADF/color/colors.yaml
+input devices config: ./ADF/input_devices/input_devices.yaml
+
+plugins: [
+ {
+   path: /home/jwang334/ambf_registration_plugin/build/,
+   name: registration_plugin,
+   filename: libregistration_plugin.so
+ }
+]
+
+multibody configs:
+  - "ADF/ghosts.yaml" #0
+  - "3d_med_phantom.yaml" #1
+  - "full_new_psm1.yaml" #2
+  - "ADF/sensors_actuators_psm1.yaml" #3
+  - "full_new_psm2.yaml" #4
+  - "ADF/sensors_actuators_psm2.yaml" #5
+  - "PegPuzzle.yaml" #6
