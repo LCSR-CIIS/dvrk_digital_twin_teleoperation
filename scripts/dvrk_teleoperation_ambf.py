@@ -13,8 +13,8 @@ import PyKDL
 import rospy
 import sensor_msgs.msg
 import std_msgs.msg
-from surgical_robotics_challenge.kinematics.psmFK import *
-from surgical_robotics_challenge.kinematics.psmIK import *
+from surgical_robotics_challenge.kinematics.psmKinematics import PSM_TYPE_DEFAULT, TOOL_TYPE_DEFAULT
+from surgical_robotics_challenge.kinematics.psmKinematics import PSMKinematicSolver
 import sys
 import time
 
@@ -312,14 +312,17 @@ class dvrk_teleoperation_ambf:
         # psm_js = rospy.wait_for_message(f'/{self.puppet.name()}/measured_js', sensor_msgs.msg.JointState)
         psm_jaw_js = rospy.wait_for_message(f'/{self.puppet.name()}/jaw/measured_js', sensor_msgs.msg.JointState)
 
-        # update this after each ArUco calibration (with left camera)
+        # TODO: update this after each ArUco calibration (with left camera)
         T_left_psmbase = PyKDL.Frame(PyKDL.Rotation(-0.425680413343186, 0.4255129190992243, -0.7985830835771751, 
                                                     0.6500765197494777, 0.7577116318433726, 0.05721539512805919,
                                                     0.6294415812181297, -0.4947846386549507, -0.5991589581944915),
                                      PyKDL.Vector(-0.06643774227587187, -0.03572082293958062, -0.021547666872504815))
         
-        # update this after each ArUco calibration (with right camera)
-        T_right_psmbase = PyKDL.Frame()
+        # TODO: update this after each ArUco calibration (with right camera)
+        T_right_psmbase = PyKDL.Frame(PyKDL.Rotation(1,0,0,
+                                                     0,1,0,
+                                                     0,0,1),
+                                      PyKDL.Vector(0,0,0))
 
         # compute the "mean" between left and right cameras to put the camera frame
         R_left_psmbase = np.array([[T_left_psmbase[0,0], T_left_psmbase[0,1], T_left_psmbase[0,2]],
@@ -335,18 +338,15 @@ class dvrk_teleoperation_ambf:
                                                            R_cameraframe_psmbase[2,0], R_cameraframe_psmbase[2,1], R_cameraframe_psmbase[2,2]),
                                             (T_left_psmbase.p + T_right_psmbase.p)/2)
 
-        # sets the virtual PSM base to mirror the real system readings
-        T_w_psmbase_frame = crtk.msg_conversions.FrameFromPoseMsg(T_w_psmbase.pose)
+        T_w_cameraframe = crtk.msg_conversions.FrameFromPoseMsg(T_w_c_real.pose)
+        # sets the virtual camera to mirror the real system readings
+        cameraframe_obj.set_pos(T_w_c_real.pose.position.x, T_w_c_real.pose.position.y, T_w_c_real.pose.position.z)
+        cameraframe_obj.set_rot([T_w_c_real.pose.orientation.x, T_w_c_real.pose.orientation.y, T_w_c_real.pose.orientation.z, T_w_c_real.pose.orientation.w])
+        
+        # sets the virtual PSM base frame based on the computed mean
+        T_w_psmbase = crtk.msg_conversions.FrameToPoseMsg(T_w_cameraframe * T_cameraframe_psmbase)
         self.psmbase_obj.set_pos(T_w_psmbase.pose.position.x, T_w_psmbase.pose.position.y, T_w_psmbase.pose.position.z)
         self.psmbase_obj.set_rot([T_w_psmbase.pose.orientation.x, T_w_psmbase.pose.orientation.y, T_w_psmbase.pose.orientation.z, T_w_psmbase.pose.orientation.w])
-        
-        # sets the virtual camera frame based on the computed mean
-        # TODO: compare this T_w_cameraframe with the real reading T_w_c_real. They should be close to each other, but the rotation 
-        #       as of now is off (I believe) by some "nice" rotation matrix (composed of 0 and +-1). Find that matrix and append to
-        #       the end of this chain.
-        T_w_cameraframe = crtk.msg_conversions.FrameToPoseMsg(T_w_psmbase_frame * T_cameraframe_psmbase.Inverse())
-        cameraframe_obj.set_pos(T_w_cameraframe.pose.position.x, T_w_cameraframe.pose.position.y, T_w_cameraframe.pose.position.z)
-        cameraframe_obj.set_rot([T_w_cameraframe.pose.orientation.x, T_w_cameraframe.pose.orientation.y, T_w_cameraframe.pose.orientation.z, T_w_cameraframe.pose.orientation.w])
 
         # T_w_c_virtual_frame = crtk.msg_conversions.FrameFromPoseMsg(T_w_c_real.pose)
         # cameraframe_obj.set_pos(T_w_c_real.pose.position.x, T_w_c_real.pose.position.y, T_w_c_real.pose.position.z)
@@ -379,6 +379,8 @@ class dvrk_teleoperation_ambf:
         self.puppet_virtual_servo_cp = crtk.msg_conversions.FrameFromPoseMsg(psm_fk.pose)
         self.puppet_virtual.servo_cp(self.puppet_virtual_servo_cp)
         self.puppet_virtual.jaw.servo_jp(psm_jaw_js.position)
+
+        self.psm_solver = PSMKinematicSolver(psm_type=PSM_TYPE_DEFAULT, tool_id=TOOL_TYPE_DEFAULT)
 
         # Testing
         self.cameraleft_obj = cameraleft_obj
@@ -956,11 +958,11 @@ class psm_ambf(object):
     def setpoint_cp(self, age = None):
         js = self.measured_js(age=age)
         self.measured_jp = js[0]
-        cp = compute_FK(self.measured_jp[0:6], 6)
+        cp = self.psm_solver.compute_FK(self.measured_jp[0:6], 6)
         return PyKDL.Frame(PyKDL.Rotation(cp[0,0],cp[0,1],cp[0,2],cp[1,0],cp[1,1],cp[1,2],cp[2,0],cp[2,1],cp[2,2]), PyKDL.Vector(cp[0,3],cp[1,3],cp[2,3]))
 
     def servo_cp(self, cp):
-        jp = compute_IK(cp)
+        jp = self.psm_solver.compute_IK(cp)
         self.command_jp[0:6] = jp[0:6]
         self.command_jp[2] = self.command_jp[2]
         self.servo_jp(self.command_jp)
