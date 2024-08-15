@@ -2,9 +2,11 @@
 
 ## Setup
 
-Before running the following scripts compile the CRTK plugin and add the build path to the `launch.yaml` file.
+Before running the following scripts compile the [CRTK plugin][crtkplugin] and add the build path to the `launch.yaml` file.
 
-## Running teleoperation of virtual and real arm.
+[crtkplugin]: (https://github.com/LCSR-CIIS/ambf_crtk_plugin)
+
+## Running teleoperation of a virtual and real PSM arm.
 
 From the desired `surgical_robotics_challenge` directory, to launch AMBF simulation and CRTK interface:
 ```
