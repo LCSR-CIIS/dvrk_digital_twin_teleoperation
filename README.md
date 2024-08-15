@@ -1,4 +1,4 @@
-# dvrk_ambf_teleoperation
+# Teleoperation under communication loss 
 
 from the desired `surgical_robotics_challenge` directory, to launch AMBF simulation and CRTK interface:
 ```
