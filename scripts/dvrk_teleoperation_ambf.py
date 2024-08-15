@@ -8,12 +8,13 @@ import geometry_msgs.msg
 import json
 import math
 import numpy
+import numpy as np
 import os
 import PyKDL
 import rospy
 import sensor_msgs.msg
 import std_msgs.msg
-from surgical_robotics_challenge.kinematics.psmKinematics import PSM_TYPE_DEFAULT, TOOL_TYPE_DEFAULT
+from surgical_robotics_challenge.kinematics.psmKinematics import PSMType, ToolType
 from surgical_robotics_challenge.kinematics.psmKinematics import PSMKinematicSolver
 import sys
 import time
@@ -380,7 +381,7 @@ class dvrk_teleoperation_ambf:
         self.puppet_virtual.servo_cp(self.puppet_virtual_servo_cp)
         self.puppet_virtual.jaw.servo_jp(psm_jaw_js.position)
 
-        self.psm_solver = PSMKinematicSolver(psm_type=PSM_TYPE_DEFAULT, tool_id=TOOL_TYPE_DEFAULT)
+        self.psm_solver = PSMKinematicSolver(psm_type=PSMType.LND_SI, tool_id=ToolType.LND_SI)
 
         # Testing
         self.cameraleft_obj = cameraleft_obj
