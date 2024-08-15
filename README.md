@@ -2,9 +2,9 @@
 
 ## Setup
 
-Before running the following scripts compile the [CRTK plugin][crtkplugin] and add the build path to the `launch.yaml` file.
+Before running the following scripts compile the [CRTK plugin][crtkplug] and add the build path to the `launch.yaml` file.
 
-[crtkplugin]: (https://github.com/LCSR-CIIS/ambf_crtk_plugin)
+[crtkplug]: https://github.com/LCSR-CIIS/ambf_crtk_plugin
 
 ## Running teleoperation of a virtual and real PSM arm.
 
