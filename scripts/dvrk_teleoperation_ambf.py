@@ -19,6 +19,10 @@ from surgical_robotics_challenge.kinematics.psmKinematics import PSMKinematicSol
 import sys
 import time
 
+# Global kinematic solver
+psm_solver = PSMKinematicSolver(
+    psm_type=PSMType.LND_SI.value, tool_id=ToolType.LND_SI.value
+)
 
 class dvrk_teleoperation_ambf:
     class state(Enum):
@@ -517,9 +521,6 @@ class dvrk_teleoperation_ambf:
         self.puppet_virtual.servo_cp(self.puppet_virtual_servo_cp)
         self.puppet_virtual.jaw.servo_jp(psm_jaw_js.position)
 
-        self.psm_solver = PSMKinematicSolver(
-            psm_type=PSMType.LND_SI, tool_id=ToolType.LND_SI
-        )
 
         # Testing
         self.cameraleft_obj = cameraleft_obj
@@ -1173,7 +1174,7 @@ class psm_ambf(object):
     def setpoint_cp(self, age=None):
         js = self.measured_js(age=age)
         self.measured_jp = js[0]
-        cp = self.psm_solver.compute_FK(self.measured_jp[0:6], 6)
+        cp = psm_solver.compute_FK(self.measured_jp[0:6], 6)
         return PyKDL.Frame(
             PyKDL.Rotation(
                 cp[0, 0],
@@ -1190,7 +1191,7 @@ class psm_ambf(object):
         )
 
     def servo_cp(self, cp):
-        jp = self.psm_solver.compute_IK(cp)
+        jp = psm_solver.compute_IK(cp)
         self.command_jp[0:6] = jp[0:6]
         self.command_jp[2] = self.command_jp[2]
         self.servo_jp(self.command_jp)
