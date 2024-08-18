@@ -45,7 +45,7 @@ cam common configs:
     near: 0.001
     far: 10.0
   field of view: &cam_common_fov 1.2 
-  publish image resolution: &cam_common_pub_img_res { width: 640, height: 480 } 
+  publish image resolution: &cam_common_pub_img_res { width: 1300, height: 1024 } 
   publish depth resolution: &cam_common_pub_depth_res { width: 640, height: 480 }
 
 cameraL:
