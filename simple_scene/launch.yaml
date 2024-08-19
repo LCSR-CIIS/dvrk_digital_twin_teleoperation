@@ -7,4 +7,5 @@ multibody configs:
   - "./ADF/box.yaml" # 0
   - "./ADF/full_new_psm2.yaml" #1
   - "./ADF/sensors_actuators_psm2.yaml" #2
+  - "./ADF/custom_camera_projection.yaml" #3
 

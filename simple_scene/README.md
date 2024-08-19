@@ -36,7 +36,7 @@ ambf_simulator --launch_file launch.yaml -l 1,2,3
 
 
 ## Notes:
-- For comparison purposes between real and virtual images use virtual images from the rostopic. A simple way to save images from the rostopic is to use ros tool `image_view` and then right click on the window to save the image.
+- To compare real and virtual images use virtual images from the rostopic. A simple way to save images from the rostopic is to use ros tool `image_view` and then right click on the window to save the image.
 
 ```
 rosrun image_view image_view image:=/ambf/env/cameras/cameraL/ImageData

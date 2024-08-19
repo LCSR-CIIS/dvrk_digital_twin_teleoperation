@@ -13,6 +13,9 @@ _client.connect()
 time.sleep(0.2)
 
 psm_gripper = _client.get_obj_handle("Cube")
+camera = _client.get_obj_handle("main_camera")
+
+time.sleep(0.2)
 
 # You can print the names of objects found
 print(_client.get_obj_names())
@@ -44,7 +47,6 @@ cam_opencv_T_cam_ambf = np.array(
 base_T_cam_ambf = base_T_cam_opencv @ cam_opencv_T_cam_ambf
 
 base_T_cam_ambf = pm.toMsg(pm.fromMatrix(base_T_cam_ambf))
-camera = _client.get_obj_handle("cameraL")
 camera.set_pose(base_T_cam_ambf)
 
 time.sleep(1.0)

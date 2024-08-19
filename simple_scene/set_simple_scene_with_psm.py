@@ -17,6 +17,7 @@ time.sleep(0.2)  # Sleep after connecting the client
 psm_gripper = _client.get_obj_handle("Cube")
 psm_base = _client.get_obj_handle("/ambf/env/psm2/base")
 psm_gripper = _client.get_obj_handle("/ambf/env/psm2/toolyawlink")
+camera = _client.get_obj_handle("main_camera")
 
 time.sleep(0.2)  # Sleep after getting the object handles
 
@@ -55,9 +56,8 @@ cam_opencv_T_cam_ambf = np.array(
     [[0, 1, 0, 0], [0, 0, -1, 0], [-1, 0, 0, 0], [0, 0, 0, 1]]
 )
 base_T_cam_ambf = base_T_cam_opencv @ cam_opencv_T_cam_ambf
-
 base_T_cam_ambf = pm.toMsg(pm.fromMatrix(base_T_cam_ambf))
-camera = _client.get_obj_handle("cameraL")
+
 camera.set_pose(base_T_cam_ambf)
 
 time.sleep(1.0)

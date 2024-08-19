@@ -1,6 +1,6 @@
 enclosure size: { length: 10.0, width: 10.0, height: 3.0 }
 lights: [light2]
-cameras: [cameraL]
+cameras: [main_camera]
 environment: "./checkered_floor.yaml"
 namespace: /ambf/env/
 max iterations: 50
@@ -44,13 +44,13 @@ cam common configs:
   clipping plane: &cam_common_clipping_plane
     near: 0.001
     far: 10.0
-  field of view: &cam_common_fov 1.2 
+  field of view: &cam_common_fov 1.2 #0.614952
   publish image resolution: &cam_common_pub_img_res { width: 1300, height: 1024 } 
   publish depth resolution: &cam_common_pub_depth_res { width: 640, height: 480 }
 
-cameraL:
+main_camera:
   namespace: cameras/
-  name: cameraL
+  name: main_camera 
   location: { x: -0.10, y: 0.0, z: 0.0 }
   look at: { x: 0.0, y: 0.0, z: 0.0 }
   up: { x: 0.0, y: 1.0, z: 0.0 }
