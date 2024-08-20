@@ -33,6 +33,26 @@ make
 ambf_simulator --launch_file launch.yaml -l 1,2,3
 ```
 
+### Scene 4: Simple AR/AMBF pipeline (Incomplete documentation)
+
+1. Launch ZED mini camera and AMBF:
+```
+roslaunch zed_wrapper zedm.launch
+ambf_simulator --launch_file launch.yaml -l 0,4
+```
+2. Launch arUco detection
+```
+rosrun aruco_detection aruco_detector.py -c /zedm/zed_node/left -i
+```
+3. Launch script to control camera position based on marker pose
+```
+python zed_m_ar_example.py
+```
+4. Launch blending node 
+```
+python blending_no_ral.py
+```
+
 
 
 ## Notes:

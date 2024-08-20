@@ -51,18 +51,27 @@ def main():
     far = camera_params["clipping plane"]["far"]
     width = camera_params["publish image resolution"]["width"]
     height = camera_params["publish image resolution"]["height"]
-    print(f"near {near} far {far} width {width} height {height}")
+
 
     ################################
     # Load or hardcode camera matrix
     ################################
 
+    #ZED MINI
+    width = 640
+    height = 360
+    K = [333.00433349609375, 0.0, 319.36297607421875, 0.0, 333.00433349609375, 185.9060821533203, 0.0, 0.0, 1.0]
+    K = np.array(K).reshape(3,3)
+
+    # DVRK endoscope
     # fmt: off
-    K = np.array([1612.360913202219, 0, 605.9392282759331, 0, 1613.069791264788, 445.2610595411001, 0, 0, 1]).reshape(3, 3) 
+    # K = np.array([1612.360913202219, 0, 605.9392282759331, 0, 1613.069791264788, 445.2610595411001, 0, 0, 1]).reshape(3, 3) 
     # fmt: on
+
 
     fx = K[0, 0]
     fy = K[1, 1]
+    print(f"near {near} far {far} width {width} height {height}")
 
     #########################
     # Calculate field of view
