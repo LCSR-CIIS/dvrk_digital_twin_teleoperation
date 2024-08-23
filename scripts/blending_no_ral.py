@@ -38,7 +38,7 @@ class image_blender:
         self.update = True
         
     def __overlay_cb(self, msg):
-        # msg.encoding = "bgr8"
+        msg.encoding = "bgr8"
         self.overlay = self.bridge.imgmsg_to_cv2(msg, desired_encoding = 'rgb8')
         self.update = True
 
