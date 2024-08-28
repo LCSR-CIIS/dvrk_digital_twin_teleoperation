@@ -33,7 +33,7 @@
 #  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 #  POSSIBILITY OF SUCH DAMAGE.
 #
-#  $Author: Adnan Munawar $
+#  $Author: Juan Antonio Barragan $
 #  $Date:  $
 #  $Rev:  $
 
@@ -55,9 +55,18 @@ add_definitions(${AMBF_DEFINITIONS})
 
 message("---> LIBS " ${catkin_INCLUDE_DIRS})
 
+## Camera overwrite plugin
 add_library(camera_projection_override SHARED
             camera_projection_override/projection_override.cpp 
             camera_projection_override/projection_override.h)
 
 target_link_libraries(camera_projection_override ${AMBF_LIBRARIES})
 set_property(TARGET camera_projection_override PROPERTY POSITION_INDEPENDENT_CODE TRUE)
+
+## AR plugin 
+add_library(ar_ros_plugin SHARED
+            ar_ros_plugin/ar_ros_plugin.cpp 
+            ar_ros_plugin/ar_ros_plugin.h)
+
+target_link_libraries(ar_ros_plugin ${AMBF_LIBRARIES})
+set_property(TARGET ar_ros_plugin PROPERTY POSITION_INDEPENDENT_CODE TRUE)
