@@ -62,42 +62,30 @@ public:
     void updateHMDParams();
 
     void makeFullScreen();
-    void get_publish_img_resolution(const afBaseObjectAttribsPtr a_objectAttribs);
+    // Initialization methods
+    void set_window_size_to_pub_resolution(const afBaseObjectAttribsPtr a_objectAttribs);
+    void load_bg_quad_shaders();
+    void create_screen_filling_quad();
 
     // ROS attributes and callbacks
     ros::NodeHandle *ros_node_handle;
     ros::Subscriber left_sub;
     void left_img_callback(const sensor_msgs::ImageConstPtr &msg);
-    // void right_img_callback(const sensor_msgs::ImageConstPtr &msg);
     cv_bridge::CvImagePtr left_img_ptr = nullptr;
-    // cv_bridge::CvImagePtr right_img_ptr = nullptr;
-    // cv_bridge::CvImagePtr concat_img_ptr = nullptr;
-    // int clipsize = 0.3;
-    void set_ros_texture();
+    void process_and_set_ros_texture();
 
     cTexture2dPtr m_rosImageTexture;
-    cTexture2dPtr sample_texture;
+    cTexture2dPtr ros_texture;
 
 protected:
+    string g_current_filepath;
     afCameraPtr m_camera;
-    // cFrameBufferPtr m_frameBuffer;
     cWorld *m_back_layer_world;
     cMesh *m_screen_filling_quad;
     int m_width;
     int m_height;
-    // int m_alias_scaling;
     cShaderProgramPtr m_shaderPgm;
 
-    // protected:
-    //     float m_viewport_scale[2];
-    //     float m_distortion_coeffs[4];
-    //     float m_aberr_scale[3];
-    //     float m_sep;
-    //     float m_left_lens_center[2];
-    //     float m_right_lens_center[2];
-    //     float m_warp_scale;
-    //     float m_warp_adj;
-    //     float m_vpos;
 };
 
 AF_REGISTER_OBJECT_PLUGIN(afCameraHMD)
