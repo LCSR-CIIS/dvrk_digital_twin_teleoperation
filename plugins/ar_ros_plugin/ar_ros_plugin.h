@@ -63,15 +63,17 @@ public:
 
     void makeFullScreen();
     // Initialization methods
+    string read_rostopic_from_config(const afBaseObjectAttribsPtr a_objectAttribs);
+    void initilize_ros_subscribers(const afBaseObjectAttribsPtr a_objectAttribs);
     void set_window_size_to_pub_resolution(const afBaseObjectAttribsPtr a_objectAttribs);
     void load_bg_quad_shaders();
     void create_screen_filling_quad();
 
     // ROS attributes and callbacks
     ros::NodeHandle *ros_node_handle;
-    ros::Subscriber left_sub;
+    ros::Subscriber img_subscriber;
     void left_img_callback(const sensor_msgs::ImageConstPtr &msg);
-    cv_bridge::CvImagePtr left_img_ptr = nullptr;
+    cv_bridge::CvImagePtr img_ptr = nullptr;
     void process_and_set_ros_texture();
 
     cTexture2dPtr m_rosImageTexture;
@@ -85,7 +87,6 @@ protected:
     int m_width;
     int m_height;
     cShaderProgramPtr m_shaderPgm;
-
 };
 
 AF_REGISTER_OBJECT_PLUGIN(afCameraHMD)

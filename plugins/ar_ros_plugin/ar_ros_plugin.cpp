@@ -82,6 +82,38 @@ void afCameraHMD::set_window_size_to_pub_resolution(const afBaseObjectAttribsPtr
     // cout << "Width: " << m_width << " Height: " << m_height << endl;
 }
 
+string afCameraHMD::read_rostopic_from_config(const afBaseObjectAttribsPtr a_objectAttribs)
+{
+    YAML::Node specificationDataNode;
+
+    specificationDataNode = YAML::Load(a_objectAttribs->getSpecificationData().m_rawData);
+
+    YAML::Node publish_img_res_node = specificationDataNode["ar-ros plugin config"];
+
+    string rostopic = publish_img_res_node["rostopic"].as<string>();
+    
+    cout << "INFO! reading images from rostopic: " << rostopic << endl;
+
+    return rostopic; 
+}
+
+void afCameraHMD::initilize_ros_subscribers(const afBaseObjectAttribsPtr a_objectAttribs)
+{
+    
+    ros_node_handle = afROSNode::getNode();
+
+    string rostopic = read_rostopic_from_config(a_objectAttribs);
+
+    img_subscriber = ros_node_handle->subscribe(rostopic, 2, &afCameraHMD::left_img_callback, this);
+
+    // Ambf camera
+    // img_subscriber = ros_node_handle->subscribe("/ambf/env/cameras/stereoL/ImageData", 2, &afCameraHMD::left_img_callback, this);
+    // right_sub = ros_node_handle->subscribe("/ambf/env/cameras/stereoR/ImageData", 2, &afCameraHMD::right_img_callback, this);
+    // Zed mini
+    // img_subscriber = ros_node_handle->subscribe("/zedm/zed_node/left/image_rect_color", 2, &afCameraHMD::left_img_callback, this);
+    // right_sub = ros_node_handle->subscribe("/zedm/zed_node/right/image_rect_color", 2, &afCameraHMD::right_img_callback, this);
+}
+
 void afCameraHMD::load_bg_quad_shaders()
 {
     afShaderAttributes shaderAttribs;
@@ -154,22 +186,15 @@ int afCameraHMD::init(const afBaseObjectPtr a_afObjectPtr, const afBaseObjectAtt
 {
 
     g_current_filepath = get_current_filepath();
-    ros_node_handle = afROSNode::getNode();
+    initilize_ros_subscribers(a_objectAttribs);
 
-    // Ambf camera
-    // left_sub = ros_node_handle->subscribe("/ambf/env/cameras/stereoL/ImageData", 2, &afCameraHMD::left_img_callback, this);
-    // right_sub = ros_node_handle->subscribe("/ambf/env/cameras/stereoR/ImageData", 2, &afCameraHMD::right_img_callback, this);
-    // Zed mini
-    left_sub = ros_node_handle->subscribe("/zedm/zed_node/left/image_rect_color", 2, &afCameraHMD::left_img_callback, this);
-    // right_sub = ros_node_handle->subscribe("/zedm/zed_node/right/image_rect_color", 2, &afCameraHMD::right_img_callback, this);
-
+    // Camera config
     m_camera = (afCameraPtr)a_afObjectPtr;
-
     // No need to override rendering. Camera textures will be added to the back layer of the current scene.
     m_camera->setOverrideRendering(false);
-
     set_window_size_to_pub_resolution(a_objectAttribs);
     glfwSetWindowSize(m_camera->m_window, m_width, m_height);
+
 
     // Load shader program into m_shaderPgm
     load_bg_quad_shaders();
@@ -206,7 +231,6 @@ void afCameraHMD::graphicsUpdate()
     ro.m_updateLabels = true;
 
     // process_and_set_ros_texture(); // NOTE: this does not work. Texture needs to be processed and update inside the ros callback
-
 }
 
 void afCameraHMD::physicsUpdate(double dt)
@@ -227,7 +251,6 @@ void afCameraHMD::updateHMDParams()
     GLint id = m_shaderPgm->getId();
     // cerr << "INFO! Shader ID " << id << endl;
     glUseProgram(id);
-
 }
 
 void afCameraHMD::makeFullScreen()
@@ -253,7 +276,7 @@ void afCameraHMD::left_img_callback(const sensor_msgs::ImageConstPtr &msg)
 {
     try
     {
-        left_img_ptr = cv_bridge::toCvCopy(msg, msg->encoding);
+        img_ptr = cv_bridge::toCvCopy(msg, msg->encoding);
     }
     catch (cv_bridge::Exception &e)
     {
@@ -263,35 +286,35 @@ void afCameraHMD::left_img_callback(const sensor_msgs::ImageConstPtr &msg)
     process_and_set_ros_texture();
 
     // Visualize the ros image
-    // cv::imshow("Left img", left_img_ptr->image);
+    // cv::imshow("Left img", img_ptr->image);
     // cv::waitKey(1);
 }
 
 void afCameraHMD::process_and_set_ros_texture()
 {
-    if (left_img_ptr != nullptr)
+    if (img_ptr != nullptr)
     {
-        cv::cvtColor(left_img_ptr->image, left_img_ptr->image, cv::COLOR_RGBA2BGRA);
-        cv::flip(left_img_ptr->image, left_img_ptr->image, 0);
+        cv::cvtColor(img_ptr->image, img_ptr->image, cv::COLOR_RGBA2BGRA);
+        cv::flip(img_ptr->image, img_ptr->image, 0);
 
-        int ros_image_size = left_img_ptr->image.cols * left_img_ptr->image.rows * left_img_ptr->image.elemSize();
+        int ros_image_size = img_ptr->image.cols * img_ptr->image.rows * img_ptr->image.elemSize();
         int texture_image_size = ros_texture->m_image->getWidth() * ros_texture->m_image->getHeight() * ros_texture->m_image->getBytesPerPixel();
 
         if (ros_image_size != texture_image_size)
         {
             cout << "INFO! Initilizing rosImageTexture" << endl;
-            // For ZED 2i and AMBF rostopics - 
+            // For ZED 2i and AMBF rostopics -
             // TODO:Note img fmt should probably not be hard-coded.
             ros_texture->m_image->erase();
-            ros_texture->m_image->allocate(left_img_ptr->image.cols, left_img_ptr->image.rows, GL_RGBA, GL_UNSIGNED_BYTE);
-            ros_texture->m_image->setData(left_img_ptr->image.data, ros_image_size);
+            ros_texture->m_image->allocate(img_ptr->image.cols, img_ptr->image.rows, GL_RGBA, GL_UNSIGNED_BYTE);
+            ros_texture->m_image->setData(img_ptr->image.data, ros_image_size);
 
             // Save for debugging
             // ros_texture->saveToFile("rosImageTexture_juan.png");
         }
         else
         {
-            ros_texture->m_image->setData(left_img_ptr->image.data, ros_image_size);
+            ros_texture->m_image->setData(img_ptr->image.data, ros_image_size);
         }
         ros_texture->markForUpdate();
     }

@@ -34,6 +34,7 @@ ar_m_camera:
   #    fragment: shader.fs
   # multipass: true
   mouse control multipliers: { pan: 0.1, rotate: 1.0, scroll: 0.1, arcball: 0.1 }
+  ## PLUGIN CONFIG
   plugins: [
     {
       name: ar_ros_plugin,
@@ -46,6 +47,9 @@ ar_m_camera:
       filename: libcamera_projection_override.so
     }
   ]
+  ar-ros plugin config:
+    rostopic: "/zedm/zed_node/right/image_rect_color"
+    # rostopic: "/ambf/env/cameras/main_camera/ImageData"
   ## option 2
   ## Calculated from calculate_projection_matrix.py
   projection matrix: [[ 1.04064,  0.     ,  0.     ,  0.     ],
