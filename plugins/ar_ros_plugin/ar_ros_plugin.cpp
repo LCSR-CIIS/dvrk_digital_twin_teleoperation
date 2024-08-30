@@ -66,122 +66,7 @@ string get_current_filepath()
 
 afCameraHMD::afCameraHMD() {}
 
-void afCameraHMD::set_window_size_to_pub_resolution(const afBaseObjectAttribsPtr a_objectAttribs)
-{
-    YAML::Node specificationDataNode;
-    // Print yaml data
-    // cerr << "INFO! SPECIFICATION DATA " << a_objectAttribs->getSpecificationData().m_rawData << endl;
-
-    specificationDataNode = YAML::Load(a_objectAttribs->getSpecificationData().m_rawData);
-
-    YAML::Node publish_img_res_node = specificationDataNode["publish image resolution"];
-
-    m_width = publish_img_res_node["width"].as<int>();
-    m_height = publish_img_res_node["height"].as<int>();
-
-    // cout << "Width: " << m_width << " Height: " << m_height << endl;
-}
-
-string afCameraHMD::read_rostopic_from_config(const afBaseObjectAttribsPtr a_objectAttribs)
-{
-    YAML::Node specificationDataNode;
-
-    specificationDataNode = YAML::Load(a_objectAttribs->getSpecificationData().m_rawData);
-
-    YAML::Node publish_img_res_node = specificationDataNode["ar-ros plugin config"];
-
-    string rostopic = publish_img_res_node["rostopic"].as<string>();
-    
-    cout << "INFO! reading images from rostopic: " << rostopic << endl;
-
-    return rostopic; 
-}
-
-void afCameraHMD::initilize_ros_subscribers(const afBaseObjectAttribsPtr a_objectAttribs)
-{
-    
-    ros_node_handle = afROSNode::getNode();
-
-    string rostopic = read_rostopic_from_config(a_objectAttribs);
-
-    img_subscriber = ros_node_handle->subscribe(rostopic, 2, &afCameraHMD::left_img_callback, this);
-
-    // Ambf camera
-    // img_subscriber = ros_node_handle->subscribe("/ambf/env/cameras/stereoL/ImageData", 2, &afCameraHMD::left_img_callback, this);
-    // right_sub = ros_node_handle->subscribe("/ambf/env/cameras/stereoR/ImageData", 2, &afCameraHMD::right_img_callback, this);
-    // Zed mini
-    // img_subscriber = ros_node_handle->subscribe("/zedm/zed_node/left/image_rect_color", 2, &afCameraHMD::left_img_callback, this);
-    // right_sub = ros_node_handle->subscribe("/zedm/zed_node/right/image_rect_color", 2, &afCameraHMD::right_img_callback, this);
-}
-
-void afCameraHMD::load_bg_quad_shaders()
-{
-    afShaderAttributes shaderAttribs;
-    shaderAttribs.m_shaderDefined = true;
-    shaderAttribs.m_vtxFilepath = g_current_filepath + "/shaders/hmd_distortion.vs";
-    shaderAttribs.m_fragFilepath = g_current_filepath + "/shaders/hmd_distortion.fs";
-
-    m_shaderPgm = afShaderUtils::createFromAttribs(&shaderAttribs, "TEST", "VR_CAM");
-}
-
-void afCameraHMD::create_screen_filling_quad()
-{
-
-    // Load an initial texture that can be displayed while the first ros image is received
-    // todo:Note: Bigger initial texture -- things will not work well with this bigger texture.
-    string texture_path = g_current_filepath + "/../textures/sample1300x1024.jpg";
-    // Texture witht the same resolution as the zed mini
-    // string texture_path = g_current_filepath + "/../textures/sample640x360.jpg";
-    cImagePtr sample_img = cImage::create();
-    bool success = sample_img->loadFromFile(texture_path);
-    if (!success)
-    {
-        cerr << "ERROR! FAILED TO LOAD TEXTURE from " << texture_path << endl;
-    }
-
-    // Texture that will be updated with the ros image
-    ros_texture = cTexture2d::create();
-    ros_texture->setImage(sample_img);
-
-    m_screen_filling_quad = new cMesh();
-    // clang-format off
-    float quad[] = {
-        // positions
-        -1.0f,  1.0f, 0.0f,
-        -1.0f, -1.0f, 0.0f, 
-         1.0f, -1.0f, 0.0f, 
-        -1.0f,  1.0f, 0.0f,
-         1.0f, -1.0f, 0.0f,
-         1.0f,  1.0f, 0.0  };
-    // clang-format on
-
-    for (int vI = 0; vI < 2; vI++)
-    {
-        int off = vI * 9;
-        cVector3d v0(quad[off + 0], quad[off + 1], quad[off + 2]);
-        cVector3d v1(quad[off + 3], quad[off + 4], quad[off + 5]);
-        cVector3d v2(quad[off + 6], quad[off + 7], quad[off + 8]);
-        m_screen_filling_quad->newTriangle(v0, v1, v2);
-    }
-    m_screen_filling_quad->m_vertices->setTexCoord(1, 0.0, 0.0, 1.0);
-    m_screen_filling_quad->m_vertices->setTexCoord(2, 1.0, 0.0, 1.0);
-    m_screen_filling_quad->m_vertices->setTexCoord(0, 0.0, 1.0, 1.0);
-    m_screen_filling_quad->m_vertices->setTexCoord(3, 0.0, 1.0, 1.0);
-    m_screen_filling_quad->m_vertices->setTexCoord(4, 1.0, 0.0, 1.0);
-    m_screen_filling_quad->m_vertices->setTexCoord(5, 1.0, 1.0, 1.0);
-
-    m_screen_filling_quad->computeAllNormals();
-
-    // Objects have multiple textures available in AMBF.
-    // To pass multiple textures to the shader, we can use these multiple default textures.
-    m_screen_filling_quad->m_texture = ros_texture;
-    // m_quadMesh->m_metallicTexture = m_frameBuffer->m_imageBuffer;
-
-    m_screen_filling_quad->setUseTexture(true);
-    m_screen_filling_quad->setShaderProgram(m_shaderPgm);
-    m_screen_filling_quad->setShowEnabled(true);
-}
-
+// PLUGIN ENTRY POINT
 int afCameraHMD::init(const afBaseObjectPtr a_afObjectPtr, const afBaseObjectAttribsPtr a_objectAttribs)
 {
 
@@ -318,4 +203,120 @@ void afCameraHMD::process_and_set_ros_texture()
         }
         ros_texture->markForUpdate();
     }
+}
+
+void afCameraHMD::set_window_size_to_pub_resolution(const afBaseObjectAttribsPtr a_objectAttribs)
+{
+    YAML::Node specificationDataNode;
+    // Print yaml data
+    // cerr << "INFO! SPECIFICATION DATA " << a_objectAttribs->getSpecificationData().m_rawData << endl;
+
+    specificationDataNode = YAML::Load(a_objectAttribs->getSpecificationData().m_rawData);
+
+    YAML::Node publish_img_res_node = specificationDataNode["publish image resolution"];
+
+    m_width = publish_img_res_node["width"].as<int>();
+    m_height = publish_img_res_node["height"].as<int>();
+
+    // cout << "Width: " << m_width << " Height: " << m_height << endl;
+}
+
+string afCameraHMD::read_rostopic_from_config(const afBaseObjectAttribsPtr a_objectAttribs)
+{
+    YAML::Node specificationDataNode;
+
+    specificationDataNode = YAML::Load(a_objectAttribs->getSpecificationData().m_rawData);
+
+    YAML::Node publish_img_res_node = specificationDataNode["ar-ros plugin config"];
+
+    string rostopic = publish_img_res_node["rostopic"].as<string>();
+    
+    cout << "INFO! reading images from rostopic: " << rostopic << endl;
+
+    return rostopic; 
+}
+
+void afCameraHMD::initilize_ros_subscribers(const afBaseObjectAttribsPtr a_objectAttribs)
+{
+    
+    ros_node_handle = afROSNode::getNode();
+
+    string rostopic = read_rostopic_from_config(a_objectAttribs);
+
+    img_subscriber = ros_node_handle->subscribe(rostopic, 2, &afCameraHMD::left_img_callback, this);
+
+    // Ambf camera
+    // img_subscriber = ros_node_handle->subscribe("/ambf/env/cameras/stereoL/ImageData", 2, &afCameraHMD::left_img_callback, this);
+    // right_sub = ros_node_handle->subscribe("/ambf/env/cameras/stereoR/ImageData", 2, &afCameraHMD::right_img_callback, this);
+    // Zed mini
+    // img_subscriber = ros_node_handle->subscribe("/zedm/zed_node/left/image_rect_color", 2, &afCameraHMD::left_img_callback, this);
+    // right_sub = ros_node_handle->subscribe("/zedm/zed_node/right/image_rect_color", 2, &afCameraHMD::right_img_callback, this);
+}
+
+void afCameraHMD::load_bg_quad_shaders()
+{
+    afShaderAttributes shaderAttribs;
+    shaderAttribs.m_shaderDefined = true;
+    shaderAttribs.m_vtxFilepath = g_current_filepath + "/shaders/hmd_distortion.vs";
+    shaderAttribs.m_fragFilepath = g_current_filepath + "/shaders/hmd_distortion.fs";
+
+    m_shaderPgm = afShaderUtils::createFromAttribs(&shaderAttribs, "TEST", "VR_CAM");
+}
+
+void afCameraHMD::create_screen_filling_quad()
+{
+
+    // Load an initial texture that can be displayed while the first ros image is received
+    // todo:Note: Bigger initial texture -- things will not work well with this bigger texture.
+    string texture_path = g_current_filepath + "/../textures/sample1300x1024.jpg";
+    // Texture witht the same resolution as the zed mini
+    // string texture_path = g_current_filepath + "/../textures/sample640x360.jpg";
+    cImagePtr sample_img = cImage::create();
+    bool success = sample_img->loadFromFile(texture_path);
+    if (!success)
+    {
+        cerr << "ERROR! FAILED TO LOAD TEXTURE from " << texture_path << endl;
+    }
+
+    // Texture that will be updated with the ros image
+    ros_texture = cTexture2d::create();
+    ros_texture->setImage(sample_img);
+
+    m_screen_filling_quad = new cMesh();
+    // clang-format off
+    float quad[] = {
+        // positions
+        -1.0f,  1.0f, 0.0f,
+        -1.0f, -1.0f, 0.0f, 
+         1.0f, -1.0f, 0.0f, 
+        -1.0f,  1.0f, 0.0f,
+         1.0f, -1.0f, 0.0f,
+         1.0f,  1.0f, 0.0  };
+    // clang-format on
+
+    for (int vI = 0; vI < 2; vI++)
+    {
+        int off = vI * 9;
+        cVector3d v0(quad[off + 0], quad[off + 1], quad[off + 2]);
+        cVector3d v1(quad[off + 3], quad[off + 4], quad[off + 5]);
+        cVector3d v2(quad[off + 6], quad[off + 7], quad[off + 8]);
+        m_screen_filling_quad->newTriangle(v0, v1, v2);
+    }
+    m_screen_filling_quad->m_vertices->setTexCoord(1, 0.0, 0.0, 1.0);
+    m_screen_filling_quad->m_vertices->setTexCoord(2, 1.0, 0.0, 1.0);
+    m_screen_filling_quad->m_vertices->setTexCoord(0, 0.0, 1.0, 1.0);
+    m_screen_filling_quad->m_vertices->setTexCoord(3, 0.0, 1.0, 1.0);
+    m_screen_filling_quad->m_vertices->setTexCoord(4, 1.0, 0.0, 1.0);
+    m_screen_filling_quad->m_vertices->setTexCoord(5, 1.0, 1.0, 1.0);
+
+    m_screen_filling_quad->computeAllNormals();
+
+    // Objects have multiple textures available in AMBF.
+    // To pass multiple textures to the shader, we can use these multiple default textures.
+    m_screen_filling_quad->m_texture = ros_texture;
+    // m_quadMesh->m_metallicTexture = m_frameBuffer->m_imageBuffer;
+
+    m_screen_filling_quad->setUseTexture(true);
+    m_screen_filling_quad->setShaderProgram(m_shaderPgm);
+    m_screen_filling_quad->setShowEnabled(true);
 }
