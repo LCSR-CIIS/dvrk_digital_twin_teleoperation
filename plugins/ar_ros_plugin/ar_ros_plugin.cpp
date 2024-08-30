@@ -129,9 +129,9 @@ void afCameraHMD::create_screen_filling_quad()
 
     // Load an initial texture that can be displayed while the first ros image is received
     // todo:Note: Bigger initial texture -- things will not work well with this bigger texture.
-    // string texture_path = g_current_filepath + "/../textures/raw_img.jpg";
+    string texture_path = g_current_filepath + "/../textures/sample1300x1024.jpg";
     // Texture witht the same resolution as the zed mini
-    string texture_path = g_current_filepath + "/../textures/test_sample.jpg";
+    // string texture_path = g_current_filepath + "/../textures/sample640x360.jpg";
     cImagePtr sample_img = cImage::create();
     bool success = sample_img->loadFromFile(texture_path);
     if (!success)
@@ -310,7 +310,7 @@ void afCameraHMD::process_and_set_ros_texture()
             ros_texture->m_image->setData(img_ptr->image.data, ros_image_size);
 
             // Save for debugging
-            // ros_texture->saveToFile("rosImageTexture_juan.png");
+            ros_texture->saveToFile("rosImageTexture_juan.png");
         }
         else
         {

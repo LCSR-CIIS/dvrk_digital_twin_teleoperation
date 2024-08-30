@@ -27,7 +27,10 @@ ar_m_camera:
   # publish depth: true
   # publish depth noise: {mean: 0.1, std_dev: 0.01, bias: 0.0}
   # publish depth interval: 5   # Publish every nth scene update
-  publish image resolution: {width: 640, height: 360}
+
+  # publish image resolution: {width: 640, height: 360} #zedm
+  publish image resolution: {width: 1300, height: 1024}   #davinci endoscope
+
   # depth compute shaders:
   #    path: ../../../ambf_shaders/depth
   #    vertex: shader.vs
@@ -48,8 +51,9 @@ ar_m_camera:
     }
   ]
   ar-ros plugin config:
-    rostopic: "/zedm/zed_node/right/image_rect_color"
+    # rostopic: "/zedm/zed_node/right/image_rect_color"
     # rostopic: "/ambf/env/cameras/main_camera/ImageData"
+    rostopic: "/jhu_daVinci/right/image_rect_color"
   ## option 2
   ## Calculated from calculate_projection_matrix.py
   projection matrix: [[ 1.04064,  0.     ,  0.     ,  0.     ],
