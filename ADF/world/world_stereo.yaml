@@ -59,7 +59,6 @@ cameraL:
   clipping plane: *cam_common_clipping_plane
   field view angle: *cam_common_fov 
   monitor: 1
-  parent: BODY CameraFrame
   publish image: True
   publish image interval: 1
   publish image resolution: *cam_common_pub_img_res 
@@ -67,11 +66,6 @@ cameraL:
   publish depth resolution: *cam_common_pub_depth_res
   multipass: False # Set to True to enable shadows
   mouse control multipliers: { pan: 0.1, rotate: 1.0, scroll: 0.1, arcball: 0.1 }
-  projection matrix: 
-    [[ 5.05844187,  0.        ,  1.65314025,  0.        ],
-      [ 0.        ,  6.74458917,  2.45976421,  0.        ],
-      [ 0.        ,  0.        , -1.002002  , -0.02002002],
-      [ 0.        ,  0.        , -1.        ,  0.        ]]
   # With alternative derivation
   # projection matrix:  
   #   [[ 5.05844187,  0.        , -0.65314025,  0.        ], 
