@@ -1,7 +1,8 @@
-# Simple testing scene to test Augmented reality pipeline.
+# Augmented reality pipeline tests.
 
+## Simple tests
 
-## Scene 1: Simple scene with cube
+### Scene 1: Simple scene with cube
 
 ```
 ambf_simulator --launch_file launch.yaml -l 0 
@@ -10,7 +11,7 @@ ambf_simulator --launch_file launch.yaml -l 0
 python set_simple_scene_with_psm.py
 ```
 
-## Scene 2: Simple scene with PSM
+### Scene 2: Simple scene with PSM
 
 ```
 ambf_simulator --launch_file launch.yaml -l 1,2 
@@ -19,7 +20,7 @@ ambf_simulator --launch_file launch.yaml -l 1,2
 python set_simple_scene_with_psm.py
 ```
 
-## Scene 3: Simple scene with PSM and custom camera projection
+### Scene 3: Simple scene with PSM and custom camera projection
 1. First compile the camera projection override
 ```
 cd <root-of-dvrk-teleoperation>/plugins/
@@ -33,7 +34,11 @@ make
 ambf_simulator --launch_file launch.yaml -l 1,2,3
 ```
 
-### Scene 4: Simple AR/AMBF pipeline (Incomplete documentation)
+## FULL AR pipelines
+ 
+Before running the AR pipelines make sure to compile the `camera_projection_override` and `ros_ar` plugins.
+
+### Scene 4: Simple AR/AMBF pipeline with Cube 
 
 1. Launch ZED mini camera and AMBF:
 ```
@@ -53,7 +58,17 @@ python zed_m_ar_example.py
 python blending_no_ral.py
 ```
 
-
+### Scene 5: Simple AR/AMBF pipeline with  PSM
+1. Calculate projection matrix.
+2. Add hand-eye calibration.
+3. Run AMBF with PSM
+```
+ambf_simulator --launch_file launch.yaml -l 1,2,5
+```
+4. Run AR pipeline
+```
+python zed_m_psm_ar_example.py
+```
 
 ## Notes:
 - To compare real and virtual images use virtual images from the rostopic. A simple way to save images from the rostopic is to use ros tool `image_view` and then right click on the window to save the image.
