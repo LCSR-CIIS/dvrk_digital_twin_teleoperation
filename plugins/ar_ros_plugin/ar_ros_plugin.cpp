@@ -76,7 +76,7 @@ int afCameraHMD::init(const afBaseObjectPtr a_afObjectPtr, const afBaseObjectAtt
     // Camera config
     m_camera = (afCameraPtr)a_afObjectPtr;
     // No need to override rendering. Camera textures will be added to the back layer of the current scene.
-    m_camera->setOverrideRendering(false);
+    m_camera->setOverrideRendering(true);
     set_window_size_to_pub_resolution(a_objectAttribs);
     glfwSetWindowSize(m_camera->m_window, m_width, m_height);
 
@@ -110,12 +110,14 @@ void afCameraHMD::graphicsUpdate()
         first_time = false;
     }
 
-    // updateHMDParams();
+    glfwMakeContextCurrent(m_camera->m_window); 
+    process_and_set_ros_texture(); // todo: this does not work. Texture needs to be processed and update inside the ros callback
+    updateHMDParams();
 
     afRenderOptions ro;
     ro.m_updateLabels = true;
+    m_camera->render(ro);
 
-    // process_and_set_ros_texture(); // todo: this does not work. Texture needs to be processed and update inside the ros callback
 }
 
 void afCameraHMD::physicsUpdate(double dt)
@@ -168,7 +170,7 @@ void afCameraHMD::left_img_callback(const sensor_msgs::ImageConstPtr &msg)
         ROS_ERROR("Could not convert");
     }
 
-    process_and_set_ros_texture();
+    // process_and_set_ros_texture();
 
     // Visualize the ros image
     // cv::imshow("Left img", img_ptr->image);
