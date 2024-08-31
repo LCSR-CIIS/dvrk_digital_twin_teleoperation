@@ -206,7 +206,7 @@ void afCameraHMD::process_and_set_ros_texture()
             ros_texture->m_image->setData(img_ptr_copy->image.data, ros_image_size);
 
             // Save for debugging
-            ros_texture->saveToFile("rosImageTexture_juan.png");
+            // ros_texture->saveToFile("rosImageTexture_juan.png");
         }
         else
         {
