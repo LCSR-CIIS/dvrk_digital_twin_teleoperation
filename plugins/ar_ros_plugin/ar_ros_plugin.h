@@ -72,21 +72,26 @@ public:
     // ROS attributes and callbacks
     ros::NodeHandle *ros_node_handle;
     ros::Subscriber img_subscriber;
+    ros::Subscriber ar_activate_subscriber;
+    void ar_activate_callback(const std_msgs::Bool::ConstPtr &msg);
     void left_img_callback(const sensor_msgs::ImageConstPtr &msg);
     cv_bridge::CvImagePtr img_ptr = nullptr;
     void process_and_set_ros_texture();
 
-    cTexture2dPtr m_rosImageTexture;
     cTexture2dPtr ros_texture;
 
 protected:
     string g_current_filepath;
     afCameraPtr m_camera;
-    cWorld *m_back_layer_world;
     cMesh *m_screen_filling_quad;
+    bool activate_ar = true;
     int m_width;
     int m_height;
     cShaderProgramPtr m_shaderPgm;
+
+    cWorld *m_back_layer_world;
+    cWorld *empty_world;
+    cWorld *ar_world;
 };
 
 AF_REGISTER_OBJECT_PLUGIN(afCameraHMD)
