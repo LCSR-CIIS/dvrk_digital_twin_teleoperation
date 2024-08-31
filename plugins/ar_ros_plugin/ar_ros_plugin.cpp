@@ -110,12 +110,12 @@ void afCameraHMD::graphicsUpdate()
         first_time = false;
     }
 
-    updateHMDParams();
+    // updateHMDParams();
 
     afRenderOptions ro;
     ro.m_updateLabels = true;
 
-    // process_and_set_ros_texture(); // NOTE: this does not work. Texture needs to be processed and update inside the ros callback
+    // process_and_set_ros_texture(); // todo: this does not work. Texture needs to be processed and update inside the ros callback
 }
 
 void afCameraHMD::physicsUpdate(double dt)
@@ -175,14 +175,25 @@ void afCameraHMD::left_img_callback(const sensor_msgs::ImageConstPtr &msg)
     // cv::waitKey(1);
 }
 
+// TODO: this doesn't seem to be doing anything useful if the callback process the image.
+void img_ptr_deep_copy(cv_bridge::CvImagePtr &img_ptr, cv_bridge::CvImagePtr &img_ptr_copy)
+{
+    img_ptr_copy->image = img_ptr->image.clone();
+    img_ptr_copy->encoding = img_ptr->encoding;
+    img_ptr_copy->header = img_ptr->header;
+}
+
 void afCameraHMD::process_and_set_ros_texture()
 {
     if (img_ptr != nullptr)
     {
-        cv::cvtColor(img_ptr->image, img_ptr->image, cv::COLOR_RGBA2BGRA);
-        cv::flip(img_ptr->image, img_ptr->image, 0);
+        cv_bridge::CvImagePtr img_ptr_copy = boost::make_shared<cv_bridge::CvImage>();;
+        img_ptr_deep_copy(img_ptr, img_ptr_copy);
 
-        int ros_image_size = img_ptr->image.cols * img_ptr->image.rows * img_ptr->image.elemSize();
+        cv::cvtColor(img_ptr_copy->image, img_ptr_copy->image, cv::COLOR_RGBA2BGRA);
+        cv::flip(img_ptr_copy->image, img_ptr_copy->image, 0);
+
+        int ros_image_size = img_ptr_copy->image.cols * img_ptr_copy->image.rows * img_ptr_copy->image.elemSize();
         int texture_image_size = ros_texture->m_image->getWidth() * ros_texture->m_image->getHeight() * ros_texture->m_image->getBytesPerPixel();
 
         if (ros_image_size != texture_image_size)
@@ -191,15 +202,15 @@ void afCameraHMD::process_and_set_ros_texture()
             // For ZED 2i and AMBF rostopics -
             // TODO:Note img fmt should probably not be hard-coded.
             ros_texture->m_image->erase();
-            ros_texture->m_image->allocate(img_ptr->image.cols, img_ptr->image.rows, GL_RGBA, GL_UNSIGNED_BYTE);
-            ros_texture->m_image->setData(img_ptr->image.data, ros_image_size);
+            ros_texture->m_image->allocate(img_ptr_copy->image.cols, img_ptr_copy->image.rows, GL_RGBA, GL_UNSIGNED_BYTE);
+            ros_texture->m_image->setData(img_ptr_copy->image.data, ros_image_size);
 
             // Save for debugging
             ros_texture->saveToFile("rosImageTexture_juan.png");
         }
         else
         {
-            ros_texture->m_image->setData(img_ptr->image.data, ros_image_size);
+            ros_texture->m_image->setData(img_ptr_copy->image.data, ros_image_size);
         }
         ros_texture->markForUpdate();
     }
