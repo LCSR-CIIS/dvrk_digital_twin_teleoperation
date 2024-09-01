@@ -60,14 +60,13 @@ python blending_no_ral.py
 
 ### Scene 5: Simple AR/AMBF pipeline with  PSM
 1. Calculate projection matrix.
-2. Add hand-eye calibration.
-3. Run AMBF with PSM
+2. Run AMBF with PSM
 ```
 ambf_simulator --launch_file launch.yaml -l 1,2,5
 ```
 4. Run AR pipeline
 ```
-python zed_m_psm_ar_example.py
+python zed_m_psm_ar_example.py -H /home/juan95/Downloads/davinci_ar_data/endoscope_demo/PSM2-registration-open-cv.json
 ```
 
 ## Notes:
