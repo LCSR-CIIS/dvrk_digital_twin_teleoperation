@@ -18,7 +18,7 @@ from surgical_robotics_challenge.kinematics.psmKinematics import PSMType, ToolTy
 from surgical_robotics_challenge.kinematics.psmKinematics import PSMKinematicSolver
 import sys
 import time
-
+import tf_conversions.posemath as pm
 # Global kinematic solver
 psm_solver = PSMKinematicSolver(
     psm_type=PSMType.LND_SI.value, tool_id=ToolType.LND_SI.value
@@ -345,7 +345,7 @@ class dvrk_teleoperation_ambf:
             )
 
         # ambf startup
-        cameraframe_obj = self.ambf_client.get_obj_handle("/CameraFrame")
+        cameraframe_obj = self.ambf_client.get_obj_handle("/ambf/env/cameras/cameraL")
         cameraleft_obj = self.ambf_client.get_obj_handle("/ambf/env/cameras/cameraL")
         cameraright_obj = self.ambf_client.get_obj_handle("/ambf/env/cameras/cameraR")
         self.psmtool_obj = self.ambf_client.get_obj_handle("/ambf/env/psm2/toolyawlink")
@@ -436,19 +436,19 @@ class dvrk_teleoperation_ambf:
 
         T_w_cameraframe = crtk.msg_conversions.FrameFromPoseMsg(T_w_c_real.pose)
         # sets the virtual camera to mirror the real system readings
-        cameraframe_obj.set_pos(
-            T_w_c_real.pose.position.x,
-            T_w_c_real.pose.position.y,
-            T_w_c_real.pose.position.z,
-        )
-        cameraframe_obj.set_rot(
-            [
-                T_w_c_real.pose.orientation.x,
-                T_w_c_real.pose.orientation.y,
-                T_w_c_real.pose.orientation.z,
-                T_w_c_real.pose.orientation.w,
-            ]
-        )
+        # cameraframe_obj.set_pos(
+        #     T_w_c_real.pose.position.x,
+        #     T_w_c_real.pose.position.y,
+        #     T_w_c_real.pose.position.z,
+        # )
+        # cameraframe_obj.set_rot(
+        #     [
+        #         T_w_c_real.pose.orientation.x,
+        #         T_w_c_real.pose.orientation.y,
+        #         T_w_c_real.pose.orientation.z,
+        #         T_w_c_real.pose.orientation.w,
+        #     ]
+        # )
 
         # sets the virtual PSM base frame based on the computed mean
         T_w_psmbase = crtk.msg_conversions.FrameToPoseMsg(
@@ -475,40 +475,99 @@ class dvrk_teleoperation_ambf:
         #                                    -0.039027081, -0.99878656, -0.030038183,
         #                                    -0.031210593, -0.028827982, 0.99909702),
         #                     PyKDL.Vector(0.0037492396, 0.011333806, -0.016384585))
+        def rpy_to_matrix(roll, pitch, yaw):
+    # Compute rotation matrices for each axis
+            R_x = np.array([[1, 0, 0],
+                            [0, np.cos(roll), -np.sin(roll)],
+                            [0, np.sin(roll), np.cos(roll)]])
+            
+            R_y = np.array([[np.cos(pitch), 0, np.sin(pitch)],
+                            [0, 1, 0],
+                            [-np.sin(pitch), 0, np.cos(pitch)]])
+            
+            R_z = np.array([[np.cos(yaw), -np.sin(yaw), 0],
+                            [np.sin(yaw), np.cos(yaw), 0],
+                            [0, 0, 1]])
+            
+            # Combine rotations
+            R = np.dot(R_z, np.dot(R_y, R_x))
+            return R
 
-        # corrects for OpenCV / AMBF convensions
-        T_cv_ambf = PyKDL.Frame(
-            PyKDL.Rotation(0, 1, 0, 0, 0, -1, -1, 0, 0), PyKDL.Vector()
+        def xyzrpy_to_transform(x, y, z, roll, pitch, yaw):
+            # Create the 4x4 transformation matrix
+            transform = np.eye(4)
+            
+            # Set the translation part
+            transform[0:3, 3] = [x, y, z]
+            
+            # Set the rotation part
+            transform[0:3, 0:3] = rpy_to_matrix(roll, pitch, yaw)
+            
+            return transform
+        # Create a instance of the client
+        _client = Client()
+
+        # Connect the client which in turn creates callable objects from ROS topics
+        # and initiates a shared pool of threads for bidrectional communication
+        _client.connect()
+        time.sleep(0.2)
+
+        psm_base = _client.get_obj_handle("/ambf/env/psm2/base")
+
+        psm_base_pose = psm_base.get_pose()
+        print("psm_base_pose", psm_base_pose)
+        #conver xyzrpw to 4 x 4 matrix
+        world_to_psm_base = xyzrpy_to_transform(psm_base_pose[0],
+                                                psm_base_pose[1],
+                                                psm_base_pose[2],
+                                                psm_base_pose[3],
+                                                psm_base_pose[4],
+                                                psm_base_pose[5])
+            # corrects for OpenCV / AMBF convensions
+        cam_opencv_T_base = [[-0.5677642075260352, 0.68064722275028, -0.4629936963012138, -0.13966244941662684], [0.6515321790776827, 0.715321645582428, 0.25262771619031293, -0.0005024173816215187], [0.5031397661471575, -0.1582223167684554, -0.8495975954519895, 0.06448081992992119], [0.0, 0.0, 0.0, 1.0]]
+        # fmt: on
+        cam_opencv_T_base = np.array(cam_opencv_T_base)
+        base_T_cam_opencv = np.linalg.inv(cam_opencv_T_base) 
+
+        cam_opencv_T_cam_ambf = np.array(
+            [[0, 1, 0, 0], [0, 0, -1, 0], [-1, 0, 0, 0], [0, 0, 0, 1]]
         )
+        base_T_cam_ambf = world_to_psm_base @ base_T_cam_opencv @ cam_opencv_T_cam_ambf
+        base_T_cam_ambf = pm.toMsg(pm.fromMatrix(base_T_cam_ambf))
+
+        cameraleft_obj.set_pose(base_T_cam_ambf)
+        # T_cv_ambf = PyKDL.Frame(
+        #     PyKDL.Rotation(0, 1, 0, 0, 0, -1, -1, 0, 0), PyKDL.Vector()
+        # )
         # sets left and right cameras
-        T_cf_cl = crtk.msg_conversions.FrameToPoseMsg(
-            T_cameraframe_psmbase * T_left_psmbase.Inverse() * T_cv_ambf
-        )
-        cameraleft_obj.set_pos(
-            T_cf_cl.position.x, T_cf_cl.position.y, T_cf_cl.position.z
-        )
-        cameraleft_obj.set_rot(
-            [
-                T_cf_cl.orientation.x,
-                T_cf_cl.orientation.y,
-                T_cf_cl.orientation.z,
-                T_cf_cl.orientation.w,
-            ]
-        )
-        T_cf_cr = crtk.msg_conversions.FrameToPoseMsg(
-            T_cameraframe_psmbase * T_right_psmbase.Inverse() * T_cv_ambf
-        )
-        cameraleft_obj.set_pos(
-            T_cf_cr.position.x, T_cf_cr.position.y, T_cf_cr.position.z
-        )
-        cameraleft_obj.set_rot(
-            [
-                T_cf_cr.orientation.x,
-                T_cf_cr.orientation.y,
-                T_cf_cr.orientation.z,
-                T_cf_cr.orientation.w,
-            ]
-        )
+        # T_cf_cl = crtk.msg_conversions.FrameToPoseMsg(
+        #     T_cameraframe_psmbase * T_left_psmbase.Inverse() * T_cv_ambf
+        # )
+        # cameraleft_obj.set_pos(
+        #     T_cf_cl.position.x, T_cf_cl.position.y, T_cf_cl.position.z
+        # )
+        # cameraleft_obj.set_rot(
+        #     [
+        #         T_cf_cl.orientation.x,
+        #         T_cf_cl.orientation.y,
+        #         T_cf_cl.orientation.z,
+        #         T_cf_cl.orientation.w,
+        #     ]
+        # )
+        # T_cf_cr = crtk.msg_conversions.FrameToPoseMsg(
+        #     T_cameraframe_psmbase * T_right_psmbase.Inverse() * T_cv_ambf
+        # )
+        # cameraright_obj.set_pos(
+        #     T_cf_cr.position.x, T_cf_cr.position.y, T_cf_cr.position.z
+        # )
+        # cameraright_obj.set_rot(
+        #     [
+        #         T_cf_cr.orientation.x,
+        #         T_cf_cr.orientation.y,
+        #         T_cf_cr.orientation.z,
+        #         T_cf_cr.orientation.w,
+        #     ]
+        # )
 
         # T_w_psmbase = crtk.msg_conversions.FrameToPoseMsg(T_w_c_virtual_frame * T_ext * T_left_psmbase)
         # self.psmbase_obj.set_pos(T_w_psmbase.position.x, T_w_psmbase.position.y, T_w_psmbase.position.z)
@@ -1220,7 +1279,7 @@ if __name__ == "__main__":
         "-p",
         "--psm",
         type=str,
-        default="PSM1",  # required = True,
+        default="PSM2",  # required = True,
         choices=["PSM1", "PSM2", "PSM3"],
         help="PSM arm name corresponding to ROS topics without namespace.  Use __ns:= to specify the namespace",
     )
