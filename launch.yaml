@@ -5,7 +5,7 @@ input devices config: ./ADF/input_devices/input_devices.yaml
 
 plugins: [
  {
-   path: /home/juan95/research/teleop_under_loss/ambf_crtk_plugin/build, #THIS IS ENV SPECIFIC 
+   path: /home/jbarrag3/research/teleop_under_loss/ambf_crtk_plugin/build, #THIS IS ENV SPECIFIC 
    name: registration_plugin,
    filename: libambf_crtk_simulator_plugin.so
  }

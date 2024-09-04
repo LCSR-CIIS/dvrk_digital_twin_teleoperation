@@ -46,11 +46,13 @@ def load_yaml(filename):
 
 def main():
 
-    camera_params = load_yaml("./simple_scene/ADF/world/world.yaml")
-    near = camera_params["clipping plane"]["near"]
-    far = camera_params["clipping plane"]["far"]
-    width = camera_params["publish image resolution"]["width"]
-    height = camera_params["publish image resolution"]["height"]
+    # camera_params = load_yaml("./simple_scene/ADF/world/world.yaml")
+    # near = camera_params["clipping plane"]["near"]
+    # far = camera_params["clipping plane"]["far"]
+    # width = camera_params["publish image resolution"]["width"]
+    # height = camera_params["publish image resolution"]["height"]
+    near = 0.001
+    far = 10
 
 
     ################################
@@ -66,7 +68,7 @@ def main():
     # DVRK endoscope
     width = 1300
     height = 1024
-    K = [[1610.88444,    0.     ,  634.98109, 0.     , 1612.41876,  533.40331, 0.     ,    0.     ,    1.     ]]
+    K = [1634.04295,    0.     ,  621.94662, 0.     , 1639.25324,  441.49985, 0.     ,    0.     ,    1.     ]
     K = np.array(K).reshape(3, 3) 
 
 

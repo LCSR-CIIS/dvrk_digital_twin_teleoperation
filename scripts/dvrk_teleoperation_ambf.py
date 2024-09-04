@@ -550,16 +550,23 @@ class dvrk_teleoperation_ambf:
         # cameraright_obj = self.ambf_client.get_obj_handle("/ambf/env/cameras/cameraR")
         self.psmtool_obj = self.ambf_client.get_obj_handle("/ambf/env/psm2/toolyawlink")
         self.psmbase_obj = self.ambf_client.get_obj_handle("/ambf/env/psm2/baselink")
+        # Testing
+        self.cameraleft_obj = cameraleft_obj
+        self.cameraframe_obj = camera_frame_handle 
 
         ##################################
         ## step one: set camera frame pose (copied from full_ar_pipeline script)
 
         # fmt: off
         # TODO: update after hand-eye (juan)
-        cam_opencv_T_base = [[-0.8790781792313629, 0.3412618733306592, -0.3328090873310377, -0.08238268273316497], 
-                             [0.33239054126068474, 0.9392881778897073, 0.08517186716905183, -0.007596158536450624], 
-                             [0.34166955216948763, -0.03574986276173252, -0.9391399599808413, 0.09819970244543609], 
-                             [0.0, 0.0, 0.0, 1.0]]
+        # cam_opencv_T_base = [[-0.8790781792313629, 0.3412618733306592, -0.3328090873310377, -0.08238268273316497], 
+        #                      [0.33239054126068474, 0.9392881778897073, 0.08517186716905183, -0.007596158536450624], 
+        #                      [0.34166955216948763, -0.03574986276173252, -0.9391399599808413, 0.09819970244543609], 
+        #                      [0.0, 0.0, 0.0, 1.0]]
+        cam_opencv_T_base = [[-0.5459032453444352, -0.7436337668137282, -0.38600319632982144, -0.05864828177066425], 
+                              [-0.5960559982739572, 0.6684655430310895, -0.4448270053647678, -0.10923058143918474], 
+                              [0.5888182178262232, -0.012752985320163394, -0.8081648765699816, 0.014914654894347932],
+                              [0.0, 0.0, 0.0, 1.0]]
         # fmt: on
 
         cam_opencv_T_base = np.array(cam_opencv_T_base)
@@ -1309,7 +1316,7 @@ if __name__ == "__main__":
         "-p",
         "--psm",
         type=str,
-        default="PSM1",  # required = True,
+        default="PSM2",  # required = True,
         choices=["PSM1", "PSM2", "PSM3"],
         help="PSM arm name corresponding to ROS topics without namespace.  Use __ns:= to specify the namespace",
     )
