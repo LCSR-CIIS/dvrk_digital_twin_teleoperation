@@ -1,5 +1,9 @@
 # Teleoperation under communication loss 
 
+temporal command
+```
+ambf_simulator --launch_file launch.yaml -l 1,4,5 --override_max_comm_freq 200 -p 200 -t 1 --conf crtk_config.yaml
+```
 ## Setup
 
 Before running the following scripts compile the [CRTK plugin][crtkplug] and add the build path to the `launch.yaml` file.

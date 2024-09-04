@@ -3,107 +3,107 @@
 # Link: https://github.com/WPI-AIM/ambf_addon
 # Generated on: 2024-05-02 11:44:57
 bodies:
-- BODY BlackGround
+# - BODY BlackGround
 - BODY CameraFrame
-- BODY Entry1
-- BODY Entry2
-- BODY Entry3
-- BODY Entry4
-- BODY Exit1
-- BODY Exit2
-- BODY Exit3
-- BODY Exit4
-- BODY Needle_001_001
-- BODY phantom
-- BODY Thread
-- BODY Thread_001
-- BODY Thread_002
-- BODY Thread_003
-- BODY Thread_004
-- BODY Thread_005
-- BODY Thread_006
-- BODY Thread_007
-- BODY Thread_008
-- BODY Thread_009
-- BODY Thread_010
-- BODY Thread_011
-- BODY Thread_012
-- BODY Thread_013
-- BODY Thread_014
-- BODY Thread_015
-- BODY Thread_016
-- BODY Thread_017
-- BODY Thread_018
-- BODY Thread_019
-- BODY Thread_020
-- BODY Thread_021
-- BODY Thread_022
-- BODY Thread_023
-- BODY Thread_024
-- BODY Thread_025
-- BODY Thread_026
-- BODY Thread_027
-- BODY Thread_028
-- BODY Thread_029
-- BODY Thread_030
-- BODY Thread_031
-- BODY Thread_032
-- BODY Thread_033
-- BODY Thread_034
-- BODY Thread_035
-- BODY Thread_036
-- BODY Thread_037
-- BODY Thread_038
-- BODY Thread_039
-joints:
-- JOINT Needle_001_001-Thread
-- JOINT Thread-Thread_001
-- JOINT Thread_001-Thread_002
-- JOINT Thread_002-Thread_003
-- JOINT Thread_003-Thread_004
-- JOINT Thread_004-Thread_005
-- JOINT Thread_005-Thread_006
-- JOINT Thread_006-Thread_007
-- JOINT Thread_007-Thread_008
-- JOINT Thread_008-Thread_009
-- JOINT Thread_009-Thread_010
-- JOINT Thread_010-Thread_011
-- JOINT Thread_011-Thread_012
-- JOINT Thread_012-Thread_013
-- JOINT Thread_013-Thread_014
-- JOINT Thread_014-Thread_015
-- JOINT Thread_015-Thread_016
-- JOINT Thread_016-Thread_017
-- JOINT Thread_017-Thread_018
-- JOINT Thread_018-Thread_019
-- JOINT Thread_019-Thread_020
-- JOINT Thread_020-Thread_021
-- JOINT Thread_021-Thread_022
-- JOINT Thread_022-Thread_023
-- JOINT Thread_023-Thread_024
-- JOINT Thread_024-Thread_025
-- JOINT Thread_025-Thread_026
-- JOINT Thread_026-Thread_027
-- JOINT Thread_027-Thread_028
-- JOINT Thread_028-Thread_029
-- JOINT Thread_029-Thread_030
-- JOINT Thread_030-Thread_031
-- JOINT Thread_031-Thread_032
-- JOINT Thread_032-Thread_033
-- JOINT Thread_033-Thread_034
-- JOINT Thread_034-Thread_035
-- JOINT Thread_035-Thread_036
-- JOINT Thread_036-Thread_037
-- JOINT Thread_037-Thread_038
-- JOINT Thread_038-Thread_039
-- JOINT phantom-Entry2
-- JOINT phantom-Exit2
-- JOINT phantom-Exit1
-- JOINT phantom-Exit3
-- JOINT phantom-Exit4
-- JOINT phantom-Entry1
-- JOINT phantom-Entry3
-- JOINT phantom-Entry4
+# - BODY Entry1
+# - BODY Entry2
+# - BODY Entry3
+# - BODY Entry4
+# - BODY Exit1
+# - BODY Exit2
+# - BODY Exit3
+# - BODY Exit4
+# - BODY Needle_001_001
+# - BODY phantom
+# - BODY Thread
+# - BODY Thread_001
+# - BODY Thread_002
+# - BODY Thread_003
+# - BODY Thread_004
+# - BODY Thread_005
+# - BODY Thread_006
+# - BODY Thread_007
+# - BODY Thread_008
+# - BODY Thread_009
+# - BODY Thread_010
+# - BODY Thread_011
+# - BODY Thread_012
+# - BODY Thread_013
+# - BODY Thread_014
+# - BODY Thread_015
+# - BODY Thread_016
+# - BODY Thread_017
+# - BODY Thread_018
+# - BODY Thread_019
+# - BODY Thread_020
+# - BODY Thread_021
+# - BODY Thread_022
+# - BODY Thread_023
+# - BODY Thread_024
+# - BODY Thread_025
+# - BODY Thread_026
+# - BODY Thread_027
+# - BODY Thread_028
+# - BODY Thread_029
+# - BODY Thread_030
+# - BODY Thread_031
+# - BODY Thread_032
+# - BODY Thread_033
+# - BODY Thread_034
+# - BODY Thread_035
+# - BODY Thread_036
+# - BODY Thread_037
+# - BODY Thread_038
+# - BODY Thread_039
+# joints:
+# - JOINT Needle_001_001-Thread
+# - JOINT Thread-Thread_001
+# - JOINT Thread_001-Thread_002
+# - JOINT Thread_002-Thread_003
+# - JOINT Thread_003-Thread_004
+# - JOINT Thread_004-Thread_005
+# - JOINT Thread_005-Thread_006
+# - JOINT Thread_006-Thread_007
+# - JOINT Thread_007-Thread_008
+# - JOINT Thread_008-Thread_009
+# - JOINT Thread_009-Thread_010
+# - JOINT Thread_010-Thread_011
+# - JOINT Thread_011-Thread_012
+# - JOINT Thread_012-Thread_013
+# - JOINT Thread_013-Thread_014
+# - JOINT Thread_014-Thread_015
+# - JOINT Thread_015-Thread_016
+# - JOINT Thread_016-Thread_017
+# - JOINT Thread_017-Thread_018
+# - JOINT Thread_018-Thread_019
+# - JOINT Thread_019-Thread_020
+# - JOINT Thread_020-Thread_021
+# - JOINT Thread_021-Thread_022
+# - JOINT Thread_022-Thread_023
+# - JOINT Thread_023-Thread_024
+# - JOINT Thread_024-Thread_025
+# - JOINT Thread_025-Thread_026
+# - JOINT Thread_026-Thread_027
+# - JOINT Thread_027-Thread_028
+# - JOINT Thread_028-Thread_029
+# - JOINT Thread_029-Thread_030
+# - JOINT Thread_030-Thread_031
+# - JOINT Thread_031-Thread_032
+# - JOINT Thread_032-Thread_033
+# - JOINT Thread_033-Thread_034
+# - JOINT Thread_034-Thread_035
+# - JOINT Thread_035-Thread_036
+# - JOINT Thread_036-Thread_037
+# - JOINT Thread_037-Thread_038
+# - JOINT Thread_038-Thread_039
+# - JOINT phantom-Entry2
+# - JOINT phantom-Exit2
+# - JOINT phantom-Exit1
+# - JOINT phantom-Exit3
+# - JOINT phantom-Exit4
+# - JOINT phantom-Entry1
+# - JOINT phantom-Entry3
+# - JOINT phantom-Entry4
 high resolution path: assets/3d_med_phantom_scene/high_res/
 low resolution path: assets/3d_med_phantom_scene/low_res/
 ignore inter-collision: false
