@@ -70,3 +70,11 @@ add_library(ar_ros_plugin SHARED
 
 target_link_libraries(ar_ros_plugin ${AMBF_LIBRARIES})
 set_property(TARGET ar_ros_plugin PROPERTY POSITION_INDEPENDENT_CODE TRUE)
+
+## Test rendering override
+add_library(test_rendering_override SHARED
+            test_rendering_override/test_rendering_override.cpp 
+            test_rendering_override/test_rendering_override.h)
+
+target_link_libraries(test_rendering_override ${AMBF_LIBRARIES})
+set_property(TARGET test_rendering_override PROPERTY POSITION_INDEPENDENT_CODE TRUE)

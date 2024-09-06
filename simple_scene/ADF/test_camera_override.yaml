@@ -1,14 +1,14 @@
 bodies: []
 joints: []
-cameras: [ar_m_camera]
+cameras: [test_camera_override]
 high resolution path: ./high_res/
 low resolution path: ./low_res/
 ignore inter-collision: false
 namespace: /ambf/env/
 
-ar_m_camera:
+test_camera_override:
   namespace: cameras/
-  name: ar_m_camera 
+  name: test_camera_override 
   parent: main_camera
   location: {x: 0.0, y: 0.0, z: 0.0}
   look at: {x: -1.0, y: 0.0, z: 0.0}

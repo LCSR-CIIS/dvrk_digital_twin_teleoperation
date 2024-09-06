@@ -10,4 +10,5 @@ multibody configs:
   - "./ADF/custom_camera_projection.yaml" #3
   - "./ADF/zed_m_camera.yaml" #4
   - "./ADF/ar_camera.yaml" #5
+  - "./ADF/test_camera_override.yaml" #6
 
