@@ -28,5 +28,22 @@ Rectify:
 ROS_NAMESPACE=/jhu_daVinci/decklink/ rosrun stereo_image_proc stereo_image_proc
 ```
 
+## Register Peg board using PSM tooltip
+First, clone the [Registration Repo](https://github.com/LCSR-CIIS/ambf_registration_plugin) and follow the build instruction. Once you successfully build the repo, use the path to `libregistration_plugin.so` and run the following command:
+<path_to_so_file> = `~/ambf_registration_plugin/build/libregistration_plugin.so`
+```
+ambf_simulator --launch_file launch.yaml -l 2,4,6 --plugins <path_to_so_file> --registration_config registration_config.yaml
+```
+
+Once, the registration pipeline is open, Press `[Ctrl + 1]` to activate pin-base registration mode. Press `[Ctrl + 9]` to store the points.
+[Caution] Sampling order matters!! Make sure to sample the points in the same order as the points in `registration_config.yaml`.
+The calibration results will be printed in the terminal. Copy and paste the results in the ADF: 
+```bash
+position: {x: 0.0, y:0.0, z:0.0}
+orientation: {r: 0.0, p: 0.0, y:0.0}
+```
+
 
 Camera registration repo: https://github.com/jabarragann/dvrk-camera-registration
+
+Registration repo: https://github.com/LCSR-CIIS/ambf_registration_plugin
