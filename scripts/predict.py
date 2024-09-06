@@ -20,14 +20,44 @@ class predict(dvrk_teleoperation_ambf):
                                                    latch = True)
 
         self.holding_peg = False
+        self.predict = False
         self.predict_vel = 0.01
-        self.jaw_to_peg_transform = PyKDL.Frame()
-        self.start_posts = numpy.zeros(3,6)
-        self.end_posts = numpy.zeros(3,6)
+        self.dist_thresh = 0.01
+        self.height_thresh = 0.016
+        self.next_goal_ind = 0
+        self.peg_to_jaw_transform = PyKDL.Frame()
+        self.start_posts = []
+        self.end_posts = []
+        for i in range(6):
+            start_obj = self.ambf_client.get_obj_handle("/ambf/env/Poll_L_" + str(i))
+            end_obj = self.ambf_client.get_obj_handle("/ambf/env/Poll_R_" + str(i))
+            start_pos = start_obj.get_pos()
+            end_pos = end_obj.get_pos()
+            self.start_posts.append(self.T_psmbase_c_frame.Inverse() * self.peg_to_jaw_transform * PyKDL.Vector(start_pos.x, start_pos.y, start_pos.z))
+            self.end_posts.append(self.T_psmbase_c_frame.Inverse() * self.peg_to_jaw_transform * PyKDL.Vector(end_pos.x, end_pos.y, end_pos.z))
+        self.next_goal = self.start_posts[self.next_goal_ind]
 
     def __comm_loss_cb(self, value):
         if value != None:
             self.comm_loss = value.data
+            if self.comm_loss:
+                self.predict = (self.puppet_setpoint_cp.p.z() > self.height_thresh)
+                if self.predict:
+                    self.jaw_pos_loss = self.puppet_jaw_servo_jp
+                    self.puppet_rotation_loss = self.master_measured_cp.M * self.alignment_offset_initial
+                    self.master.lock_orientation(self.master_measured_cp.M)
+                else:
+                    # locks master and both puppets (virtual and real)
+                    self.operator_present(not self.comm_loss)
+                    self.operator_is_present = True
+            else:
+                if self.predict:
+                    self.master_cartesian_initial = self.master_measured_cp
+                    self.master.unlock_orientation()
+                else:
+                    # unlocks master and both puppets (virtual and real)
+                    self.operator_present(not self.comm_loss)
+                    self.operator_is_present = True
 
     def run_enabled(self):
         if self.master_measured_cp and self.puppet_setpoint_cp:
@@ -54,10 +84,13 @@ class predict(dvrk_teleoperation_ambf):
                 # desired puppet goal
                 puppet_cartesian_goal = PyKDL.Frame(puppet_rotation, puppet_translation)
 
-                # TODO: Add PSM base frame (?)
-                # TODO: Can't really add velocity to servo_cp?
-
-                self.puppet.servo_cp(puppet_cartesian_goal)
+                if not self.comm_loss:
+                    self.puppet.servo_cp(puppet_cartesian_goal)
+                elif self.predict:
+                    puppet_translation_loss = self.puppet_setpoint_cp.p + (self.next_goal - self.puppet_setpoint_cp.p).Normalize() * self.predict_vel
+                    self.puppet.servo_cp(PyKDL.Frame(self.puppet_rotation_loss, puppet_translation_loss))
+                else:
+                    self.puppet.hold()
                 self.puppet_virtual.servo_cp(self.T_psmbase_c_frame * puppet_cartesian_goal)
                 
                 if not self.jaw_ignore:
@@ -81,23 +114,24 @@ class predict(dvrk_teleoperation_ambf):
                         if self.puppet_jaw_servo_jp[0] < self.gripper_to_jaw_position_min:
                             self.puppet_jaw_servo_jp[0] = self.gripper_to_jaw_position_min
                             self.gripper_ghost = self.jaw_to_gripper(self.gripper_to_jaw_position_min)
-                        self.puppet.jaw.servo_jp(self.puppet_jaw_servo_jp)
-                        self.puppet_virtual.jaw.servo_jp(self.puppet_jaw_servo_jp)
                         
-                        # specific for prediction
-                        puppet_translation_xy = numpy.array([puppet_translation.x, puppet_translation.y])
-                        if not self.holding_peg:
-                            ref_posts = self.start_posts
+                        if self.comm_loss:
+                            self.puppet.jaw.servo_jp(self.jaw_pos_loss)
+                            self.puppet_virtual.jaw.servo_jp(self.jaw_pos_loss)
                         else:
-                            ref_posts = self.end_posts
-                        distances = numpy.linalg.norm(ref_posts[0:2,:] - puppet_translation_xy)
-                        ind = numpy.argmin(distances)
-                        if distances(ind) < 0.01 and ref_posts[ind][2] - puppet_translation.z > 0:
-                            if not self.holding_peg and self.puppet_jaw_servo_jp[0] <= math.pi/6:
-                                self.holding_peg = True
-                            elif self.holding_peg and self.puppet_jaw_servo_jp[0] >= math.pi/6:
-                                self.holding_peg = False
+                            self.puppet.jaw.servo_jp(self.puppet_jaw_servo_jp)
+                            self.puppet_virtual.jaw.servo_jp(self.puppet_jaw_servo_jp)
                         
+                        if not self.comm_loss:
+                            distance_to_goal = numpy.sqrt(self.next_goal.x * puppet_translation.x + self.next_goal.y * puppet_translation.y)
+                            if distance_to_goal < self.dist_thresh and puppet_translation.z < self.height_thresh:
+                                if not self.holding_peg and self.puppet_jaw_servo_jp[0] <= math.pi/6:
+                                    self.holding_peg = True
+                                    self.next_goal = self.end_posts[self.next_goal_ind]
+                                elif self.holding_peg and self.puppet_jaw_servo_jp[0] >= math.pi/6:
+                                    self.holding_peg = False
+                                    self.next_goal_ind = (self.next_goal_ind + 1) % 6
+                                    self.next_goal = self.start_posts[self.next_goal_ind]
                     else:
                         self.puppet_jaw_servo_jp[0] = 45 * math.pi / 180
                         self.puppet.jaw.servo_jp(self.puppet_jaw_servo_jp)
