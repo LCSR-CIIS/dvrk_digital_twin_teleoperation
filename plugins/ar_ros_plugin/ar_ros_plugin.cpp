@@ -208,10 +208,10 @@ void afCameraHMD::process_and_set_ros_texture()
     if (img_ptr != nullptr)
     {
         cv_bridge::CvImagePtr img_ptr_copy = boost::make_shared<cv_bridge::CvImage>();
-        ;
+        
         img_ptr_deep_copy(img_ptr, img_ptr_copy);
 
-        cv::cvtColor(img_ptr_copy->image, img_ptr_copy->image, cv::COLOR_RGBA2BGRA);
+        // cv::cvtColor(img_ptr_copy->image, img_ptr_copy->image, cv::COLOR_RGBA2BGRA); // Only needed for zed mini
         cv::flip(img_ptr_copy->image, img_ptr_copy->image, 0);
 
         int ros_image_size = img_ptr_copy->image.cols * img_ptr_copy->image.rows * img_ptr_copy->image.elemSize();
