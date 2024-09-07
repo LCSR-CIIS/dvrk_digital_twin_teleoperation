@@ -68,6 +68,11 @@ ambf_simulator --launch_file launch.yaml -l 1,2,5
 ```
 python zed_m_psm_ar_example.py -H /home/juan95/Downloads/davinci_ar_data/endoscope_demo/PSM2-registration-open-cv.json
 ```
+5. Activate deactivate AR with rostopic.
+```
+rostopic pub /ar_activate std_msgs/Bool "data: true"
+rostopic pub /ar_activate std_msgs/Bool "data: false"
+```
 
 ## Notes:
 - To compare real and virtual images use virtual images from the rostopic. A simple way to save images from the rostopic is to use ros tool `image_view` and then right click on the window to save the image.

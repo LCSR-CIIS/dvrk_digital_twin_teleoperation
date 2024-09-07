@@ -64,7 +64,10 @@ string get_current_filepath()
     return g_current_filepath;
 }
 
-afCameraHMD::afCameraHMD() {}
+afCameraHMD::afCameraHMD()
+{
+    empty_world = new cWorld();
+}
 
 // PLUGIN ENTRY POINT
 int afCameraHMD::init(const afBaseObjectPtr a_afObjectPtr, const afBaseObjectAttribsPtr a_objectAttribs)
@@ -75,11 +78,10 @@ int afCameraHMD::init(const afBaseObjectPtr a_afObjectPtr, const afBaseObjectAtt
 
     // Camera config
     m_camera = (afCameraPtr)a_afObjectPtr;
-    // No need to override rendering. Camera textures will be added to the back layer of the current scene.
-    m_camera->setOverrideRendering(false);
+    m_camera->setOverrideRendering(true);
+    ar_world = m_camera->getInternalCamera()->getParentWorld();
     set_window_size_to_pub_resolution(a_objectAttribs);
     glfwSetWindowSize(m_camera->m_window, m_width, m_height);
-
 
     // Load shader program into m_shaderPgm
     load_bg_quad_shaders();
@@ -110,12 +112,25 @@ void afCameraHMD::graphicsUpdate()
         first_time = false;
     }
 
-    // updateHMDParams();
+    glfwMakeContextCurrent(m_camera->m_window);
+    process_and_set_ros_texture(); // todo: this does not work. Texture needs to be processed and update inside the ros callback
+    updateHMDParams();
 
     afRenderOptions ro;
     ro.m_updateLabels = true;
 
-    // process_and_set_ros_texture(); // todo: this does not work. Texture needs to be processed and update inside the ros callback
+    // Turn on-off the AR overlays
+    if (activate_ar)
+    {
+        m_camera->getInternalCamera()->setParentWorld(ar_world);
+    }
+    else
+    {
+        m_camera->getInternalCamera()->setParentWorld(empty_world);
+    }
+
+    m_camera->render(ro);
+    m_camera->getInternalCamera()->setParentWorld(ar_world);
 }
 
 void afCameraHMD::physicsUpdate(double dt)
@@ -157,6 +172,11 @@ void afCameraHMD::makeFullScreen()
     cerr << "\t Making " << m_camera->getName() << " fullscreen \n";
 }
 
+void afCameraHMD::ar_activate_callback(const std_msgs::Bool::ConstPtr &msg)
+{
+    activate_ar = msg->data;
+}
+
 void afCameraHMD::left_img_callback(const sensor_msgs::ImageConstPtr &msg)
 {
     try
@@ -168,7 +188,7 @@ void afCameraHMD::left_img_callback(const sensor_msgs::ImageConstPtr &msg)
         ROS_ERROR("Could not convert");
     }
 
-    process_and_set_ros_texture();
+    // process_and_set_ros_texture();
 
     // Visualize the ros image
     // cv::imshow("Left img", img_ptr->image);
@@ -187,10 +207,11 @@ void afCameraHMD::process_and_set_ros_texture()
 {
     if (img_ptr != nullptr)
     {
-        cv_bridge::CvImagePtr img_ptr_copy = boost::make_shared<cv_bridge::CvImage>();;
+        cv_bridge::CvImagePtr img_ptr_copy = boost::make_shared<cv_bridge::CvImage>();
+        
         img_ptr_deep_copy(img_ptr, img_ptr_copy);
 
-        cv::cvtColor(img_ptr_copy->image, img_ptr_copy->image, cv::COLOR_RGBA2BGRA);
+        // cv::cvtColor(img_ptr_copy->image, img_ptr_copy->image, cv::COLOR_RGBA2BGRA); // Only needed for zed mini
         cv::flip(img_ptr_copy->image, img_ptr_copy->image, 0);
 
         int ros_image_size = img_ptr_copy->image.cols * img_ptr_copy->image.rows * img_ptr_copy->image.elemSize();
@@ -241,20 +262,22 @@ string afCameraHMD::read_rostopic_from_config(const afBaseObjectAttribsPtr a_obj
     YAML::Node publish_img_res_node = specificationDataNode["ar-ros plugin config"];
 
     string rostopic = publish_img_res_node["rostopic"].as<string>();
-    
+
     cout << "INFO! reading images from rostopic: " << rostopic << endl;
 
-    return rostopic; 
+    return rostopic;
 }
 
 void afCameraHMD::initilize_ros_subscribers(const afBaseObjectAttribsPtr a_objectAttribs)
 {
-    
+
     ros_node_handle = afROSNode::getNode();
 
     string rostopic = read_rostopic_from_config(a_objectAttribs);
 
     img_subscriber = ros_node_handle->subscribe(rostopic, 2, &afCameraHMD::left_img_callback, this);
+
+    ar_activate_subscriber = ros_node_handle->subscribe("/ar_activate", 2, &afCameraHMD::ar_activate_callback, this);
 
     // Ambf camera
     // img_subscriber = ros_node_handle->subscribe("/ambf/env/cameras/stereoL/ImageData", 2, &afCameraHMD::left_img_callback, this);

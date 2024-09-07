@@ -43,55 +43,55 @@
 // To silence warnings on MacOS
 #define GL_SILENCE_DEPRECATION
 #include <afFramework.h>
-#include <sensor_msgs/Image.h>
-#include <cv_bridge/cv_bridge.h>
+// #include <sensor_msgs/Image.h>
+// #include <cv_bridge/cv_bridge.h>
 
 using namespace std;
 using namespace ambf;
 
-class afCameraHMD : public afObjectPlugin
+class afTestCameraOverride : public afObjectPlugin
 {
 public:
-    afCameraHMD();
+    afTestCameraOverride();
     virtual int init(const afBaseObjectPtr a_afObjectPtr, const afBaseObjectAttribsPtr a_objectAttribs) override;
     virtual void graphicsUpdate() override;
     virtual void physicsUpdate(double dt) override;
     virtual void reset() override;
     virtual bool close() override;
 
-    void updateHMDParams();
+    // void updateHMDParams();
 
-    void makeFullScreen();
-    // Initialization methods
-    string read_rostopic_from_config(const afBaseObjectAttribsPtr a_objectAttribs);
-    void initilize_ros_subscribers(const afBaseObjectAttribsPtr a_objectAttribs);
+    // void makeFullScreen();
+    // // Initialization methods
+    // string read_rostopic_from_config(const afBaseObjectAttribsPtr a_objectAttribs);
+    // void initilize_ros_subscribers(const afBaseObjectAttribsPtr a_objectAttribs);
     void set_window_size_to_pub_resolution(const afBaseObjectAttribsPtr a_objectAttribs);
-    void load_bg_quad_shaders();
-    void create_screen_filling_quad();
+    // void load_bg_quad_shaders();
+    // void create_screen_filling_quad();
 
-    // ROS attributes and callbacks
-    ros::NodeHandle *ros_node_handle;
-    ros::Subscriber img_subscriber;
-    ros::Subscriber ar_activate_subscriber;
-    void ar_activate_callback(const std_msgs::Bool::ConstPtr &msg);
-    void left_img_callback(const sensor_msgs::ImageConstPtr &msg);
-    cv_bridge::CvImagePtr img_ptr = nullptr;
-    void process_and_set_ros_texture();
+    // // ROS attributes and callbacks
+    // ros::NodeHandle *ros_node_handle;
+    // ros::Subscriber img_subscriber;
+    // ros::Subscriber ar_activate_subscriber;
+    // void ar_activate_callback(const std_msgs::Bool::ConstPtr &msg);
+    // void left_img_callback(const sensor_msgs::ImageConstPtr &msg);
+    // cv_bridge::CvImagePtr img_ptr = nullptr;
+    // void process_and_set_ros_texture();
 
-    cTexture2dPtr ros_texture;
+    // cTexture2dPtr ros_texture;
 
 protected:
     string g_current_filepath;
     afCameraPtr m_camera;
-    cMesh *m_screen_filling_quad;
+    // cMesh *m_screen_filling_quad;
     bool activate_ar = true;
     int m_width;
     int m_height;
-    cShaderProgramPtr m_shaderPgm;
+    // cShaderProgramPtr m_shaderPgm;
 
-    cWorld *m_back_layer_world;
+    // cWorld *m_back_layer_world;
     cWorld *empty_world;
     cWorld *ar_world;
 };
 
-AF_REGISTER_OBJECT_PLUGIN(afCameraHMD)
+AF_REGISTER_OBJECT_PLUGIN(afTestCameraOverride)
