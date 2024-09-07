@@ -8,7 +8,7 @@ ambf_simulator --launch_file launch.yaml -l 1,4,5 --override_max_comm_freq 200 -
 
 Before running the following scripts compile the [CRTK plugin][crtkplug] and add the build path to the `launch.yaml` file.
 
-[crtkplug]: https://github.com/LCSR-CIIS/ambf_crtk_plugin
+[crtkplug]: https://github.com/lcsr-ciis/ambf_crtk_plugin
 
 ## Running teleoperation of a virtual and real PSM arm.
 
