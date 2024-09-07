@@ -19,12 +19,12 @@ BODY Cube:
     iy: 0.0
     iz: 0.0
   collision margin: 0.001
-  scale: 1.0
+  scale: 0.5
   location:
     position:
       x: 0.0
       y: 0.0
-      z: 0.015
+      z: 0.0075
     orientation:
       r: 0.0
       p: -0.0

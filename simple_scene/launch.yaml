@@ -9,6 +9,6 @@ multibody configs:
   - "./ADF/sensors_actuators_psm2.yaml" #2
   - "./ADF/custom_camera_projection.yaml" #3
   - "./ADF/zed_m_camera.yaml" #4
-  - "./ADF/ar_camera.yaml" #5
-  - "./ADF/test_camera_override.yaml" #6
+  - "./ADF/buggy_ar_camera.yaml" #5 --> The buggy camera
+  - "./ADF/ar_cameras.yaml" #6
 

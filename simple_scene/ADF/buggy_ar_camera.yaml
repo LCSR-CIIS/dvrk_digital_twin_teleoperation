@@ -1,14 +1,14 @@
 bodies: []
 joints: []
-cameras: [test_camera_override]
+cameras: [ar_m_camera]
 high resolution path: ./high_res/
 low resolution path: ./low_res/
 ignore inter-collision: false
 namespace: /ambf/env/
 
-test_camera_override:
+ar_m_camera:
   namespace: cameras/
-  name: test_camera_override 
+  name: ar_m_camera 
   parent: main_camera
   location: {x: 0.0, y: 0.0, z: 0.0}
   look at: {x: -1.0, y: 0.0, z: 0.0}
@@ -67,7 +67,7 @@ test_camera_override:
   ## daVinci Endoscope config
   publish image resolution: {width: 1300, height: 1024}   #davinci endoscope
   ar-ros plugin config:
-    rostopic: "/jhu_daVinci/left/image_rect_color"
+    rostopic: "/davinci_endoscope/left/image_rect_color"
   ## option 2
   ## Calculated from calculate_projection_matrix.py
   projection matrix: [[ 2.47828,  0.     ,  0.     ,  0.     ],
