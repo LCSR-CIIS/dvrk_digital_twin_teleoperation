@@ -931,20 +931,20 @@ BODY Poll_R_5:
     transparency: 1.0
 BODY Puzzle:
   name: Puzzle
-  mesh: Puzzle.STL
+  mesh: Puzzle_Jack_v1.STL
   mass: 0.0
   inertia:
     ix: 0.0
     iy: 0.0
     iz: 0.0
   collision margin: 0.001
-  scale: 1.0
+  scale: 0.001
   parent: Puzzle_origin
   location:
     position:
       x: 0.0
       y: 0.01143
-      z: -0.00013
+      z: -0.00613
     orientation:
       r: 1.5708
       p: -0.0
