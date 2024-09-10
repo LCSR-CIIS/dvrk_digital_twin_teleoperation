@@ -2,17 +2,19 @@
 
 ## Setup
 
-Before running the following scripts compile the [CRTK plugin][crtkplug] and add the build path to the `launch.yaml` file.
+Before running the following scripts compile the [CRTK plugin][crtkplug] and add the build path to the `launch.yaml` file. You also need the plugins in this repository.
 
 [crtkplug]: https://github.com/lcsr-ciis/ambf_crtk_plugin
 
 ## Running teleoperation of a virtual and real PSM arm.
 
-From the desired `surgical_robotics_challenge` directory, to launch AMBF simulation and CRTK interface:
+### Virtual PSM
+From the desired the root directory of this repository launch AMBF simulation and CRTK interface with:
 ```
-ambf_simulator --launch_file launch.yaml -l 0,1,4,5,6 --override_max_comm_freq 200 -p 200 -t 1 --conf ~/dvrk_ambf_teleoperation/crtk_config.yaml
+ambf_simulator --launch_file launch.yaml -l 0,1,4,5,6 --override_max_comm_freq 200 -p 200 -t 1 --conf plugins-config/crtk_config.yaml
 ```
 
+### Real PSM
 To run the dVRK console:
 ```
 rosrun dvrk_robot dvrk_console_json -j ~/catkin_ws/src/dvrk/dvrk_config_jhu/jhu-daVinci/console-SUJ-ECM-MTMR-PSM1-MTML-PSM2-Teleop.json -p 0.005
@@ -20,13 +22,9 @@ rosrun dvrk_robot dvrk_console_json -j ~/catkin_ws/src/dvrk/dvrk_config_jhu/jhu-
 
 To start the camera:
 ```
-roslaunch dvrk_video jhu_daVinci_video.launch 
+roslaunch dvrk_video decklink_stereo_1280x1024.launch stereo_rig_name:=davinci_endoscope stereo_proc:=True 
 ```
 
-Rectify:
-```
-ROS_NAMESPACE=/jhu_daVinci/decklink/ rosrun stereo_image_proc stereo_image_proc
-```
 
 ## Register Peg board using PSM tooltip
 First, clone the [Registration Repo](https://github.com/LCSR-CIIS/ambf_registration_plugin) and follow the build instruction. Once you successfully build the repo, use the path to `libregistration_plugin.so` and run the following command:

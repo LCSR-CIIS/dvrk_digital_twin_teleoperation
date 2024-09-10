@@ -12,13 +12,13 @@ plugins: [
 ]
 
 multibody configs:
-  - "ADF/ghosts.yaml" #0
-  - "3d_med_phantom.yaml" #1
-  - "full_new_psm1.yaml" #2
-  - "ADF/sensors_actuators_psm1.yaml" #3
-  - "full_new_psm2.yaml" #4
+  - "ADF/ghosts.yaml" #0 #NOT USED
+  - "ADF/camera_frame.yaml" #1
+  - "full_new_psm1.yaml" #2 #NOT USED
+  - "ADF/sensors_actuators_psm1.yaml" #3 #NOT USED
+  - "ADF/full_new_psm2.yaml" #4
   - "ADF/sensors_actuators_psm2.yaml" #5
-  - "assets/20240909_PegPuzzle.yaml" #6
+  - "assets/20240909_PegPuzzle/20240909_PegPuzzle.yaml" #6
 
   - "ADF/full_new_psm2_registration.yaml" #7
   - "ADF/full_new_psm2_with_peg.yaml" #8
