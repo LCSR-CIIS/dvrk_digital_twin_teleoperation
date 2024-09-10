@@ -13,7 +13,7 @@ plugins: [
 
 multibody configs:
   - "ADF/ghosts.yaml" #0 #NOT USED
-  - "ADF/camera_frame.yaml" #1
+  - "ADF/camera_frame.yaml" #1 #VERY IMPORTANT.
   - "full_new_psm1.yaml" #2 #NOT USED
   - "ADF/sensors_actuators_psm1.yaml" #3 #NOT USED
   - "ADF/full_new_psm2.yaml" #4
