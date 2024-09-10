@@ -18,4 +18,8 @@ multibody configs:
   - "ADF/sensors_actuators_psm1.yaml" #3
   - "full_new_psm2.yaml" #4
   - "ADF/sensors_actuators_psm2.yaml" #5
-  - "PegPuzzle.yaml" #6
+  - "assets/20240909_PegPuzzle.yaml" #6
+
+  - "ADF/full_new_psm2_registration.yaml" #7
+  - "ADF/full_new_psm2_with_peg.yaml" #8
+
