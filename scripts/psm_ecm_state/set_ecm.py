@@ -4,6 +4,8 @@ import yaml
 import os
 import crtk
 import rospy
+
+
 class ECMdVRK:
     # simplified jaw class to close gripper
     # class __jaw_device:
@@ -15,7 +17,9 @@ class ECMdVRK:
     def __init__(self, ral, arm_name, ros_namespace="", expected_interval=0.01):
         # ROS initialization
         if not rospy.get_node_uri():
-            rospy.init_node('simplified_ecm_class', anonymous=False, log_level=rospy.WARN)
+            rospy.init_node(
+                "simplified_ecm_class", anonymous=False, log_level=rospy.WARN
+            )
         # populate this class with all the ROS topics we need
         self.__ral = ral.create_child(arm_name)
         self.crtk_utils = crtk.utils(self, self.__ral, expected_interval)
@@ -37,15 +41,16 @@ class ECMdVRK:
     def check_connections(self, timeout=5.0):
         self.__ral.check_connections(timeout)
 
+
 ral = crtk.ral("Teleop_Loss")
-ecm_handle =ECMdVRK(ral,arm_name="ECM",expected_interval=0.01)
+ecm_handle = ECMdVRK(ral, arm_name="ECM", expected_interval=0.01)
 ral.check_connections()
 
-state=yaml.load(open(os.path.join(os.path.dirname(__file__),"ECM_state.yaml"), 'r'))
-position=state['position']
+state = yaml.load(open(os.path.join(os.path.dirname(__file__), "ECM_state.yaml"), "r"))
+position = state["position"]
 print(position)
 pos_np = np.array(position)
-#move ecm to a position
+# move ecm to a position
 
 ecm_handle.move_jp(pos_np).wait()
 
