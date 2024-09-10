@@ -19,11 +19,26 @@ from surgical_robotics_challenge.kinematics.psmKinematics import PSMKinematicSol
 import sys
 import time
 import tf_conversions.posemath as pm
+from pathlib import Path
 
 # Global kinematic solver
 psm_solver = PSMKinematicSolver(
     psm_type=PSMType.LND_SI.value, tool_id=ToolType.LND_SI.value
 )
+
+
+def load_hand_eye_calibration(json_file: Path) -> np.ndarray:
+
+    if not json_file.exists():
+        raise FileNotFoundError(f"Hand-eye calibration file not found: {json_file}")
+
+    with open(json_file, "r") as f:
+        data = json.load(f)
+
+    cam_T_robot_base = np.array(data["base-frame"]["transform"]).reshape(4, 4)
+
+    return cam_T_robot_base
+
 
 class dvrk_teleoperation_ambf:
     class state(Enum):
@@ -65,7 +80,12 @@ class dvrk_teleoperation_ambf:
         expected_interval,
         operator_present_topic="",
         config_file_name="",
+        cam_opencv_T_base=None,
     ):
+
+        assert cam_opencv_T_base is not None, "Hand-eye calibration matrix is required"
+        self.cam_opencv_T_base = cam_opencv_T_base
+
         print(
             "Initialzing dvrk_teleoperation for {} and {}".format(
                 master.name(), puppet.name()
@@ -346,16 +366,11 @@ class dvrk_teleoperation_ambf:
             )
 
         ##############
-        # AMBF SETUP 
+        # AMBF SETUP
         ##############
 
+        # Setup the ambf scene to match the real setup.
         self.new_ambf_setup()
-
-        # cameraframe_obj = self.ambf_client.get_obj_handle("/CameraFrame")
-        # cameraleft_obj = self.ambf_client.get_obj_handle("/ambf/env/cameras/cameraL")
-        # # cameraright_obj = self.ambf_client.get_obj_handle("/ambf/env/cameras/cameraR")
-        # self.psmtool_obj = self.ambf_client.get_obj_handle("/ambf/env/psm2/toolyawlink")
-        # self.psmbase_obj = self.ambf_client.get_obj_handle("/ambf/env/psm2/baselink")
 
         self.psmbase_pub = rospy.Publisher(
             "ambf_psmbase", geometry_msgs.msg.PoseStamped, queue_size=10
@@ -370,178 +385,8 @@ class dvrk_teleoperation_ambf:
             "ambf_cameraleft", geometry_msgs.msg.PoseStamped, queue_size=10
         )
 
-
-        # # T_c_psmbase = rospy.wait_for_message(f'/SUJ/{self.puppet.name()}/measured_cp', geometry_msgs.msg.PoseStamped)
-        # T_w_psmbase = rospy.wait_for_message(
-        #     f"/SUJ/{self.puppet.name()}/local/measured_cp",
-        #     geometry_msgs.msg.PoseStamped,
-        # )
-        # psm_fk = rospy.wait_for_message(
-        #     f"/{self.puppet.name()}/local/measured_cp", geometry_msgs.msg.PoseStamped
-        # )
-        # # psm_js = rospy.wait_for_message(f'/{self.puppet.name()}/measured_js', sensor_msgs.msg.JointState)
-        # psm_jaw_js = rospy.wait_for_message(
-        #     f"/{self.puppet.name()}/jaw/measured_js", sensor_msgs.msg.JointState
-        # )
-
-        ## HAND-EYE CALIBRATION - Add opencv hand-eye
-        # TODO: update this after each ArUco calibration (with left camera)
-        #fmt: off
-        # T_left_psmbase = [[-0.8790781792313629, 0.3412618733306592, -0.3328090873310377, -0.08238268273316497], 
-        #                      [0.33239054126068474, 0.9392881778897073, 0.08517186716905183, -0.007596158536450624], 
-        #                      [0.34166955216948763, -0.03574986276173252, -0.9391399599808413, 0.09819970244543609], 
-        #                      [0.0, 0.0, 0.0, 1.0]]
-        # T_left_psmbase = np.array(T_left_psmbase)
-        # T_left_psmbase = pm.fromMatrix(T_left_psmbase)
-        #fmt :on
-
-        # T_left_psmbase = PyKDL.Frame(
-        #     PyKDL.Rotation(
-        #         -0.425680413343186, 0.4255129190992243, -0.7985830835771751,
-        #         0.6500765197494777, 0.7577116318433726, 0.05721539512805919,
-        #         0.6294415812181297, -0.4947846386549507, -0.5991589581944915,),
-        #     PyKDL.Vector(
-        #         -0.06643774227587187, -0.03572082293958062, -0.021547666872504815
-        #     ),
-        # )
-
-        # # TODO: update this after each ArUco calibration (with right camera)
-        # T_right_psmbase = PyKDL.Frame(
-        #     PyKDL.Rotation(1, 0, 0, 0, 1, 0, 0, 0, 1), PyKDL.Vector(0, 0, 0)
-        # )
-
-
-        #############################################################################################
-        # compute the "mean" between left and right cameras to put the camera frame
-        # R_left_psmbase = np.array(
-        #     [
-        #         [T_left_psmbase[0, 0], T_left_psmbase[0, 1], T_left_psmbase[0, 2]],
-        #         [T_left_psmbase[1, 0], T_left_psmbase[1, 1], T_left_psmbase[1, 2]],
-        #         [T_left_psmbase[2, 0], T_left_psmbase[2, 1], T_left_psmbase[2, 2]],
-        #     ]
-        # )
-        # R_right_psmbase = np.array(
-        #     [
-        #         [T_right_psmbase[0, 0], T_right_psmbase[0, 1], T_right_psmbase[0, 2]],
-        #         [T_right_psmbase[1, 0], T_right_psmbase[1, 1], T_right_psmbase[1, 2]],
-        #         [T_right_psmbase[2, 0], T_right_psmbase[2, 1], T_right_psmbase[2, 2]],
-        #     ]
-        # )
-        # U, _, Vh = np.linalg.svd((R_left_psmbase + R_right_psmbase) / 2)
-        # R_cameraframe_psmbase = U @ Vh
-        # #fmt: off
-        # T_cameraframe_psmbase = PyKDL.Frame(
-        #     PyKDL.Rotation(
-        #         R_cameraframe_psmbase[0, 0], R_cameraframe_psmbase[0, 1], R_cameraframe_psmbase[0, 2],
-        #         R_cameraframe_psmbase[1, 0], R_cameraframe_psmbase[1, 1], R_cameraframe_psmbase[1, 2],
-        #         R_cameraframe_psmbase[2, 0], R_cameraframe_psmbase[2, 1], R_cameraframe_psmbase[2, 2],
-        #     ),
-        #     (T_left_psmbase.p + T_right_psmbase.p) / 2,
-        # )
-        # #fmt: on
-        #############################################################################################
-
-
-        #############################################################################################
-        ### Set the virtual camera to mirror the real system readings (Not needed if handeye is used)
-
-        # T_w_c_real = rospy.wait_for_message( "/ECM/measured_cp", geometry_msgs.msg.PoseStamped)
-        # T_w_cameraframe = crtk.msg_conversions.FrameFromPoseMsg(T_w_c_real.pose)
-        # cameraframe_obj.set_pos(
-        #     T_w_c_real.pose.position.x, 
-        #     T_w_c_real.pose.position.y, 
-        #     T_w_c_real.pose.position.z,
-        # )
-        # cameraframe_obj.set_rot( [
-        #         T_w_c_real.pose.orientation.x,
-        #         T_w_c_real.pose.orientation.y,
-        #         T_w_c_real.pose.orientation.z,
-        #         T_w_c_real.pose.orientation.w,
-        #     ]
-        # )
-
-        #############################################################################################
-
-        #############################################################################################
-        # Sets the virtual PSM base frame based on the computed mean
-        # T_w_psmbase = crtk.msg_conversions.FrameToPoseMsg(
-        #     T_w_cameraframe * T_cameraframe_psmbase
-        # )
-        # self.psmbase_obj.set_pos(
-        #     T_w_psmbase.position.x, T_w_psmbase.position.y, T_w_psmbase.position.z
-        # )
-        # self.psmbase_obj.set_rot(
-        #     [
-        #         T_w_psmbase.orientation.x,
-        #         T_w_psmbase.orientation.y,
-        #         T_w_psmbase.orientation.z,
-        #         T_w_psmbase.orientation.w,
-        #     ]
-        # )
-        #############################################################################################
-
-        # T_w_c_virtual_frame = crtk.msg_conversions.FrameFromPoseMsg(T_w_c_real.pose)
-        # cameraframe_obj.set_pos(T_w_c_real.pose.position.x, T_w_c_real.pose.position.y, T_w_c_real.pose.position.z)
-        # cameraframe_obj.set_rot([T_w_c_real.pose.orientation.x, T_w_c_real.pose.orientation.y, T_w_c_real.pose.orientation.z, T_w_c_real.pose.orientation.w])
-
-        # hard-coded from hand-eye calibration
-        # T_ext = PyKDL.Frame(PyKDL.Rotation(-0.99875061, 0.03992935, -0.030047648,
-        #                                    -0.039027081, -0.99878656, -0.030038183,
-        #                                    -0.031210593, -0.028827982, 0.99909702),
-        #                     PyKDL.Vector(0.0037492396, 0.011333806, -0.016384585))
-
-        # corrects for OpenCV / AMBF convensions
-        # T_cv_ambf = PyKDL.Frame(
-        #     PyKDL.Rotation(0, 1, 0, 0, 0, -1, -1, 0, 0), PyKDL.Vector()
-        # )
-        # # sets left and right cameras
-        # T_cf_cl = crtk.msg_conversions.FrameToPoseMsg(
-        #     T_cameraframe_psmbase * T_left_psmbase.Inverse() * T_cv_ambf
-        # )
-        # cameraleft_obj.set_pos(
-        #     T_cf_cl.position.x, T_cf_cl.position.y, T_cf_cl.position.z
-        # )
-        # cameraleft_obj.set_rot(
-        #     [
-        #         T_cf_cl.orientation.x,
-        #         T_cf_cl.orientation.y,
-        #         T_cf_cl.orientation.z,
-        #         T_cf_cl.orientation.w,
-        #     ]
-        # )
-        # T_cf_cr = crtk.msg_conversions.FrameToPoseMsg(
-        #     T_cameraframe_psmbase * T_right_psmbase.Inverse() * T_cv_ambf
-        # )
-        # cameraleft_obj.set_pos(
-        #     T_cf_cr.position.x, T_cf_cr.position.y, T_cf_cr.position.z
-        # )
-        # cameraleft_obj.set_rot(
-        #     [
-        #         T_cf_cr.orientation.x,
-        #         T_cf_cr.orientation.y,
-        #         T_cf_cr.orientation.z,
-        #         T_cf_cr.orientation.w,
-        #     ]
-        # )
-
-        # T_w_psmbase = crtk.msg_conversions.FrameToPoseMsg(T_w_c_virtual_frame * T_ext * T_left_psmbase)
-        # self.psmbase_obj.set_pos(T_w_psmbase.position.x, T_w_psmbase.position.y, T_w_psmbase.position.z)
-        # self.psmbase_obj.set_rot([T_w_psmbase.orientation.x, T_w_psmbase.orientation.y, T_w_psmbase.orientation.z, T_w_psmbase.orientation.w])
-
-        # self.T_psmbase_c_frame = T_cameraframe_psmbase.Inverse()
-        # self.puppet_virtual_servo_cp = crtk.msg_conversions.FrameFromPoseMsg(
-        #     psm_fk.pose
-        # )
-        # self.puppet_virtual.servo_cp(self.puppet_virtual_servo_cp)
-        # self.puppet_virtual.jaw.servo_jp(psm_jaw_js.position)
-
-
-        # # Testing
-        # self.cameraleft_obj = cameraleft_obj
-        # self.cameraframe_obj = cameraframe_obj
-
         print("Initialization finished")
-    
+
     def new_ambf_setup(self):
         print("AMBF initialization started")
 
@@ -552,25 +397,24 @@ class dvrk_teleoperation_ambf:
         self.psmbase_obj = self.ambf_client.get_obj_handle("/ambf/env/psm2/baselink")
         # Testing
         self.cameraleft_obj = cameraleft_obj
-        self.cameraframe_obj = camera_frame_handle 
+        self.cameraframe_obj = camera_frame_handle
 
         ##################################
         ## step one: set camera frame pose (copied from full_ar_pipeline script)
 
         # fmt: off
-        # TODO: update after hand-eye (juan)
-        # cam_opencv_T_base = [[-0.8790781792313629, 0.3412618733306592, -0.3328090873310377, -0.08238268273316497], 
-        #                      [0.33239054126068474, 0.9392881778897073, 0.08517186716905183, -0.007596158536450624], 
-        #                      [0.34166955216948763, -0.03574986276173252, -0.9391399599808413, 0.09819970244543609], 
+        # cam_opencv_T_base comes from hand-eye calibration procedure.
+        #
+        # cam_opencv_T_base = [[-0.9971828353654232, 0.07284605928703093, -0.01788419690465498, -0.0031723406327913645],
+        #                      [0.07246047494023475, 0.8738922581508637, -0.4806888814143925, -0.06745113398489502],
+        #                      [-0.019387429535905804, -0.48063059909907385, -0.8767088198402334, 0.046205594817578216],
         #                      [0.0, 0.0, 0.0, 1.0]]
-        cam_opencv_T_base = [[-0.5459032453444352, -0.7436337668137282, -0.38600319632982144, -0.05864828177066425], 
-                              [-0.5960559982739572, 0.6684655430310895, -0.4448270053647678, -0.10923058143918474], 
-                              [0.5888182178262232, -0.012752985320163394, -0.8081648765699816, 0.014914654894347932],
-                              [0.0, 0.0, 0.0, 1.0]]
+        # cam_opencv_T_base = np.array(cam_opencv_T_base)
         # fmt: on
 
-        cam_opencv_T_base = np.array(cam_opencv_T_base)
-        base_T_cam_opencv = np.linalg.inv(cam_opencv_T_base) 
+        # cam_opencv_T_base should be provided as an argument to the constructor of this class.
+        cam_opencv_T_base = self.cam_opencv_T_base
+        base_T_cam_opencv = np.linalg.inv(cam_opencv_T_base)
 
         # fmt: off
         cam_opencv_T_cam_ambf = [[ 0, 1,  0, 0], 
@@ -584,27 +428,35 @@ class dvrk_teleoperation_ambf:
                                 [0, 1, 0, 0],
                                 [0, 0, 0, 1]]
         cam_ambf_T_cam_frame = np.array(cam_ambf_T_cam_frame)
-        
+
         # fmt: on
 
-        base_T_cam_frame = base_T_cam_opencv @ cam_opencv_T_cam_ambf @ cam_ambf_T_cam_frame
-        cam_frame_T_base = np.linalg.inv(base_T_cam_frame) # Virtual PSM base frame.
+        base_T_cam_frame = (
+            base_T_cam_opencv @ cam_opencv_T_cam_ambf @ cam_ambf_T_cam_frame
+        )
+        cam_frame_T_base = np.linalg.inv(base_T_cam_frame)  # Virtual PSM base frame.
 
         camera_frame_handle.set_pose(pm.toMsg(pm.fromMatrix(base_T_cam_frame)))
 
         ################################
-        ## step two: set teleoperation base frame for virtual PSM 
+        ## step two: set teleoperation base frame for virtual PSM
 
-        #fmt: off
-        dvrk_frame_T_cam_frame = [[-1, 0, 0, 0],
+        # fmt: off
+        dvrkframe_T_camframe = [[-1, 0, 0, 0],
                                   [ 0, 1, 0, 0],
                                   [ 0, 0,-1, 0],
                                   [ 0, 0, 0, 1]]
-        dvrk_frame_T_cam_frame = np.array(dvrk_frame_T_cam_frame)
-        #fmt: on
-        T_cameraframe_psmbase = dvrk_frame_T_cam_frame @ cam_frame_T_base 
-        T_cameraframe_psmbase = pm.fromMatrix(T_cameraframe_psmbase) # Virtual PSM base frame
-        self.T_psmbase_c_frame = T_cameraframe_psmbase.Inverse()
+        dvrkframe_T_camframe = np.array(dvrkframe_T_camframe)
+        # fmt: on
+        T_dvrkframe_psmbase = dvrkframe_T_camframe @ cam_frame_T_base
+
+        # Virtual PSM base frame - 
+        # SRC camera frame does not follows dvrk frame conventions
+        # This additional transformation ensures the real and virtual robot are using the same base frame. 
+        T_dvrkframe_psmbase = pm.fromMatrix(
+            T_dvrkframe_psmbase
+        )  
+        self.T_psmbase_dvrkframe = T_dvrkframe_psmbase.Inverse()
 
         ################################
         ## step Three: set instrument pose
@@ -621,7 +473,7 @@ class dvrk_teleoperation_ambf:
         )
         self.puppet_virtual.servo_cp(self.puppet_virtual_servo_cp)
         self.puppet_virtual.jaw.servo_jp(psm_jaw_js.position)
-        
+
         print("AMBF initialization finished")
 
     def run_all_states(self):
@@ -933,7 +785,7 @@ class dvrk_teleoperation_ambf:
 
                 self.puppet.servo_cp(puppet_cartesian_goal)
                 self.puppet_virtual.servo_cp(
-                    self.T_psmbase_c_frame * puppet_cartesian_goal
+                    self.T_psmbase_dvrkframe * puppet_cartesian_goal
                 )
 
                 if not self.jaw_ignore:
@@ -1308,7 +1160,7 @@ if __name__ == "__main__":
         "-m",
         "--mtm",
         type=str,
-        default="MTML",  # required = True,
+        default="MTMR",  # required = True,
         choices=["MTML", "MTMR"],
         help="MTM arm name corresponding to ROS topics without namespace.  Use __ns:= to specify the namespace",
     )
@@ -1341,7 +1193,20 @@ if __name__ == "__main__":
         default=0.005,
         help="expected interval in seconds between messages sent by the device",
     )
+
+    parser.add_argument(
+        "-H",
+        "--hand-eye-json",
+        type=str,
+        required=True,
+        help="hand-eye calibration matrix in JSON format using OpenCV coordinate system. \
+             This is required to set the base of the virtual PSM to match the real setup",
+    )
+
     args = parser.parse_args(argv)
+
+    hand_eye_path = Path(args.hand_eye_json)
+    cam_opencv_T_base = load_hand_eye_calibration(hand_eye_path)
 
     ral = crtk.ral("dvrk_python_teleoperation")
     mtm = mtm_teleop(ral, args.mtm, 4 * args.interval)
@@ -1356,5 +1221,6 @@ if __name__ == "__main__":
         args.interval,
         operator_present_topic=args.operator,
         config_file_name="",
+        cam_opencv_T_base=cam_opencv_T_base,
     )
     ral.spin_and_execute(application.run)
