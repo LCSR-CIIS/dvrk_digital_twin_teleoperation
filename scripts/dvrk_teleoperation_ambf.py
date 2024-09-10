@@ -113,7 +113,7 @@ class dvrk_teleoperation_ambf:
         getattr(self.puppet, "operating_state")
         getattr(self.puppet, "state_command")
 
-        self.puppet_virtual = puppet_virtual
+        self.puppet_virtual: psm_ambf = puppet_virtual
         # Required features of virtual puppet
         getattr(self.puppet_virtual, "setpoint_cp")
         getattr(self.puppet_virtual, "servo_cp")

@@ -11,7 +11,7 @@ Before running the following scripts compile the [CRTK plugin][crtkplug] and add
 ### Virtual PSM
 From the desired the root directory of this repository launch AMBF simulation and CRTK interface with:
 ```
-ambf_simulator --launch_file launch.yaml -l 0,1,4,5,6 --override_max_comm_freq 200 -p 200 -t 1 --conf plugins-config/crtk_config.yaml
+ambf_simulator --launch_file launch.yaml -l 1,4,5,6 --override_max_comm_freq 200 -p 200 -t 1 --conf plugins-config/crtk_config.yaml
 ```
 
 ### Real PSM
