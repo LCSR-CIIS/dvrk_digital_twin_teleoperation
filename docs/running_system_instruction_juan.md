@@ -37,3 +37,15 @@ rosrun aruco_detection aruco_detector.py -c /zedm/zed_node/left -i
 rosrun aruco_detection aruco_detector.py -c /davinci_endoscope/left -i
 ```
 
+
+## Testing teleoperation of virtual and real PSM arm
+
+Simple debug script
+```
+python AR_with_full_scene.py  -H ~/temp/ar_test2/PSM2-registration-open-cv.json
+```
+
+FULL teleop script
+```
+python dvrk_teleoperation_ambf.py -m MTMR -H ~/temp/ar_test2/PSM2-registration-open-cv.json
+```
