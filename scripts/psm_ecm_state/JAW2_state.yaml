@@ -1,0 +1,14 @@
+effort:
+- -0.015506821975793006
+header:
+  frame_id: ''
+  seq: 685
+  stamp:
+    nsecs: 119482797
+    secs: 1726002646
+name:
+- jaw
+position:
+- 0.0076771711083111205
+velocity:
+- 0.0

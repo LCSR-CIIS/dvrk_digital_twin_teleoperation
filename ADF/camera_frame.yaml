@@ -1,6 +1,8 @@
 bodies:
 - BODY CameraFrame
 
+namespace: /ambf/env/
+
 ## Taken from SRC scene 
 BODY CameraFrame:
   name: CameraFrame
