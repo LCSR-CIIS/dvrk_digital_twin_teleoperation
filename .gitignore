@@ -2,3 +2,4 @@
 build/
 simple_scene_2/
 temp/
+__pycache__/

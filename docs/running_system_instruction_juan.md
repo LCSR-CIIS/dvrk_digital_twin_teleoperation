@@ -49,3 +49,20 @@ FULL teleop script
 ```
 python dvrk_teleoperation_ambf.py -m MTMR -H ~/temp/ar_test2/PSM2-registration-open-cv.json
 ```
+
+## Experiment scripts
+
+Communication loss
+```
+python com_loss_generator.py
+```
+
+Teleoperation in baseline condition
+```
+python baseline.py -H /home/jbarrag3/ros_workspaces/zed_dvrk_ws/src/davinci_endoscope/calibrations/PSM2-registration-open-cv.json -m MTML -i 0.01
+```
+
+Teleoperation in replay condition
+```
+python replay.py -H /home/jbarrag3/ros_workspaces/zed_dvrk_ws/src/davinci_endoscope/calibrations/PSM2-registration-open-cv.json -m MTML -i 0.01
+```

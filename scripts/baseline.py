@@ -1,7 +1,8 @@
 import argparse
+from pathlib import Path
 import crtk
 import crtk_msgs.msg
-from dvrk_teleoperation_ambf import dvrk_teleoperation_ambf, mtm_teleop, psm_teleop, psm_ambf
+from dvrk_teleoperation_ambf import dvrk_teleoperation_ambf, load_hand_eye_calibration, mtm_teleop, psm_teleop, psm_ambf
 import math
 import PyKDL
 import std_msgs.msg
@@ -9,8 +10,8 @@ import sys
 
 
 class baseline(dvrk_teleoperation_ambf):
-    def __init__(self, ral, master, puppet, puppet_virtual, clutch_topic, expected_interval, operator_present_topic="", config_file_name=""):
-        super().__init__(ral, master, puppet, puppet_virtual, clutch_topic, expected_interval, operator_present_topic, config_file_name)
+    def __init__(self, ral, master, puppet, puppet_virtual, clutch_topic, expected_interval, operator_present_topic="", config_file_name="", cam_opencv_T_base=None):
+        super().__init__(ral, master, puppet, puppet_virtual, clutch_topic, expected_interval, operator_present_topic, config_file_name, cam_opencv_T_base)
         
         self.comm_loss = False
         self.__comm_loss_sub = self.ral.subscriber('/communication_loss',
@@ -43,11 +44,24 @@ if __name__ == '__main__':
                         help = 'ROS topic corresponding to operator present button/pedal/sensor input')
     parser.add_argument('-i', '--interval', type=float, default=0.005,
                         help = 'expected interval in seconds between messages sent by the device')
+    parser.add_argument(
+        "-H",
+        "--hand-eye-json",
+        type=str,
+        required=True,
+        help="hand-eye calibration matrix in JSON format using OpenCV coordinate system. \
+             This is required to set the base of the virtual PSM to match the real setup",
+    )
+
     args = parser.parse_args(argv)
+
+    hand_eye_path = Path(args.hand_eye_json)
+    cam_opencv_T_base = load_hand_eye_calibration(hand_eye_path)
 
     ral = crtk.ral('teleop_baseline')
     mtm = mtm_teleop(ral, args.mtm, args.interval)
     psm = psm_teleop(ral, args.psm, args.interval)
     psm_virtual = psm_ambf(ral, '/ambf/env/psm2', args.interval)
-    application = baseline(ral, mtm, psm, psm_virtual, args.clutch, args.interval, operator_present_topic=args.operator, config_file_name="")
+    application = baseline(ral, mtm, psm, psm_virtual, args.clutch, args.interval, operator_present_topic=args.operator, config_file_name="",
+                           cam_opencv_T_base=cam_opencv_T_base)
     ral.spin_and_execute(application.run)
