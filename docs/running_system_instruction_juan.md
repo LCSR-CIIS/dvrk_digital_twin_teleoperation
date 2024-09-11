@@ -1,15 +1,15 @@
 
 ## Repositories
-- [GSCAM](git@github.com:hap1961/gscam.git)
+- [GSCAM](https://github.com/hap1961/gscam)
 - [Jack aruco detection](https://github.com/JackHaoyingZhou/aruco_detection)
 - [ZED mini wrapper](https://github.com/stereolabs/zed-ros-wrapper)
 - [CRTK plugin](https://github.com/lcsr-ciis/ambf_crtk_plugin)
-- [Registration plugin]()
+- [Registration plugin](https://github.com/LCSR-CIIS/ambf_registration_plugin)
+- [Camera Registration](https://github.com/jhu-dvrk/dvrk_camera_registration)
 
 ## Instructions:
 - [dvrk video devel](https://github.com/jhu-dvrk/dvrk_video/tree/devel)
 - [dvrk camera calibration](https://github.com/jhu-dvrk/sawIntuitiveResearchKit/wiki/Camera-Calibration)
-
 
 
 ## Running the system
