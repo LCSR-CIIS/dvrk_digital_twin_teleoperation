@@ -41,7 +41,6 @@ test_cam_augmented_left:
     #   path: ../../plugins/build/,
     #   filename: libtest_rendering_override.so
     # },
-
     {
       name: camera_projection_override,
       path: ../../plugins/build,
@@ -54,31 +53,31 @@ test_cam_augmented_left:
     }
   ]
 
-  ## ZEDM config
-  # publish image resolution: {width: 640, height: 360} # zedm
-  # ar-ros plugin config:
-  #   rostopic: "/zedm/zed_node/left/image_rect_color"
-
-  # camera-override plugin config:
-  #   # Priority 1 
-  #   rostopic camera info: "/zedm/zed_node/left/camera_info"
-  #   # Priority 2 - from calculate_projection_matrix.py 
-  #   projection matrix: [[ 1.0476, 0.0000,  0.0020, 0.0000 ],
-  #                       [ 0.0000, 1.8624,  0.0328, 0.0000 ] ,
-  #                       [ 0.0000, 0.0000, -1.0002, -0.0020 ], 
-  #                       [ 0.0000, 0.0000, -1.0000, 0.0000 ] ]
-
-  # daVinci Endoscope config
-  publish image resolution: {width: 1300, height: 1024}   # davinci endoscope
+  # ZEDM config
+  publish image resolution: {width: 640, height: 360} # zedm
   ar-ros plugin config:
-    rostopic: "/jhu_daVinci/left/image_rect_color"
+    rostopic: "/zedm/zed_node/left/image_rect_color"
 
   camera-override plugin config:
-    rostopic camera info: "/jhu_daVinci/left/camera_info"
-    projection matrix: [[ 2.47828,  0.     ,  0.     ,  0.     ],
-                        [0.     ,  3.14926,  0.     ,  0.     ],
-                        [0.     ,  0.     , -1.0002 , -0.002  ],
-                        [0.     ,  0.     , -1.     ,  0.     ]]
+    # Priority 1 
+    rostopic camera info: "/zedm/zed_node/left/camera_info"
+    # Priority 2 - from calculate_projection_matrix.py 
+    projection matrix: [[ 1.0476, 0.0000,  0.0020, 0.0000 ],
+                        [ 0.0000, 1.8624,  0.0328, 0.0000 ] ,
+                        [ 0.0000, 0.0000, -1.0002, -0.0020 ], 
+                        [ 0.0000, 0.0000, -1.0000, 0.0000 ] ]
+
+  ## daVinci Endoscope config
+  # publish image resolution: {width: 1300, height: 1024}   # davinci endoscope
+  # ar-ros plugin config:
+  #   rostopic: "/jhu_daVinci/left/image_rect_color"
+
+  # camera-override plugin config:
+  #   rostopic camera info: "/jhu_daVinci/left/camera_info"
+  #   projection matrix: [[ 2.47828,  0.     ,  0.     ,  0.     ],
+  #                       [0.     ,  3.14926,  0.     ,  0.     ],
+  #                       [0.     ,  0.     , -1.0002 , -0.002  ],
+  #                       [0.     ,  0.     , -1.     ,  0.     ]]
 
 
 # test_cam_augmented_right:

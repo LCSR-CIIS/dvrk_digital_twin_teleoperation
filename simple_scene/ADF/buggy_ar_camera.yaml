@@ -42,51 +42,39 @@ ar_m_camera:
     #   filename: libtest_rendering_override.so
     # },
     {
-      name: ar_ros_plugin,
-      path: ../../plugins/build/,
-      filename: libar_ros_plugin.so
+      name: camera_projection_override,
+      path: ../../plugins/build,
+      filename: libcamera_projection_override.so
     },
     {
-      name: camera_projection_override,
-      path: ../../plugins/build/,
-      filename: libcamera_projection_override.so
-    }
+      name: ar_ros_plugin,
+      path: ../../plugins/build,
+      filename: libar_ros_plugin.so
+    },
   ]
 
-  # ## ZEDM config
-  # publish image resolution: {width: 640, height: 360} #zedm
-  # ar-ros plugin config:
-  #   rostopic: "/zedm/zed_node/left/image_rect_color"
-  # ## option 2
-  # ## Calculated from calculate_projection_matrix.py
-  # projection matrix: [[ 1.04064,  0.     ,  0.     ,  0.     ],
-  #                      [0.     ,  1.85002,  0.     ,  0.     ],
-  #                      [0.     ,  0.     , -1.0002 , -0.002  ],
-  #                      [0.     ,  0.     , -1.     ,  0.     ]]
+  # ZEDM config
+  publish image resolution: {width: 640, height: 360} # zedm
+  ar-ros plugin config:
+    rostopic: "/zedm/zed_node/left/image_rect_color"
+
+  camera-override plugin config:
+    # Priority 1 
+    rostopic camera info: "/zedm/zed_node/left/camera_info"
+    # Priority 2 - from calculate_projection_matrix.py 
+    projection matrix: [[ 1.0476, 0.0000,  0.0020, 0.0000 ],
+                        [ 0.0000, 1.8624,  0.0328, 0.0000 ] ,
+                        [ 0.0000, 0.0000, -1.0002, -0.0020 ], 
+                        [ 0.0000, 0.0000, -1.0000, 0.0000 ] ]
 
   ## daVinci Endoscope config
-  publish image resolution: {width: 1300, height: 1024}   #davinci endoscope
-  ar-ros plugin config:
-    rostopic: "/davinci_endoscope/left/image_rect_color"
+  # publish image resolution: {width: 1300, height: 1024}   # davinci endoscope
+  # ar-ros plugin config:
+  #   rostopic: "/jhu_daVinci/left/image_rect_color"
 
-  # ## option 1 raw camera info
-  # projection matrix: [[ 2.52589,  0.     ,  0.0236 ,  0.     ],
-  #                      [0.     ,  3.2048 , -0.09282,  0.     ],
-  #                      [0.     ,  0.     , -1.0002 , -0.002  ],
-  #                      [0.     ,  0.     , -1.     ,  0.     ]]
-
-  # projection matrix: [[ 2.52589,  0.     ,  0.     ,  0.     ],
-  #                      [0.     ,  3.2048 ,  0.     ,  0.     ],
-  #                      [0.     ,  0.     , -1.0002 , -0.002  ],
-  #                      [0.     ,  0.     , -1.     ,  0.     ]]
-
-  ## option 2 projection matrix
-  # projection matrix: [[ 2.76788,  0.     ,  0.36919,  0.     ],
-  #                      [0.     ,  3.51391, -0.11814,  0.     ],
-  #                      [0.     ,  0.     , -1.0002 , -0.002  ],
-  #                      [0.     ,  0.     , -1.     ,  0.     ]]
-
-  projection matrix: [[ 2.76788,  0.     ,  0.     ,  0.     ],
-                       [0.     ,  3.51391,  0.     ,  0.     ],
-                       [0.     ,  0.     , -1.0002 , -0.002  ],
-                       [0.     ,  0.     , -1.     ,  0.     ]]
+  # camera-override plugin config:
+  #   rostopic camera info: "/jhu_daVinci/left/camera_info"
+  #   projection matrix: [[ 2.47828,  0.     ,  0.     ,  0.     ],
+  #                       [0.     ,  3.14926,  0.     ,  0.     ],
+  #                       [0.     ,  0.     , -1.0002 , -0.002  ],
+  #                       [0.     ,  0.     , -1.     ,  0.     ]]
