@@ -83,7 +83,7 @@ cameraL:
   ]
   ## daVinci Endoscope config
   ar-ros plugin config:
-    rostopic: "/davinci_endoscope/left/image_rect_color"
+    rostopic: "/jhu_daVinci/left/image_rect_color"
   ## option 2
   ## Calculated from calculate_projection_matrix.py
   projection matrix: [[ 2.51391,  0.     ,  0.     ,  0.     ],
@@ -94,19 +94,40 @@ cameraL:
 cameraR:
   namespace: cameras/
   name: cameraR
-  location: { x: 0.002, y: 0.0, z: -0.05 }
-  look at: { x: 0.0, y: 0.0, z: -1.0 }
+  # camera is set at the ECM tip in the hand-eye script.
+  location: { x: 0.00412108186, y: -0.0000892636808, z: 0.000028263996 }
+  look at: { x: -0.00716592943, y: -0.00899776239, z: -0.999933845 }
   up: { x: 0.0, y: 1.0, z: 0.0 }
   clipping plane: *cam_common_clipping_plane
   field view angle: *cam_common_fov 
-  monitor: 2
+  monitor: 3
   parent: BODY CameraFrame
-  publish image: False
-  publish image interval: 5
-  publish image resolution: *cam_common_pub_img_res
+  publish image: True
+  publish image interval: 1
+  publish image resolution: *cam_common_pub_img_res 
   publish depth: False
   publish depth resolution: *cam_common_pub_depth_res
-  visible: False
+  multipass: False # Set to True to enable shadows
   mouse control multipliers: { pan: 0.1, rotate: 1.0, scroll: 0.1, arcball: 0.1 }
-  # multipass: True
-
+  ## PLUGIN CONFIG
+  plugins: [
+    {
+      name: ar_ros_plugin,
+      path: ../../plugins/build/,
+      filename: libar_ros_plugin.so
+    },
+    {
+      name: camera_projection_override,
+      path: ../../plugins/build/,
+      filename: libcamera_projection_override.so
+    }
+  ]
+  ## daVinci Endoscope config
+  ar-ros plugin config:
+    rostopic: "/jhu_daVinci/right/image_rect_color"
+  ## option 2
+  ## Calculated from calculate_projection_matrix.py
+  projection matrix:  [[ 2.48196,  0.     ,  0.     ,  0.     ],
+                       [0.     ,  3.15704,  0.     ,  0.     ],
+                       [0.     ,  0.     , -1.0002 , -0.002  ],
+                       [0.     ,  0.     , -1.     ,  0.     ]]
