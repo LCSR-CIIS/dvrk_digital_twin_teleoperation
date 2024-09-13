@@ -98,10 +98,11 @@ cameraL:
     # option 1: set from rostopic.
     rostopic camera info: *left_cam_info_rostopic 
     # option 2: set from matrix in ADF - calculate_projection_matrix.py
-    # projection matrix: [[ 2.51391,  0.     ,  0.     ,  0.     ],
-    #                     [0.     ,  3.20167,  0.     ,  0.     ],
-    #                     [0.     ,  0.     , -1.0002 , -0.002  ],
-    #                     [0.     ,  0.     , -1.     ,  0.     ]]
+    # From projection matrix
+    projection matrix: [[ 2.8694, 0.0000, -0.0385,  0.0000 ],
+                        [ 0.0000, 3.6428,  0.0267,  0.0000 ],
+                        [ 0.0000, 0.0000, -1.0002, -0.0020 ],
+                        [ 0.0000, 0.0000, -1.0000,  0.0000 ]]
 
 cameraR:
   namespace: cameras/
