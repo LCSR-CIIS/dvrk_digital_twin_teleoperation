@@ -17,3 +17,7 @@ projection matrix: [[ 2.8694, 0.0000, -0.0385, 0.0000 ],
                     [ 0.0000, 0.0000, -1.0002, -0.0020 ],
                     [ 0.0000, 0.0000, -1.0000, 0.0000 ] ]
 ```
+
+## Errors between virtual and real PSM
+
+* It seems like the virtual models don't have the same dimensions of the real robot. There is a 16mm difference between virtual and real robot.
