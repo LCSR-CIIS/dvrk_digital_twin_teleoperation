@@ -11,7 +11,8 @@ import numpy as np
 import rospy
 from sensor_msgs.msg import JointState
 
-initial_jp = [ -0.294, -0.0977, 0.154, 0.554, 0.00150, 0.0061 ]
+initial_jp = [-0.294, -0.0977, 0.154, 0.554, 0.00150, 0.0061]
+
 
 @dataclass
 class PsmSub:
@@ -55,13 +56,13 @@ def set_camera_pose(camera_frame_handle, cam_opencv_T_base: np.ndarray):
     cam_frame:  correspond to AMBF body CameraFrame.
     """
     # # fmt: off
-    # cam_opencv_T_base = [[-0.8790781792313629, 0.3412618733306592, -0.3328090873310377, -0.08238268273316497], 
-    #                      [0.33239054126068474, 0.9392881778897073, 0.08517186716905183, -0.007596158536450624], 
-    #                      [0.34166955216948763, -0.03574986276173252, -0.9391399599808413, 0.09819970244543609], 
+    # cam_opencv_T_base = [[-0.8790781792313629, 0.3412618733306592, -0.3328090873310377, -0.08238268273316497],
+    #                      [0.33239054126068474, 0.9392881778897073, 0.08517186716905183, -0.007596158536450624],
+    #                      [0.34166955216948763, -0.03574986276173252, -0.9391399599808413, 0.09819970244543609],
     #                      [0.0, 0.0, 0.0, 1.0]]
     # fmt: on
     cam_opencv_T_base = np.array(cam_opencv_T_base)
-    base_T_cam_opencv = np.linalg.inv(cam_opencv_T_base) 
+    base_T_cam_opencv = np.linalg.inv(cam_opencv_T_base)
 
     # fmt: off
     cam_opencv_T_cam_ambf = [[ 0, 1,  0, 0], 
@@ -75,7 +76,7 @@ def set_camera_pose(camera_frame_handle, cam_opencv_T_base: np.ndarray):
                             [0, 1, 0, 0],
                             [0, 0, 0, 1]]
     cam_ambf_T_cam_frame = np.array(cam_ambf_T_cam_frame)
-    
+
     # fmt: on
 
     base_T_cam_frame = base_T_cam_opencv @ cam_opencv_T_cam_ambf @ cam_ambf_T_cam_frame
@@ -83,9 +84,15 @@ def set_camera_pose(camera_frame_handle, cam_opencv_T_base: np.ndarray):
 
     camera_frame_handle.set_pose(base_T_cam_frame)
 
+
 def virtual_psm_measured_jp(psm_base, joint_state):
     for i in range(6):
-        psm_base.set_joint_pos(i, joint_state[i])
+        # Hack to reduce differences between virtual and real robot.
+        if i == 2:
+            psm_base.set_joint_pos(i, joint_state[i] - 0.016)
+        else:
+            psm_base.set_joint_pos(i, joint_state[i])
+
 
 def load_hand_eye_calibration(json_file: pathlib.Path) -> np.ndarray:
 
@@ -95,9 +102,10 @@ def load_hand_eye_calibration(json_file: pathlib.Path) -> np.ndarray:
     with open(json_file, "r") as f:
         data = json.load(f)
 
-    cam_T_robot_base = np.array(data['base-frame']['transform']).reshape(4, 4)
+    cam_T_robot_base = np.array(data["base-frame"]["transform"]).reshape(4, 4)
 
     return cam_T_robot_base
+
 
 def main():
 
@@ -124,7 +132,6 @@ def main():
         time.sleep(0.033)  # 30 Hz
 
     print("finishing program ...")
-
 
 
 if __name__ == "__main__":

@@ -52,6 +52,7 @@ using namespace std;
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
+//TODO: Plugin certain camera names will trigger OPENGL errors. Run yaml buggy_cameras.
 
 string get_current_filepath()
 {
@@ -113,7 +114,7 @@ void afCameraHMD::graphicsUpdate()
     }
 
     glfwMakeContextCurrent(m_camera->m_window);
-    process_and_set_ros_texture(); // todo: this does not work. Texture needs to be processed and update inside the ros callback
+    process_and_set_ros_texture(); 
     updateHMDParams();
 
     afRenderOptions ro;
@@ -195,7 +196,6 @@ void afCameraHMD::left_img_callback(const sensor_msgs::ImageConstPtr &msg)
     // cv::waitKey(1);
 }
 
-// TODO: this doesn't seem to be doing anything useful if the callback process the image.
 void img_ptr_deep_copy(cv_bridge::CvImagePtr &img_ptr, cv_bridge::CvImagePtr &img_ptr_copy)
 {
     img_ptr_copy->image = img_ptr->image.clone();
@@ -301,10 +301,27 @@ void afCameraHMD::create_screen_filling_quad()
 {
 
     // Load an initial texture that can be displayed while the first ros image is received
-    // todo:Note: Bigger initial texture -- things will not work well with this bigger texture.
-    string texture_path = g_current_filepath + "/../textures/sample1300x1024.jpg";
-    // Texture witht the same resolution as the zed mini
-    // string texture_path = g_current_filepath + "/../textures/sample640x360.jpg";
+    string texture_path;
+    // todo:: Fix Hack.
+    if (m_width == 1300)
+    {
+        texture_path = g_current_filepath + "/../textures/sample1300x1024.jpg";
+    }
+    else if(m_width == 640)
+    {
+
+        // Texture witht the same resolution as the zed mini
+        texture_path = g_current_filepath + "/../textures/sample640x360.jpg";
+    }
+    else
+    {
+        // Ugly hack: the initial texture needs to be the same resolution as the images 
+        // coming from the rostopic. This means this plugin will only work correctly
+        // with davinci endoscope images or zed mini images
+        cerr << "ERROR! PLUGIN ONLY WORKS FOR SPECIFIC RESOLUTIONS " << endl;
+        throw runtime_error("");
+    }
+
     cImagePtr sample_img = cImage::create();
     bool success = sample_img->loadFromFile(texture_path);
     if (!success)
