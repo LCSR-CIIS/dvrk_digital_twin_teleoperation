@@ -50,6 +50,13 @@ cam common configs:
   publish image resolution: &cam_common_pub_img_res { width: 1300, height: 1024 } # davinci endoscope 
   publish depth resolution: &cam_common_pub_depth_res { width: 640, height: 512 }
 
+  # Plugin config
+  left_cam_rostopic: &left_cam_rostopic "/jhu_daVinci/left/image_rect_color"
+  left_cam_info_rostopic: &left_cam_info_rostopic "/jhu_daVinci/left/camera_info"
+
+  right_cam_rostopic: &right_cam_rostopic "/jhu_daVinci/right/image_rect_color"
+  right_cam_info_rostopic: &right_cam_info_rostopic "/jhu_daVinci/right/camera_info"
+
 cameraL:
   namespace: cameras/
   name: cameraL
@@ -71,25 +78,30 @@ cameraL:
   ## PLUGIN CONFIG
   plugins: [
     {
+      name: camera_projection_override,
+      path: ../../plugins/build/,
+      filename: libcamera_projection_override.so
+    },
+    {
       name: ar_ros_plugin,
       path: ../../plugins/build/,
       filename: libar_ros_plugin.so
     },
-    {
-      name: camera_projection_override,
-      path: ../../plugins/build/,
-      filename: libcamera_projection_override.so
-    }
   ]
   ## daVinci Endoscope config
   ar-ros plugin config:
-    rostopic: "/davinci_endoscope/left/image_rect_color"
-  ## option 2
-  ## Calculated from calculate_projection_matrix.py
-  projection matrix: [[ 2.51391,  0.     ,  0.     ,  0.     ],
-                       [0.     ,  3.20167,  0.     ,  0.     ],
-                       [0.     ,  0.     , -1.0002 , -0.002  ],
-                       [0.     ,  0.     , -1.     ,  0.     ]]
+    rostopic: *left_cam_rostopic 
+    set_window_size_from_cam_info: True #If false use publish image resolution
+
+  camera-override plugin config:
+    ## Option 1 takes priority over option 2 if both are defined.
+    # option 1: set from rostopic.
+    rostopic camera info: *left_cam_info_rostopic 
+    # option 2: set from matrix in ADF - calculate_projection_matrix.py
+    # projection matrix: [[ 2.51391,  0.     ,  0.     ,  0.     ],
+    #                     [0.     ,  3.20167,  0.     ,  0.     ],
+    #                     [0.     ,  0.     , -1.0002 , -0.002  ],
+    #                     [0.     ,  0.     , -1.     ,  0.     ]]
 
 cameraR:
   namespace: cameras/
