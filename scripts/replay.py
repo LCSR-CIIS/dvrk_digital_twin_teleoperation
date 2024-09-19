@@ -234,7 +234,7 @@ if __name__ == "__main__":
     ral = crtk.ral("teleop_replay")
     mtm = mtm_teleop(ral, args.mtm, args.interval)
     psm = psm_teleop(ral, args.psm, args.interval)
-    psm_virtual = psm_ambf(ral, "/ambf/env/psm2", args.interval)
+    psm_virtual = psm_ambf(ral, "/ambf/env/psm2", 2 * args.interval) ### should be 100 Hz, so times 2
     application = replay(
         ral,
         mtm,
