@@ -1,0 +1,14 @@
+# List of Transformations used in ambf_tf_plugin
+# Author: Hisashi Ishida (hishida3@jhu.edu)
+# Date: 09.09.2024
+
+transformations:
+- TF World-PegBoard
+
+TF World-PegBoard:
+  parent: World # World: AMBF world origin or Name of rigidBody
+  child: Puzzle_Board
+  type: INITIAL # {FIXED, INITIAL, ROS}
+  transformation:
+    position: {x: 0.0, y: 0.0, z: 0.0}   # Change HERE
+    orientation: {r: 0.0, p: 0.0, y: 0.0} # Change HERE

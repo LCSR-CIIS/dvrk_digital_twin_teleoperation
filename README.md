@@ -30,16 +30,29 @@ roslaunch dvrk_video decklink_stereo_1280x1024.launch stereo_rig_name:=davinci_e
 First, clone the [Registration Repo](https://github.com/LCSR-CIIS/ambf_registration_plugin) and follow the build instruction. Once you successfully build the repo, use the path to `libregistration_plugin.so` and run the following command:
 <path_to_so_file> = `~/ambf_registration_plugin/build/libregistration_plugin.so`
 ```
-ambf_simulator --launch_file launch.yaml -l 2,4,6 --plugins <path_to_so_file> --registration_config registration_config.yaml
+ambf_simulator --launch_file launch.yaml -l 1,6,7 --plugins <path_to_so_file> --registration_config plugins-config/registration_config.yaml
 ```
 
-Once, the registration pipeline is open, Press `[Ctrl + 1]` to activate pin-base registration mode. Press `[Ctrl + 9]` to store the points.
+Once, the registration pipeline is open, Press `[Ctrl + 3]` to activate pin-base registration mode. Press `[Ctrl + 9]` to store the points.
 [Caution] Sampling order matters!! Make sure to sample the points in the same order as the points in `registration_config.yaml`.
 The calibration results will be printed in the terminal. Copy and paste the results in the ADF: 
 ```bash
-position: {x: 0.0, y:0.0, z:0.0}
-orientation: {r: 0.0, p: 0.0, y:0.0}
+position: {x: 0.0, y: 0.0, z: 0.0}
+orientation: {r: 0.0, p: 0.0, y: 0.0}
 ```
+
+## Apply the registration result in the scene
+First, clone the [TF Repo](https://github.com/LCSR-CIIS/ambf_tf_plugin) and follow the build instruction. Once you successfully build the repo, use the path to `libambf_tf_plugin.so` and run the following command:
+<path_to_tf_so_file> = `~/ambf_tf_plugin/build/libambf_tf_plugin.so`
+```
+Change the configuration file, `plugins-config/tf_PegBoard.yaml` by copy and pasting the result from the previous registration section.
+Lastly, in order to apply this registrarion result, add the following options when running your ambf_simulator:
+```
+--plugins <path_to_tf_so_file>  --tf_list plugins-config/tf_PegBoard.yaml
+```
+
+
+
 
 ## Important repositories:
 
