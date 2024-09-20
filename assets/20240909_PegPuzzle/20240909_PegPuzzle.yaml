@@ -19,7 +19,7 @@ bodies:
 - BODY Poll_R_4
 - BODY Poll_R_5
 - BODY Puzzle_Board
-- BODY Puzzle_Origin
+# - BODY Puzzle_Origin
 joints:
 - JOINT Puzzle_Board-Poll_L_0
 - JOINT Puzzle_Board-Poll_L_1
@@ -37,6 +37,10 @@ joints:
 high resolution path: ./high_res/
 low resolution path: ./low_res/
 ignore inter-collision: false
+gravity:
+  x: 0.0
+  y: 0.0
+  z: 0.0
 namespace: /ambf/env/
 BODY Peg_1:
   name: Peg_1
@@ -989,7 +993,7 @@ BODY Poll_R_5:
 BODY Puzzle_Board:
   name: Puzzle_Board
   mesh: Puzzle_Board.STL
-  mass: 1.0
+  mass: 1000.0
   collision margin: 0.001
   scale: 1.0
   location:
@@ -1015,12 +1019,12 @@ BODY Puzzle_Board:
   publish joint names: false
   publish joint positions: false
   friction:
-    rolling: 0.0
-    static: 0.5
+    rolling: 1000.0
+    static: 1000.0
   restitution: 0.1
   damping:
-    angular: 0.1
-    linear: 0.04
+    angular: 10000.0
+    linear: 10000.0
   visible: true
   collision groups:
   - 0
