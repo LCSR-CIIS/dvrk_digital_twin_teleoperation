@@ -12,4 +12,4 @@ pointer:
     - Poll_R_2
     - Poll_R_5
 
-  object name: Puzzle_origin
+  object name: Puzzle_Board
