@@ -32,6 +32,14 @@ First, clone the [Registration Repo](https://github.com/LCSR-CIIS/ambf_registrat
 ```
 ambf_simulator --launch_file launch.yaml -l 1,6,7 --plugins <path_to_so_file> --registration_config plugins-config/registration_config.yaml
 ```
+[Alternative] Add the following content in your `launch.yaml`.
+```
+{
+   path: <path_to_registration_build_folder>, #THIS IS ENV SPECIFIC 
+   name: registration_plugin,
+   filename: libregistration_plugin.so
+ }
+```
 
 Once, the registration pipeline is open, Press `[Ctrl + 3]` to activate pin-base registration mode. Press `[Ctrl + 9]` to store the points.
 [Caution] Sampling order matters!! Make sure to sample the points in the same order as the points in `registration_config.yaml`.
@@ -47,12 +55,17 @@ First, clone the [TF Repo](https://github.com/LCSR-CIIS/ambf_tf_plugin) and foll
 ```
 Change the configuration file, `plugins-config/tf_PegBoard.yaml` by copy and pasting the result from the previous registration section.
 Lastly, in order to apply this registrarion result, add the following options when running your ambf_simulator:
-```
+```bash
 --plugins <path_to_tf_so_file>  --tf_list plugins-config/tf_PegBoard.yaml
 ```
-
-
-
+[Alternative] Add the following content in your `launch.yaml`.
+```
+{
+   path: <path_to_tf_build_folder>, #THIS IS ENV SPECIFIC 
+   name: ambf_tf_plugin,
+   filename: libambf_tf_plugin.so
+ }
+```
 
 ## Important repositories:
 

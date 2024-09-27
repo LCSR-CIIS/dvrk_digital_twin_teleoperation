@@ -3,3 +3,6 @@ build/
 simple_scene_2/
 temp/
 __pycache__/
+
+
+*.problem
