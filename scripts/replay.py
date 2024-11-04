@@ -165,7 +165,8 @@ class replay(dvrk_teleoperation_ambf):
                             else:
                                 self.puppet.jaw.servo_jp(self.puppet_jaw_servo_jp)
                         if self.recording:
-                            self.jaw_traj.append(self.puppet_jaw_servo_jp)
+                            self.jaw_traj.append(self.puppet_jaw_servo_jp.copy())
+                            print(self.puppet_jaw_servo_jp)
                     else:
                         self.puppet_jaw_servo_jp[0] = 45 * math.pi / 180
                         self.puppet_virtual.jaw.servo_jp(self.puppet_jaw_servo_jp)
