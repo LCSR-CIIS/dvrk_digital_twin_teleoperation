@@ -78,3 +78,11 @@ add_library(test_rendering_override SHARED
 
 target_link_libraries(test_rendering_override ${AMBF_LIBRARIES})
 set_property(TARGET test_rendering_override PROPERTY POSITION_INDEPENDENT_CODE TRUE)
+
+## Peg Gripper plugin
+add_library(peg_gripper_plugin SHARED
+            peg_gripper_plugin/peg_gripper_plugin.cpp 
+            peg_gripper_plugin/peg_gripper_plugin.h)
+
+target_link_libraries(peg_gripper_plugin ${AMBF_LIBRARIES})
+set_property(TARGET peg_gripper_plugin PROPERTY POSITION_INDEPENDENT_CODE TRUE)
