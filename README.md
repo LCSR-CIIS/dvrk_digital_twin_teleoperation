@@ -1,12 +1,19 @@
 # Teleoperation under communication loss 
 
-## Setup
+- [Teleoperation under communication loss](#teleoperation-under-communication-loss)
+  - [Usage](#usage)
+    - [Virtual PSM](#virtual-psm)
+    - [Real PSM](#real-psm)
+  - [Register Peg board using PSM tooltip](#register-peg-board-using-psm-tooltip)
+    - [Apply the registration result in the scene](#apply-the-registration-result-in-the-scene)
+  - [Setup and installation](#setup-and-installation)
+    - [1. Plugin configuration](#1-plugin-configuration)
+    - [2. Scene configuration](#2-scene-configuration)
+  - [Important repositories](#important-repositories)
+  - [Future improvements](#future-improvements)
 
-Before running the following scripts compile the [CRTK plugin][crtkplug] and add the build path to the `launch.yaml` file. You also need the plugins in this repository.
-
-[crtkplug]: https://github.com/lcsr-ciis/ambf_crtk_plugin
-
-## Running teleoperation of a virtual and real PSM arm.
+## Usage
+The following section describes how to run teleoperation of a virtual and real PSM arm.
 
 ### Virtual PSM
 From the desired the root directory of this repository launch AMBF simulation and CRTK interface with:
@@ -49,7 +56,7 @@ position: {x: 0.0, y: 0.0, z: 0.0}
 orientation: {r: 0.0, p: 0.0, y: 0.0}
 ```
 
-## Apply the registration result in the scene
+### Apply the registration result in the scene
 First, clone the [TF Repo](https://github.com/LCSR-CIIS/ambf_tf_plugin) and follow the build instruction. Once you successfully build the repo, use the path to `libambf_tf_plugin.so` and run the following command:
 <path_to_tf_so_file> = `~/ambf_tf_plugin/build/libambf_tf_plugin.so`
 ```
@@ -66,8 +73,34 @@ Lastly, in order to apply this registrarion result, add the following options wh
    filename: libambf_tf_plugin.so
  }
 ```
+## Setup and installation
 
-## Important repositories:
+### 1. Plugin configuration
+1. Before running the following scripts compile the [CRTK plugin][crtkplug], [tf plugin][tfplug] and [registration plugin][regplug]. Add the build path to the `launch.yaml` file.  
+2. Compile plugins inside the plugins folder with:
+```bash
+cd plugins
+mkdir build
+cmake ..
+make -j7
+```
 
-* Camera registration repo: https://github.com/jabarragann/dvrk-camera-registration
-* Registration repo: https://github.com/LCSR-CIIS/ambf_registration_plugin
+### 2. Scene configuration
+TODO.
+
+
+## Important repositories
+
+* [Camera registration repo][camreg]
+* [Registration repo][regplug]
+* [tf plugin][tfplug]
+* [crtk plugin][crtkplug]
+
+[camreg]: https://github.com/jabarragann/dvrk-camera-registration
+[crtkplug]: https://github.com/lcsr-ciis/ambf_crtk_plugin
+[tfplug]: https://github.com/LCSR-CIIS/ambf_tf_plugin.git
+[regplug]: https://github.com/LCSR-CIIS/ambf_registration_plugin.git
+
+## Future improvements
+
+TODO
