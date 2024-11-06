@@ -1,9 +1,7 @@
 # Teleoperation under communication loss 
 
 - [Teleoperation under communication loss](#teleoperation-under-communication-loss)
-  - [Usage](#usage)
-    - [Virtual PSM](#virtual-psm)
-    - [Real PSM](#real-psm)
+  - [Usage: teleoperation of virtual and real PSM arm](#usage-teleoperation-of-virtual-and-real-psm-arm)
   - [Register Peg board using PSM tooltip](#register-peg-board-using-psm-tooltip)
     - [Apply the registration result in the scene](#apply-the-registration-result-in-the-scene)
   - [Setup and installation](#setup-and-installation)
@@ -12,24 +10,29 @@
   - [Important repositories](#important-repositories)
   - [Future improvements](#future-improvements)
 
-## Usage
+## Usage: teleoperation of virtual and real PSM arm 
 The following section describes how to run teleoperation of a virtual and real PSM arm.
 
-### Virtual PSM
+1. Run virtual PSM
 From the desired the root directory of this repository launch AMBF simulation and CRTK interface with:
 ```
 ambf_simulator --launch_file launch.yaml -l 1,4,5,6 --override_max_comm_freq 200 -p 200 -t 1 --conf plugins-config/crtk_config.yaml
 ```
 
-### Real PSM
-To run the dVRK console:
+2. Run real PSM
+Run the dVRK console with
 ```
 rosrun dvrk_robot dvrk_console_json -j ~/catkin_ws/src/dvrk/dvrk_config_jhu/jhu-daVinci/console-SUJ-ECM-MTMR-PSM1-MTML-PSM2-Teleop.json -p 0.005
 ```
 
-To start the camera:
+3. Start the camera stream with
 ```
 roslaunch dvrk_video decklink_stereo_1280x1024.launch stereo_rig_name:=davinci_endoscope stereo_proc:=True 
+```
+
+4. Launch simultaneous teleoperation of real and virtual PSM (requires hand-eye calibration):
+```
+python dvrk_teleoperation_ambf.py -m MTMR -H ~/temp/ar_test2/PSM2-registration-open-cv.json
 ```
 
 
@@ -86,6 +89,14 @@ make -j7
 ```
 
 ### 2. Scene configuration
+Configure the rostopic names in [world_stereo.yaml](./ADF/world/world_stereo.yaml)
+```yaml
+  left_cam_rostopic: &left_cam_rostopic "/davinci_endoscope/left/image_rect_color"
+  left_cam_info_rostopic: &left_cam_info_rostopic "/davinci_endoscope/left/camera_info"
+
+  right_cam_rostopic: &right_cam_rostopic "/davinci_endoscope/right/image_rect_color"
+  right_cam_info_rostopic: &right_cam_info_rostopic "/davinci_endoscope/right/camera_info"
+```
 TODO.
 
 
