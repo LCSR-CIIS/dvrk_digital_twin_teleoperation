@@ -94,8 +94,8 @@ int afPegGripperPlugin::init(int argc, char** argv, const afWorldPtr a_afWorld){
     m_pegs.push_back(m_peg2Ptr);
     m_pegs.push_back(m_peg3Ptr);
 
-    m_gripper2peg.setLocalPos(cVector3d(-0.00006383,0.000003079,-0.000023484));
-    cQuaternion qrot(0.3535,0.612262,-0.612262,-0.3535); //(w,x,y,z)
+    m_gripper2peg.setLocalPos(cVector3d(0.006383, 0.023474, -0.003079));
+    cQuaternion qrot(-0.3535,-0.612262,0.3535, 0.612262); //(w,x,y,z)
     cMatrix3d rot; //(w,x,y,z)
     qrot.toRotMat(rot);
     m_gripper2peg.setLocalRot(rot);
