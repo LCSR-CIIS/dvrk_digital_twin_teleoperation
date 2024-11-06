@@ -52,7 +52,7 @@ class predict(dvrk_teleoperation_ambf):
                     self.operator_is_present = True
             else:
                 if self.predict:
-                    self.master_cartesian_initial = self.master_measured_cp
+                    self.update_initial_state()
                     self.master.unlock_orientation()
                 else:
                     # unlocks master and both puppets (virtual and real)
@@ -123,7 +123,7 @@ class predict(dvrk_teleoperation_ambf):
                             self.puppet_virtual.jaw.servo_jp(self.puppet_jaw_servo_jp)
                         
                         if not self.comm_loss:
-                            distance_to_goal = numpy.sqrt(self.next_goal.x * puppet_translation.x + self.next_goal.y * puppet_translation.y)
+                            distance_to_goal = numpy.sqrt((self.next_goal.x - puppet_translation.x)**2 + (self.next_goal.y - puppet_translation.y)**2)
                             if distance_to_goal < self.dist_thresh and puppet_translation.z < self.height_thresh:
                                 if not self.holding_peg and self.puppet_jaw_servo_jp[0] <= math.pi/6:
                                     self.holding_peg = True
