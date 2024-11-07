@@ -113,8 +113,8 @@ if __name__ == "__main__":
     cam_opencv_T_base = load_hand_eye_calibration(hand_eye_path)
 
     ral = crtk.ral("teleop_baseline")
-    mtm = mtm_teleop(ral, args.mtm, 4 * args.interval)
-    psm = psm_teleop(ral, args.psm, 4 * args.interval)
+    mtm = mtm_teleop(ral, args.mtm, 2 * args.interval)
+    psm = psm_teleop(ral, args.psm, 2 * args.interval)
     psm_virtual = psm_ambf(ral, "/ambf/env/psm2", 2 * args.interval)
     application = baseline(
         ral,
