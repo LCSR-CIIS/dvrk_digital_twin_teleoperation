@@ -105,7 +105,7 @@ mkdir ambf_crtk_plugin/build ambf_registration_plugin/build ambf_tf_plugin/build
   </code></pre>
 </details>
 
-2. Add a symbolic link to the `external-plugin-folder` to project root folder:
+2. Add a symbolic link to the `external-plugin-folder` inside the `dvrk-ambf-teleoperation` root folder:
 
 ```bash
 cd <dvrk-ambf-teleoperation-folder>
