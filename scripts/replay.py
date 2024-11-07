@@ -49,6 +49,12 @@ class replay(dvrk_teleoperation_ambf):
             "/communication_loss", std_msgs.msg.Bool, self.__comm_loss_cb, latch=True
         )
 
+        # handling clutch during communication loss for the virtual PSM
+        self.use_manual_puppet_cp = False
+        self.puppet_cp_clutch_loss = None
+        
+        self.puppet_setpoint_cp_start_of_loss = PyKDL.Frame()
+
     def __comm_loss_cb(self, value):
         if value != None:
             self.comm_loss = value.data
@@ -57,8 +63,53 @@ class replay(dvrk_teleoperation_ambf):
     def handle_comm_loss(self, comm_loss):
         if comm_loss:
             self.recording = True
+            self.puppet_setpoint_cp_start_of_loss = self.puppet_setpoint_cp
         else:
             self.replaying = True
+            self.puppet_setpoint_cp_start_of_loss = None
+
+    def enter_enabled(self):
+        # update MTM/PSM previous position
+        if self.use_manual_puppet_cp:
+            assert self.puppet_cp_clutch_loss
+            self.update_initial_state(self.puppet_cp_clutch_loss)
+        else:
+            self.update_initial_state()
+
+        # set gripper ghost if needed
+        if not self.jaw_ignore:
+            self.jaw_caught_up_after_clutch = False
+            # gripper ghost
+            self.puppet_jaw_setpoint_js = self.puppet.jaw.setpoint_js()
+            if len(self.puppet_jaw_setpoint_js[0]) != 1:
+                print(
+                    f"{self.ral.node_name()}: unable to get jaw position. Make sure there is an instrument on the puppet ({self.puppet.name()})"
+                )
+                self.set_desired_state(self.state.DISABLED)
+            current_jaw = self.puppet_jaw_setpoint_js[0][0]
+            self.gripper_ghost = self.jaw_to_gripper(current_jaw)
+
+        # set MTM/PSM to Teleop (Cartesian Position Mode)
+        self.master.use_gravity_compensation(True)
+        # set forces to zero and lock/unlock orientation as needed
+        wrench = [0, 0, 0, 0, 0, 0]
+        self.master.body.servo_cf(wrench)
+        # reset user wrench
+        self.following_master_body_servo_cf = wrench
+
+        # orientation locked or not
+        if self.rotation_locked and callable(
+            getattr(self.master, "lock_orientation", None)
+        ):
+            self.master.lock_orientation(self.master_measured_cp.M)
+        elif callable(getattr(self.master, "unlock_orientation", None)):
+            self.master.unlock_orientation()
+
+        # check if by any chance the clutch pedal is pressed
+        if self.clutched:
+            self.clutch(True)
+        else:
+            self.set_following(True)
 
     def run_enabled(self):
         if self.master_measured_cp and self.puppet_setpoint_cp:
@@ -108,6 +159,12 @@ class replay(dvrk_teleoperation_ambf):
                             self.arm_traj = self.arm_traj[2:]
                     else:
                         self.puppet.servo_cp(puppet_cartesian_goal)
+                else:
+                    self.puppet_cp_clutch_loss = puppet_cartesian_goal
+                    if self.puppet_setpoint_cp_start_of_loss:
+                        self.puppet.servo_cp(self.puppet_setpoint_cp_start_of_loss)
+                    else:
+                        print("This shouldn't be happening")
                 if self.recording:
                     self.arm_traj.append(puppet_cartesian_goal)
 
@@ -171,6 +228,48 @@ class replay(dvrk_teleoperation_ambf):
                         self.puppet_jaw_servo_jp[0] = 45 * math.pi / 180
                         self.puppet_virtual.jaw.servo_jp(self.puppet_jaw_servo_jp)
         return
+    
+    def clutch(self, clutch):
+        if clutch:
+            # keep track of last follow mode
+            self.operator_was_active_before_clutch = self.operator_is_active
+            self.set_following(False)
+            if self.comm_loss:
+                self.master_move_cp.M = self.puppet_cp_clutch_loss.M
+            else:
+                self.master_move_cp.M = self.puppet_setpoint_cp.M
+            self.master_move_cp.p = self.master_measured_cp.p
+
+            if self.comm_loss:
+                self.use_manual_puppet_cp = True
+
+            wrench = [0, 0, 0, 0, 0, 0]
+            self.master.body.servo_cf(wrench)
+            self.master.use_gravity_compensation(True)
+            if (self.align_master or self.rotation_locked) and callable(
+                getattr(self.master, "lock_orientation", None)
+            ):
+                self.master.lock_orientation(self.master_measured_cp.M)
+            elif callable(getattr(self.master, "unlock_orientation", None)):
+                self.master.unlock_orientation()
+
+            self.puppet.hold()
+            self.puppet_virtual.hold()
+        else:
+            self.set_current_state(self.state.SETTING_ARMS_STATE)
+            self.back_from_clutch = True
+            self.jaw_caught_up_after_clutch = False
+
+    def update_initial_state(self, puppet_manual_initial=None):
+        self.master_cartesian_initial = self.master_measured_cp
+        if not puppet_manual_initial:
+            self.puppet_cartesian_initial = self.puppet_setpoint_cp
+            self.use_manual_puppet_cp = False
+        else:
+            self.puppet_cartesian_initial = puppet_manual_initial
+        self.update_align_offset()
+        self.alignment_offset_initial = self.alignment_offset
+        # TODO: missing base frame (?) here
 
 
 if __name__ == "__main__":
