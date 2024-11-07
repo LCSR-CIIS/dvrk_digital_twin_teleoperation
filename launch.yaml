@@ -5,21 +5,17 @@ input devices config: ./ADF/input_devices/input_devices.yaml
 
 plugins: [
  {
-   path: /home/jbarrag3/research_juan/teleop_under_comm_loss/ambf_crtk_plugin/build, #THIS IS ENV SPECIFIC 
+   path: ./plugins/external_plugins/ambf_crtk_plugin/build,  
    name: crtk_plugin,
    filename: libambf_crtk_simulator_plugin.so
  }
 ]
 
 multibody configs:
-  - "ADF/ghosts.yaml" #0 #NOT USED
-  - "ADF/camera_frame.yaml" #1 #VERY IMPORTANT.
-  - "full_new_psm1.yaml" #2 #NOT USED
-  - "ADF/sensors_actuators_psm1.yaml" #3 #NOT USED
-  - "ADF/full_new_psm2.yaml" #4
-  - "ADF/sensors_actuators_psm2.yaml" #5
-  - "ADF/20240909_PegPuzzle.yaml" #6
-
-  - "ADF/full_new_psm2_registration.yaml" #7
-  - "ADF/full_new_psm2_with_peg.yaml" #8
+  - "ADF/camera_frame.yaml" #0 #VERY IMPORTANT.
+  - "ADF/full_new_psm2.yaml" #1
+  - "ADF/sensors_actuators_psm2.yaml" #2
+  - "ADF/20240909_PegPuzzle.yaml" #3
+  - "ADF/full_new_psm2_registration.yaml" #4
+  - "ADF/full_new_psm2_with_peg.yaml" #5
 
