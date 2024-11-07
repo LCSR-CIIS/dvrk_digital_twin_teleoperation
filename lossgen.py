@@ -5,12 +5,13 @@ import threading
 
 def com_loss_publisher():
     pub = rospy.Publisher('communication_loss', Bool, queue_size=1)
+    pub_visibility = rospy.Publisher('ar_activate', Bool, queue_size=1)
     rospy.init_node('communication_loss_talker', anonymous=True)
 
     flag = False  # Initial state of communication (no loss)
     hz = 200
     rate = rospy.Rate(hz)  # 200hz
-
+    pub_visibility.publish(flag)
     print("Press 'enter' to toggle communication loss.")
 
     def key_listener():
@@ -44,6 +45,7 @@ def com_loss_publisher():
     while not rospy.is_shutdown():
         # Publish the current flag status periodically
         pub.publish(flag)
+        pub_visibility.publish(flag)
         rate.sleep()
         
 
