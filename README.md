@@ -5,8 +5,9 @@
   - [Register Peg board using PSM tooltip](#register-peg-board-using-psm-tooltip)
     - [Apply the registration result in the scene](#apply-the-registration-result-in-the-scene)
   - [Setup and installation](#setup-and-installation)
-    - [1. Plugin configuration](#1-plugin-configuration)
-    - [2. Scene configuration](#2-scene-configuration)
+    - [1. Compile and setup external plugins](#1-compile-and-setup-external-plugins)
+    - [2. Compile internal plugins](#2-compile-internal-plugins)
+    - [3. Scene configuration](#3-scene-configuration)
   - [Important repositories](#important-repositories)
   - [Future improvements](#future-improvements)
 
@@ -16,7 +17,7 @@ The following section describes how to run teleoperation of a virtual and real P
 1. Run virtual PSM
 From the desired the root directory of this repository launch AMBF simulation and CRTK interface with:
 ```
-ambf_simulator --launch_file launch.yaml -l 1,4,5,6 --override_max_comm_freq 200 -p 200 -t 1 --conf plugins-config/crtk_config.yaml
+ambf_simulator --launch_file launch.yaml -l 0,1,2,3 --override_max_comm_freq 200 -p 200 -t 1 --conf plugins-config/crtk_config.yaml
 ```
 
 2. Run real PSM
@@ -78,9 +79,35 @@ Lastly, in order to apply this registrarion result, add the following options wh
 ```
 ## Setup and installation
 
-### 1. Plugin configuration
-1. Before running the following scripts compile the [CRTK plugin][crtkplug], [tf plugin][tfplug] and [registration plugin][regplug]. Add the build path to the `launch.yaml` file.  
-2. Compile plugins inside the plugins folder with:
+### 1. Compile and setup external plugins 
+1. Compile the [CRTK plugin][crtkplug], [tf plugin][tfplug] and [registration plugin][regplug]. Add the build path to the `launch.yaml` file.  
+
+```bash
+cd <plugin-folder>
+git clone https://github.com/LCSR-CIIS/ambf_registration_plugin.git
+git clone https://github.com/LCSR-CIIS/ambf_tf_plugin.git
+git clone https://github.com/LCSR-CIIS/ambf_crtk_plugin.git
+
+mkdir ambf_crtk_plugin/build ambf_registration_plugin/build ambf_tf_plugin/build
+```
+<details>
+  <summary>SSH git clone equivalents</summary>
+  <pre><code> 
+  cd plugin-folder
+  git clone git@github.com:LCSR-CIIS/ambf_registration_plugin.git
+  git clone git@github.com:LCSR-CIIS/ambf_tf_plugin.git
+  git clone git@github.com:LCSR-CIIS/ambf_crtk_plugin.git
+  </code></pre>
+</details>
+
+2. Add a symbolic link to your external plugin folder. From the root of the project run:
+```bash
+# Don't use relative links to specify the path to external plugins
+ln -s /path to external plugins/* plugins/external_plugins/ 
+```
+### 2. Compile internal plugins
+
+Compile plugins inside the plugins folder with:
 ```bash
 cd plugins
 mkdir build
@@ -88,7 +115,7 @@ cmake ..
 make -j7
 ```
 
-### 2. Scene configuration
+### 3. Scene configuration
 Configure the rostopic names in [world_stereo.yaml](./ADF/world/world_stereo.yaml)
 ```yaml
   left_cam_rostopic: &left_cam_rostopic "/davinci_endoscope/left/image_rect_color"
@@ -97,7 +124,6 @@ Configure the rostopic names in [world_stereo.yaml](./ADF/world/world_stereo.yam
   right_cam_rostopic: &right_cam_rostopic "/davinci_endoscope/right/image_rect_color"
   right_cam_info_rostopic: &right_cam_info_rostopic "/davinci_endoscope/right/camera_info"
 ```
-TODO.
 
 
 ## Important repositories
