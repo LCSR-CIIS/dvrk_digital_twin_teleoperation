@@ -414,8 +414,9 @@ BODY Poll_L_0:
   damping:
     angular: 0.1
     linear: 0.04
-  visible: true
-  collision groups: []
+  visible: false
+  collision groups: 
+  - 21
   use material: true
   color components:
     ambient:
@@ -465,8 +466,9 @@ BODY Poll_L_1:
   damping:
     angular: 0.1
     linear: 0.04
-  visible: true
-  collision groups: []
+  visible: false
+  collision groups: 
+  - 21
   use material: true
   color components:
     ambient:
@@ -516,8 +518,9 @@ BODY Poll_L_2:
   damping:
     angular: 0.1
     linear: 0.04
-  visible: true
-  collision groups: []
+  visible: false
+  collision groups: 
+  - 21
   use material: true
   color components:
     ambient:
@@ -567,8 +570,9 @@ BODY Poll_L_3:
   damping:
     angular: 0.1
     linear: 0.04
-  visible: true
-  collision groups: []
+  visible: false
+  collision groups: 
+  - 21
   use material: true
   color components:
     ambient:
@@ -618,8 +622,9 @@ BODY Poll_L_4:
   damping:
     angular: 0.1
     linear: 0.04
-  visible: true
-  collision groups: []
+  visible: false
+  collision groups: 
+  - 21
   use material: true
   color components:
     ambient:
@@ -669,8 +674,9 @@ BODY Poll_L_5:
   damping:
     angular: 0.1
     linear: 0.04
-  visible: true
-  collision groups: []
+  visible: false
+  collision groups: 
+  - 21
   use material: true
   color components:
     ambient:
@@ -720,8 +726,9 @@ BODY Poll_R_0:
   damping:
     angular: 0.1
     linear: 0.04
-  visible: true
-  collision groups: []
+  visible: false
+  collision groups: 
+  - 21
   use material: true
   color components:
     ambient:
@@ -771,8 +778,9 @@ BODY Poll_R_1:
   damping:
     angular: 0.1
     linear: 0.04
-  visible: true
-  collision groups: []
+  visible: false
+  collision groups: 
+  - 21
   use material: true
   color components:
     ambient:
@@ -822,8 +830,9 @@ BODY Poll_R_2:
   damping:
     angular: 0.1
     linear: 0.04
-  visible: true
-  collision groups: []
+  visible: false
+  collision groups: 
+  - 21
   use material: true
   color components:
     ambient:
@@ -873,8 +882,9 @@ BODY Poll_R_3:
   damping:
     angular: 0.1
     linear: 0.04
-  visible: true
-  collision groups: []
+  visible: false
+  collision groups: 
+  - 21
   use material: true
   color components:
     ambient:
@@ -924,8 +934,9 @@ BODY Poll_R_4:
   damping:
     angular: 0.1
     linear: 0.04
-  visible: true
-  collision groups: []
+  visible: false
+  collision groups: 
+  - 21
   use material: true
   color components:
     ambient:
@@ -975,8 +986,9 @@ BODY Poll_R_5:
   damping:
     angular: 0.1
     linear: 0.04
-  visible: true
-  collision groups: []
+  visible: false
+  collision groups: 
+  - 21
   use material: true
   color components:
     ambient:
@@ -1025,9 +1037,9 @@ BODY Puzzle_Board:
   damping:
     angular: 10000.0
     linear: 10000.0
-  visible: true
+  visible: false
   collision groups:
-  - 0
+  - 21
   compound collision shape:
   - name: '1'
     shape: BOX

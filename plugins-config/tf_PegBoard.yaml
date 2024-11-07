@@ -3,21 +3,36 @@
 # Date: 09.09.2024
 
 transformations:
+- TF World-PegBoard
 - TF PegBoard-PegBoard
-- TF Peg-Peg
+# - TF Peg-Peg
+
+TF World-PegBoard:
+  parent: World # World: AMBF world origin or Name of rigidBody
+  child: Puzzle_Board
+  type: INITIAL # {FIXED, INITIAL, ROS}
+  transformation:
+    #   position: {x: 0.0, y: 0.0, z: 0.0}   # Change HERE
+    #   orientation: {r: 0.0, p: 0.0, y: 0.0} # Change HERE
+    # # position: {x: -0.123126, y: -0.0380302, z: -0.222379}
+    # orientation: {r: -0.117173, p: -0.175377, y: 2.68116}
+      position: {x: -0.0801569, y: -0.0429214, z: -0.183104}
+      orientation: {r: 0.00568677, p: -0.142515, y: 2.73617}
+
 
 TF PegBoard-PegBoard:
   parent: Puzzle_Board # World: AMBF world origin or Name of rigidBody
   child: Puzzle_Board
   type: INITIAL # {FIXED, INITIAL, ROS}
   transformation:
-    position: {x: 0.0, y: 0.0, z: 0.0}   # Change HERE
-    orientation: {r: 0.0, p: 0.0, y: 0.0} # Change HERE
+      position: {x: 0.0, y: 0.0, z: 0.0}   # Change HERE
+      orientation: {r: 1.5708, p: 0.0, y: 0.0} # Change HERE
+
 
 TF Peg-Peg:
-  parent: Peg_1 # World: AMBF world origin or Name of rigidBody
-  child: Peg_1
-  type: INITIAL # {FIXED, INITIAL, ROS}
+  parent: /ambf/env/psm2/BODY tool gripper right link  # World: AMBF world origin or Name of rigidBody
+  child: Peg_1  
+  type: FIXED # {FIXED, INITIAL, ROS}
   transformation:
     position: {x: 0.0, y: 0.0, z: 0.0}   # Change HERE
     orientation: {r: 0.0, p: 0.0, y: 0.0} # Change HERE

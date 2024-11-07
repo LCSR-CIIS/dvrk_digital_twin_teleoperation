@@ -1,6 +1,6 @@
 enclosure size: { length: 10.0, width: 10.0, height: 3.0 }
-lights: [light2]
-cameras: [cameraL, cameraR]
+lights: [light2, model_light]
+cameras: [cameraL, cameraR, model_camera]
 environment: "./checkered_floor.yaml"
 namespace: /ambf/env/
 max iterations: 50
@@ -100,10 +100,10 @@ cameraL:
     rostopic camera info: *left_cam_info_rostopic 
     # option 2: set from matrix in ADF - calculate_projection_matrix.py
     # From projection matrix
-    projection matrix: [[ 2.8694, 0.0000, -0.0385,  0.0000 ],
-                        [ 0.0000, 3.6428,  0.0267,  0.0000 ],
-                        [ 0.0000, 0.0000, -1.0002, -0.0020 ],
-                        [ 0.0000, 0.0000, -1.0000,  0.0000 ]]
+    projection matrix: [[ 2.53274,  0.     ,  0.     ,  0.     ],
+                       [0.     ,  3.21651,  0.     ,  0.     ],
+                       [0.     ,  0.     , -1.0002 , -0.002  ],
+                       [0.     ,  0.     , -1.     ,  0.     ]]
 
 cameraR:
   namespace: cameras/
@@ -150,4 +150,23 @@ cameraR:
     projection matrix:  #Specify if needed.
                        
                        
-                       
+  model_camera:
+    namespace: cameras/
+    name: main_camera
+    location: {x: 0.5, y: 0.0, z: -0.25}
+    look at: {x: 0.0, y: 0.0, z: -0.5}
+    up: {x: 0.0, y: 0.0, z: 1.0}
+    clipping plane: {near: 0.0, far: 3.0}
+    field view angle: 0.7 # so that focal length is approximately 1000px and phantom is 250 mm away
+    monitor: 0
+    # multipass: true
+    visible: true
+
+  model_light:
+    namespace: lights/
+    name: model_light
+    location: {x: 0.0, y: 0.0, z: 3.5}
+    direction: {x: 0.0, y: 0.0, z: -1.0}
+    spot exponent: 0.3
+    shadow quality: 0
+    cutoff angle: 10

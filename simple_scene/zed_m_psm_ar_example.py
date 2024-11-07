@@ -36,7 +36,7 @@ def setup(cam_opencv_T_base: np.ndarray):
     _client.connect()
     time.sleep(0.2)
     psm = _client.get_obj_handle("/ambf/env/psm2/base")
-    camera = _client.get_obj_handle("main_camera")
+    camera = _client.get_obj_handle("/CameraFrame")
     time.sleep(0.2)
 
     # Set initial cam pose base on hand-eye calibration

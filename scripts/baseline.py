@@ -53,7 +53,7 @@ class baseline(dvrk_teleoperation_ambf):
 
 
 if __name__ == "__main__":
-    # extract ros arguments (e.g. __ns:= for namespace)
+ # extract ros arguments (e.g. __ns:= for namespace)
     argv = crtk.ral.parse_argv(sys.argv[1:])  # skip argv[0], script name
 
     # parse arguments
@@ -97,6 +97,7 @@ if __name__ == "__main__":
         default=0.005,
         help="expected interval in seconds between messages sent by the device",
     )
+
     parser.add_argument(
         "-H",
         "--hand-eye-json",
@@ -112,9 +113,9 @@ if __name__ == "__main__":
     cam_opencv_T_base = load_hand_eye_calibration(hand_eye_path)
 
     ral = crtk.ral("teleop_baseline")
-    mtm = mtm_teleop(ral, args.mtm, args.interval)
-    psm = psm_teleop(ral, args.psm, args.interval)
-    psm_virtual = psm_ambf(ral, "/ambf/env/psm2", args.interval)
+    mtm = mtm_teleop(ral, args.mtm, 4 * args.interval)
+    psm = psm_teleop(ral, args.psm, 4 * args.interval)
+    psm_virtual = psm_ambf(ral, "/ambf/env/psm2", 2 * args.interval)
     application = baseline(
         ral,
         mtm,

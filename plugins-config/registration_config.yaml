@@ -1,11 +1,9 @@
 # AMBF registration configuration file
 # Author: Hisashi Ishida
 # Date: 09.06.2024
-
-
 ## Pointer based registration
 pointer:
-  tooltip name: /ambf/env/psm1/BODY yaw link # Rigid body that is attached to the tip of the tool
+  tooltip name: /ambf/env/psm2/BODY tool yaw link # Rigid body that is attached to the tip of the tool
   name of points:
     - Poll_L_0
     - Poll_L_3
@@ -13,3 +11,5 @@ pointer:
     - Poll_R_5
 
   object name: Puzzle_Board
+
+  # camera

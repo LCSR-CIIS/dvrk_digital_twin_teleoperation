@@ -233,9 +233,9 @@ if __name__ == "__main__":
     cam_opencv_T_base = load_hand_eye_calibration(hand_eye_path)
 
     ral = crtk.ral("teleop_replay")
-    mtm = mtm_teleop(ral, args.mtm, args.interval)
-    psm = psm_teleop(ral, args.psm, args.interval)
-    psm_virtual = psm_ambf(ral, "/ambf/env/psm2", args.interval)
+    mtm = mtm_teleop(ral, args.mtm, 2 * args.interval) # 4 * 0.005 = 0.02 50hz
+    psm = psm_teleop(ral, args.psm, 2 * args.interval) # 4 * 0.005 = 0.02 
+    psm_virtual = psm_ambf(ral, "/ambf/env/psm2", 2 * args.interval) # 2 * 0.005 = 0.01 100hz
     application = replay(
         ral,
         mtm,
