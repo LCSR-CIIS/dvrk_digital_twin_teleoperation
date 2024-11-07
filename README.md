@@ -35,6 +35,7 @@ roslaunch dvrk_video decklink_stereo_1280x1024.launch stereo_rig_name:=davinci_e
 ```
 python dvrk_teleoperation_ambf.py -m MTMR -H ~/temp/ar_test2/PSM2-registration-open-cv.json
 ```
+see [camera_registration_from_SUJ.md](./docs/camera_registration_from_SUJ.md) for more information on how to generate the hand-eye calibration file.
 
 
 ## Register Peg board using PSM tooltip

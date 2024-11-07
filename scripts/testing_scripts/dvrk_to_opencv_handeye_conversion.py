@@ -38,7 +38,7 @@ def pose_listener():
 
     # Print the matrix
     rospy.loginfo("Transformation Matrix (DVRK convention):\n%s", matrix_dvrk_str)
-    rospy.loginfo("Transformation Matrix (Opencv convention convention):\n%s", matrix_opencv_str)
+    rospy.loginfo("Transformation Matrix (Opencv convention):\n%s", matrix_opencv_str)
 
 if __name__ == '__main__':
     try:
