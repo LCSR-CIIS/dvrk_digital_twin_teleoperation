@@ -12,23 +12,23 @@
   - [Future improvements](#future-improvements)
 
 ## Usage: teleoperation of virtual and real PSM arm 
-The following section describes how to run teleoperation of a virtual and real PSM arm.
+The following section describes how to run teleoperation of a virtual and real PSM arm. This project assumes you have previously calibrated your camera using the dVRK pipeline.
 
-1. Run virtual PSM
-From the desired the root directory of this repository launch AMBF simulation and CRTK interface with:
-```
-ambf_simulator --launch_file launch.yaml -l 0,1,2,3 --override_max_comm_freq 200 -p 200 -t 1 --conf plugins-config/crtk_config.yaml
-```
-
-2. Run real PSM
+1. Run real PSM
 Run the dVRK console with
 ```
 rosrun dvrk_robot dvrk_console_json -j ~/catkin_ws/src/dvrk/dvrk_config_jhu/jhu-daVinci/console-SUJ-ECM-MTMR-PSM1-MTML-PSM2-Teleop.json -p 0.005
 ```
 
-3. Start the camera stream with
+2. Start the camera stream with
 ```
 roslaunch dvrk_video decklink_stereo_1280x1024.launch stereo_rig_name:=davinci_endoscope stereo_proc:=True 
+```
+
+3. Run virtual PSM
+From the desired the root directory of this repository launch AMBF simulation and CRTK interface with:
+```
+ambf_simulator --launch_file launch.yaml -l 0,1,2,3 --override_max_comm_freq 200 -p 200 -t 1 --conf plugins-config/crtk_config.yaml
 ```
 
 4. Launch simultaneous teleoperation of real and virtual PSM (requires hand-eye calibration):
@@ -64,7 +64,7 @@ orientation: {r: 0.0, p: 0.0, y: 0.0}
 ### Apply the registration result in the scene
 First, clone the [TF Repo](https://github.com/LCSR-CIIS/ambf_tf_plugin) and follow the build instruction. Once you successfully build the repo, use the path to `libambf_tf_plugin.so` and run the following command:
 <path_to_tf_so_file> = `~/ambf_tf_plugin/build/libambf_tf_plugin.so`
-```
+
 Change the configuration file, `plugins-config/tf_PegBoard.yaml` by copy and pasting the result from the previous registration section.
 Lastly, in order to apply this registrarion result, add the following options when running your ambf_simulator:
 ```bash
@@ -81,30 +81,36 @@ Lastly, in order to apply this registrarion result, add the following options wh
 ## Setup and installation
 
 ### 1. Compile and setup external plugins 
-1. Compile the [CRTK plugin][crtkplug], [tf plugin][tfplug] and [registration plugin][regplug]. Add the build path to the `launch.yaml` file.  
+1. Compile and setup [CRTK plugin][crtkplug], [tf plugin][tfplug] and [registration plugin][regplug].  
 
 ```bash
-cd <plugin-folder>
+mkdir <your-external-plugin-folder>
+cd <your-external-plugin-folder>
 git clone https://github.com/LCSR-CIIS/ambf_registration_plugin.git
 git clone https://github.com/LCSR-CIIS/ambf_tf_plugin.git
 git clone https://github.com/LCSR-CIIS/ambf_crtk_plugin.git
 
 mkdir ambf_crtk_plugin/build ambf_registration_plugin/build ambf_tf_plugin/build
+
+# compile each plugin 
 ```
+
 <details>
   <summary>SSH git clone equivalents</summary>
   <pre><code> 
-  cd plugin-folder
+  cd your-external-plugin-folder
   git clone git@github.com:LCSR-CIIS/ambf_registration_plugin.git
   git clone git@github.com:LCSR-CIIS/ambf_tf_plugin.git
   git clone git@github.com:LCSR-CIIS/ambf_crtk_plugin.git
   </code></pre>
 </details>
 
-2. Add a symbolic link to your external plugin folder. From the root of the project run:
+2. Add a symbolic link to the `external-plugin-folder` to project root folder:
+
 ```bash
+cd <dvrk-ambf-teleoperation-folder>
 # Don't use relative links to specify the path to external plugins
-ln -s /path to external plugins/* plugins/external_plugins/ 
+ln -s <your-external-plugin-folder>/* plugins/external_plugins/ 
 ```
 ### 2. Compile internal plugins
 
@@ -130,9 +136,9 @@ Configure the rostopic names in [world_stereo.yaml](./ADF/world/world_stereo.yam
 ## Important repositories
 
 * [Camera registration repo][camreg]
-* [Registration repo][regplug]
-* [tf plugin][tfplug]
-* [crtk plugin][crtkplug]
+* [registration plugin repo][regplug]
+* [tf plugin repo][tfplug]
+* [crtk plugin repo][crtkplug]
 
 [camreg]: https://github.com/jabarragann/dvrk-camera-registration
 [crtkplug]: https://github.com/lcsr-ciis/ambf_crtk_plugin
