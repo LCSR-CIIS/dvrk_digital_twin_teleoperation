@@ -112,6 +112,9 @@ cd <dvrk-ambf-teleoperation-folder>
 # Don't use relative links to specify the path to external plugins
 ln -s <your-external-plugin-folder>/* plugins/external_plugins/ 
 ```
+
+TODO: show how directories should look like after the symlink.
+
 ### 2. Compile internal plugins
 
 Compile plugins inside the plugins folder with:
@@ -148,3 +151,5 @@ Configure the rostopic names in [world_stereo.yaml](./ADF/world/world_stereo.yam
 ## Future improvements
 
 TODO
+
+* FIX catkin ws
