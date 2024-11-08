@@ -4,7 +4,8 @@ import yaml
 import os
 import crtk
 import rospy
-
+import click
+from pathlib import Path
 
 class ECMdVRK:
     # simplified jaw class to close gripper
@@ -42,16 +43,24 @@ class ECMdVRK:
         self.__ral.check_connections(timeout)
 
 
-ral = crtk.ral("Teleop_Loss")
-ecm_handle = ECMdVRK(ral, arm_name="ECM", expected_interval=0.01)
-ral.check_connections()
+@click.command()
+@click.option("--path", required=True, help="Path to ecm state yaml file")
+def main(path: Path):
+    path = Path(path)
+    path = path.resolve()
 
-state = yaml.load(open(os.path.join(os.path.dirname(__file__), "ECM_state.yaml"), "r"))
-position = state["position"]
-print(position)
-pos_np = np.array(position)
-# move ecm to a position
+    ral = crtk.ral("Teleop_Loss")
+    ecm_handle = ECMdVRK(ral, arm_name="ECM", expected_interval=0.01)
+    ral.check_connections()
 
-ecm_handle.move_jp(pos_np).wait()
+    state = yaml.safe_load(open(str(path), "r"))
+    position = state["position"]
+    print(position)
+    pos_np = np.array(position)
+    # move ecm to a position
 
-# Move_jp
+    ecm_handle.move_jp(pos_np).wait()
+    # Move_jp
+
+if __name__ == "__main__":
+    main()
