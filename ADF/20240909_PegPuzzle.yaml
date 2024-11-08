@@ -40,7 +40,7 @@ ignore inter-collision: false
 gravity:
   x: 0.0
   y: 0.0
-  z: 0.0
+  z: 0.2
 namespace: /ambf/env/
 BODY Peg_1:
   name: Peg_1
@@ -71,12 +71,12 @@ BODY Peg_1:
   publish joint names: false
   publish joint positions: false
   friction:
-    rolling: 0.0
-    static: 0.5
+    rolling: 1.0
+    static: 1.0
   restitution: 0.1
   damping:
-    angular: 0.1
-    linear: 0.04
+    angular: 1.0
+    linear: 0.4
   visible: true
   collision groups:
   - 0
@@ -183,12 +183,12 @@ BODY Peg_2:
   publish joint names: false
   publish joint positions: false
   friction:
-    rolling: 0.0
-    static: 0.5
+    rolling: 1.0
+    static: 1.0
   restitution: 0.1
   damping:
-    angular: 0.1
-    linear: 0.04
+    angular: 1.0
+    linear: 0.4
   visible: true
   collision groups:
   - 0
@@ -295,12 +295,12 @@ BODY Peg_3:
   publish joint names: false
   publish joint positions: false
   friction:
-    rolling: 0.0
-    static: 0.5
+    rolling: 1.0
+    static: 1.0
   restitution: 0.1
   damping:
-    angular: 0.1
-    linear: 0.04
+    angular: 1.0
+    linear: 0.4
   visible: true
   collision groups:
   - 0
@@ -1039,7 +1039,7 @@ BODY Puzzle_Board:
     linear: 10000.0
   visible: false
   collision groups:
-  - 21
+  - 0
   compound collision shape:
   - name: '1'
     shape: BOX
