@@ -1,12 +1,14 @@
 bodies: []
 joints: []
 cameras: [ar_m_camera]
+# cameras: [test_ar_m_camera] ## This is the magic name that will fix the problem
 high resolution path: ./high_res/
 low resolution path: ./low_res/
 ignore inter-collision: false
 namespace: /ambf/env/
 
 ar_m_camera:
+# test_ar_m_camera: ## This is the magic name that will fix the problem
   namespace: cameras/
   name: ar_m_camera 
   parent: main_camera
@@ -17,7 +19,7 @@ ar_m_camera:
   field view angle: 1.2
   monitor: 0
   # multipass: true
-  publish image: true
+  publish image: false 
   visible: true
   # preprocessing shaders:
     # path: ./shaders/preprocessing/
@@ -36,20 +38,10 @@ ar_m_camera:
   mouse control multipliers: { pan: 0.1, rotate: 1.0, scroll: 0.1, arcball: 0.1 }
   ## PLUGIN CONFIG
   plugins: [
-    # {
-    #   name: test_camera_override,
-    #   path: ../../plugins/build/,
-    #   filename: libtest_rendering_override.so
-    # },
     {
-      name: camera_projection_override,
-      path: ../../plugins/build,
-      filename: libcamera_projection_override.so
-    },
-    {
-      name: ar_ros_plugin,
-      path: ../../plugins/build,
-      filename: libar_ros_plugin.so
+      name: test_camera_override,
+      path: ../../plugins/build/,
+      filename: libtest_rendering_override.so
     },
   ]
 
@@ -66,15 +58,3 @@ ar_m_camera:
                         [ 0.0000, 1.8624,  0.0328, 0.0000 ] ,
                         [ 0.0000, 0.0000, -1.0002, -0.0020 ], 
                         [ 0.0000, 0.0000, -1.0000, 0.0000 ] ]
-
-  ## daVinci Endoscope config
-  # publish image resolution: {width: 1300, height: 1024}   # davinci endoscope
-  # ar-ros plugin config:
-  #   rostopic: "/jhu_daVinci/left/image_rect_color"
-
-  # camera-override plugin config:
-  #   rostopic camera info: "/jhu_daVinci/left/camera_info"
-  #   projection matrix: [[ 2.47828,  0.     ,  0.     ,  0.     ],
-  #                       [0.     ,  3.14926,  0.     ,  0.     ],
-  #                       [0.     ,  0.     , -1.0002 , -0.002  ],
-  #                       [0.     ,  0.     , -1.     ,  0.     ]]
