@@ -6,7 +6,7 @@ The transformation between the PSM base and the camera frame is required to tele
 
 ## Approximate camera registration from SUJ measurements
 
-To generate the transformation from SUJ measurements, turn on the robot and run the script [dvrk_to_opencv_handeye_conversion.py](../scripts/testing_scripts/dvrk_to_opencv_handeye_conversion.py)
+To generate the transformation from SUJ measurements, turn on the robot and run the script [approximate_camera_reg_with_SUJ.py](../scripts/testing_scripts/approximate_camera_reg_with_SUJ.py)
 
 Copy the transformation matrix in Opencv convention into the json file template below. This generated json file can then be used to run the teleoperation scripts. 
 
