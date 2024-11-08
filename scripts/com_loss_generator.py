@@ -53,13 +53,13 @@ def com_loss_publisher():
 
 if __name__ == '__main__':
     print("COMMUNICATION LOSS GENERATOR")
-    print("Please enter your seed:")
-    time.sleep(2)
-    num_seed = input(":\n")
+    # print("Please enter your seed:")
+    # time.sleep(2)
+    # num_seed = input(":\n")
     
-    print(f'Seed Number: {num_seed}')
+    # print(f'Seed Number: {num_seed}')
 
-    random.seed(num_seed)
+    # random.seed(num_seed)
     try:
         com_loss_publisher()
     except rospy.ROSInterruptException:
