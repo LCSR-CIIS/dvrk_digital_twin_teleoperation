@@ -8,6 +8,11 @@ plugins: [
    path: ./plugins/external_plugins/ambf_crtk_plugin/build,  
    name: crtk_plugin,
    filename: libambf_crtk_simulator_plugin.so
+ },
+ {
+   path: ./plugins/build,  
+   name: keyboard_shortcuts_plugin,
+   filename: libkeyboard_shortcuts_plugin.so
  }
 ]
 

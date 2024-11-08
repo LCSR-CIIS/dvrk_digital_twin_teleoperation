@@ -45,6 +45,7 @@
 
 #include "keyboard_shortcuts.h"
 #include <boost/program_options.hpp>
+#include <ambf_server/RosComBase.h>
 
 using namespace std;
 
@@ -61,63 +62,23 @@ KeyboardPlugin::KeyboardPlugin()
 
 int KeyboardPlugin::init(int argc, char **argv, const afWorldPtr a_afWorld)
 {
-    p_opt::options_description cmd_opts("drilling_simulator Command Line Options");
-    cmd_opts.add_options()("info", "Show Info")
-                          ("nt", p_opt::value<int>()->default_value(8), "Number Tool Cursors to Load. Default 8")
-                          ("ds", p_opt::value<float>()->default_value(0.026), "Offset between shaft tool cursors. Default 0.026")
-                          ("vm", p_opt::value<string>()->default_value("00ShinyWhite.jpg"), "Volume's Matcap Filename (Should be placed in the ./resources/matcap/ folder)")
-                          ("dm", p_opt::value<string>()->default_value("dark_metal_brushed.jpg"), "Drill's Matcap Filename (Should be placed in ./resources/matcap/ folder)")
-                          ("fp", p_opt::value<string>()->default_value("/dev/input/js0"), "Footpedal joystick input file description E.g. /dev/input/js0)")
-                          ("mute", p_opt::value<bool>()->default_value(false), "Mute")
-                          ("gcdr", p_opt::value<double>()->default_value(30.0), "Gaze Calibration Marker Motion Duration");
 
-    p_opt::variables_map var_map;
-    p_opt::store(p_opt::command_line_parser(argc, argv).options(cmd_opts).allow_unregistered().run(), var_map);
-    p_opt::notify(var_map);
+    // Get world and cameras 
+    m_worldPtr = a_afWorld;
+    m_cameraL = findAndAppendCamera("cameraL");
+    m_cameraR = findAndAppendCamera("cameraR");
 
-    if (var_map.count("info"))
+    if (m_cameras.size() == 0)
     {
-        std::cout << cmd_opts << std::endl;
+        cerr << "ERROR! NO CAMERAS FOUND. " << endl;
         return -1;
     }
+    
+    cVector3d p = m_cameraR->getLocalPos();
+    cout << "cameraR pose: " << p.x() <<  " " << p.y() << " " << p.z() << endl;
 
-    string file_path = __FILE__;
-    string current_filepath = file_path.substr(0, file_path.rfind("/"));
+    initialize_ros_publishers();
 
-
-    // string volume_matcap = var_map["vm"].as<string>();
-    // string footpedal_fd = var_map["fp"].as<string>();
-
-    // m_worldPtr = a_afWorld;
-
-    // // Get first camera
-    // m_mainCamera = findAndAppendCamera("main_camera");
-    // m_cameraL = findAndAppendCamera("cameraL");
-    // m_cameraR = findAndAppendCamera("cameraR");
-    // m_stereoCamera = findAndAppendCamera("stereoLR");
-
-    // if (m_cameras.size() == 0)
-    // {
-    //     cerr << "ERROR! NO CAMERAS FOUND. " << endl;
-    //     return -1;
-    // }
-
-    // if (!m_mainCamera)
-    // {
-    //     cerr << "INFO! FAILED TO LOAD main_camera, taking the first camera from world " << endl;
-    //     m_mainCamera = m_worldPtr->getCameras()[0];
-    // }
-
-    // // if (m_stereoCamera){
-    // //     makeVRWindowFullscreen(m_stereoCamera);
-    // // }
-
-    // m_panelManager.addCamera(m_mainCamera);
-    // if (m_stereoCamera)
-    // {
-    //     m_stereoCamera->getInternalCamera()->m_stereoOffsetW = 0.1;
-    //     m_panelManager.addCamera(m_stereoCamera);
-    // }
 
     return 1;
 }
@@ -149,6 +110,14 @@ void KeyboardPlugin::keyboardUpdate(GLFWwindow *a_window, int a_key, int a_scanc
 {
     if (a_mods == GLFW_MOD_CONTROL)
     {
+        if (a_key == GLFW_KEY_A)
+        {
+            toggle_ar();
+        }
+        else if (a_key == GLFW_KEY_C)
+        {
+            toggle_comm_loss();
+        }
     }
     else if (a_mods == GLFW_MOD_ALT)
     {
@@ -158,22 +127,14 @@ void KeyboardPlugin::keyboardUpdate(GLFWwindow *a_window, int a_key, int a_scanc
         // Increase disparity of cameras
         if (a_key == GLFW_KEY_LEFT_BRACKET) // [
         {
-            cout << "Increase distance between cameras" << endl;
+            cout << "Move right cam to the left" << endl;
+            increaseCameraDisparity(-0.0005); 
         }
         // Decrease disparity of small window
         else if (a_key == GLFW_KEY_RIGHT_BRACKET) // ]
         {
-
-            cout << "Decrease distance between cameras" << endl;
-        }
-        // option - reduce size along X axis
-        else if (a_key == GLFW_KEY_A)
-        {
-            cout << "Toggle AR" << endl;
-        }
-        else if (a_key == GLFW_KEY_C)
-        {
-            cout << "Toggle comm loss" << endl;
+            cout << "Move right cm to the right" << endl;
+            increaseCameraDisparity(0.0005);
         }
     }
 }
@@ -194,4 +155,54 @@ void KeyboardPlugin::reset()
 bool KeyboardPlugin::close()
 {
     return true;
+}
+
+void KeyboardPlugin::toggle_comm_loss()
+{
+    comm_loss_status = !comm_loss_status; 
+
+    std_msgs::Bool msg;
+    msg.data = comm_loss_status;
+    m_comm_loss_pub.publish(msg);
+    cout << "Communication Loss: " << comm_loss_status << endl;
+}
+void KeyboardPlugin::toggle_ar()
+{
+    ar_activate_status = !ar_activate_status;
+
+    std_msgs::Bool msg;
+    msg.data = ar_activate_status;
+    m_ar_activate_pub.publish(msg);
+    cout << "AR Activate: " << ar_activate_status << endl;
+}
+
+void KeyboardPlugin::initialize_ros_publishers()
+{
+    m_rosNode = afROSNode::getNode();
+    m_comm_loss_pub = m_rosNode->advertise<std_msgs::Bool>("/communication_loss", 1);
+    m_ar_activate_pub = m_rosNode->advertise<std_msgs::Bool>("/ar_activate", 1);
+
+    cout << "INFO! Initialize comm_loss_status to: " << comm_loss_status << endl;
+    cout << "INFO! Initialize ar_activate_status to: " << ar_activate_status << endl;
+
+    std_msgs::Bool msg_comm;
+    msg_comm.data = comm_loss_status;
+    m_comm_loss_pub.publish(msg_comm);
+
+    std_msgs::Bool msg_ar;
+    msg_ar.data = ar_activate_status;
+    m_ar_activate_pub.publish(msg_ar);
+
+}
+
+// Positive delta move the camera away from the left cam.
+// Negative delta move the camera towards the left cam.
+void KeyboardPlugin::increaseCameraDisparity(float delta)
+{
+    cVector3d p = m_cameraR->getLocalPos();
+    p.x(p.x() + delta);
+    m_cameraR->setLocalPos(p);
+
+    cVector3d p2 = m_cameraR->getLocalPos();
+    cout << "cameraR pose: " << p2.x() <<  " " << p2.y() << " " << p2.z() << endl;
 }

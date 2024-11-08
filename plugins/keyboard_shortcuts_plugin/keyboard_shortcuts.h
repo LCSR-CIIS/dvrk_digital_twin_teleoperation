@@ -44,6 +44,9 @@
 #define GL_SILENCE_DEPRECATION
 #include <afFramework.h>
 #include "memory"
+#include "ros/ros.h"
+
+
 
 using namespace std;
 using namespace ambf;
@@ -63,44 +66,30 @@ public:
     virtual bool close() override;
 
 protected:
-    void sliceVolume(int axisIdx, double delta);
-
-    void makeVRWindowFullscreen(afCameraPtr vrCam, int monitor_number = -1);
-
     void updateButtons();
-
     void initializeLabels();
 
     afCameraPtr findAndAppendCamera(string cam_name);
 
-    void publishDrillTipLocationInsideVolume();
+    // ROS
+    ros::NodeHandle *m_rosNode;
+    ros::Publisher m_comm_loss_pub;
+    ros::Publisher m_ar_activate_pub;
+
+    void toggle_comm_loss();
+    void toggle_ar();
+    bool comm_loss_status = false;
+    bool ar_activate_status = true;
+
+    void initialize_ros_publishers();
+
+    // Keyboard functions
+    void increaseCameraDisparity(float delta);
+
 
 private:
-    cVoxelObject *m_voxelObj;
-
-    int m_renderingMode = 0;
-
-    double m_opticalDensity;
-
-    cMutex m_mutexVoxel;
-
-    cCollisionAABBBox m_volumeUpdate;
-
-    cColorb m_zeroColor;
-
-    bool m_flagStart = true;
-
-    int m_counter = 0;
-
-    cGenericObject *m_selectedObject = NULL;
-
-    bool m_flagMarkVolumeForUpdate = false;
-
-    afVolumePtr m_volumeObject;
-
     // camera to render the world
-    afCameraPtr m_mainCamera, m_cameraL, m_cameraR, m_stereoCamera;
-
+    afCameraPtr m_cameraL, m_cameraR;
     map<string, afCameraPtr> m_cameras;
 };
 
