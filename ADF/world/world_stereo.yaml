@@ -67,7 +67,7 @@ cameraL:
   clipping plane: *cam_common_clipping_plane
   field view angle: *cam_common_fov 
   visible: True
-  monitor: 3
+  monitor: 1
   parent: BODY CameraFrame
   publish image: True
   publish image interval: 1
@@ -118,7 +118,7 @@ cameraR:
   up: { x: 0.0, y: 1.0, z: 0.0 }
   clipping plane: *cam_common_clipping_plane
   field view angle: *cam_common_fov 
-  monitor: 2
+  monitor: 3
   visible: True 
   parent: BODY CameraFrame
   publish image: True
