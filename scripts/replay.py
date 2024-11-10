@@ -223,7 +223,7 @@ class replay(dvrk_teleoperation_ambf):
                                 self.puppet.jaw.servo_jp(self.puppet_jaw_servo_jp)
                         if self.recording:
                             self.jaw_traj.append(self.puppet_jaw_servo_jp.copy())
-                            print(self.puppet_jaw_servo_jp)
+                            # print(self.puppet_jaw_servo_jp)
                     else:
                         self.puppet_jaw_servo_jp[0] = 45 * math.pi / 180
                         self.puppet_virtual.jaw.servo_jp(self.puppet_jaw_servo_jp)
@@ -332,8 +332,8 @@ if __name__ == "__main__":
     cam_opencv_T_base = load_hand_eye_calibration(hand_eye_path)
 
     ral = crtk.ral("teleop_replay")
-    mtm = mtm_teleop(ral, args.mtm, 2 * args.interval) # 4 * 0.005 = 0.02 50hz
-    psm = psm_teleop(ral, args.psm, 2 * args.interval) # 4 * 0.005 = 0.02 
+    mtm = mtm_teleop(ral, args.mtm, 4 * args.interval) # 4 * 0.005 = 0.02 50hz
+    psm = psm_teleop(ral, args.psm, 4 * args.interval) # 4 * 0.005 = 0.02 
     psm_virtual = psm_ambf(ral, "/ambf/env/psm2", 2 * args.interval) # 2 * 0.005 = 0.01 100hz
     application = replay(
         ral,

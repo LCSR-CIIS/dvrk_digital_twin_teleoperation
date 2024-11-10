@@ -69,6 +69,28 @@ FULL teleop script
 python dvrk_teleoperation_ambf.py -m MTMR -H ~/temp/ar_test2/PSM2-registration-open-cv.json
 ```
 
+## From pilot-study
+
+After peg registration
+```
+ambf_simulator --launch_file launch.yaml -l 0,1,2,3 --conf plugins-config/crtk_config.yaml --plugins ./plugins/external_plugins/ambf_tf_plugin/build/libambf_tf_plugin.so --tf_list plugins-config/tf_PegBoard.yaml
+```
+
+Rosbag record
+```
+rosbag record -e "/PSM2/(.*)" "/MTML/(.*)" "/ambf/env/psm2/(.*)"  /ambf/env/cameras/cameraL/ImageData/compressed  -o pilot01-baseline
+```
+
+### FULL system with plugins
+```
+ambf_simulator --launch_file launch.yaml -l 0,1,2,3 --conf plugins-config/crtk_config.yaml --override_max_comm_freq 200 -p 200 -t 1 --plugins ./plugins/external_plugins/ambf_tf_plugin/build/libambf_tf_plugin.so --tf_list plugins-config/tf_PegBoard.yaml
+```
+* ` --override_max_comm_freq 200 -p 200 -t 1` this seems important for the AR plugin to work properly.
+* board visibility is set to false.
+* Transparency is important.
+* Does dVRK console needs to be run with -p option (-p 0.005)?
+
+
 ## Experiment scripts
 
 Communication loss

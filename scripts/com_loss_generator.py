@@ -11,9 +11,9 @@ def com_loss_publisher():
     i = 0
     comm_loss = False
 
-    comm_good_mean = 1.2
+    comm_good_mean = 3.2
     comm_good_std = 0.15
-    comm_loss_mean = 0.6
+    comm_loss_mean = 0.8
     comm_loss_std = 0.1
 
     hz = 200

@@ -42,7 +42,7 @@ see [camera_registration_from_SUJ.md](./docs/camera_registration_from_SUJ.md) fo
 First, clone the [Registration Repo](https://github.com/LCSR-CIIS/ambf_registration_plugin) and follow the build instruction. Once you successfully build the repo, use the path to `libregistration_plugin.so` and run the following command:
 <path_to_so_file> = `~/ambf_registration_plugin/build/libregistration_plugin.so`
 ```
-ambf_simulator --launch_file launch.yaml -l 1,6,7 --plugins <path_to_so_file> --registration_config plugins-config/registration_config.yaml
+ambf_simulator --launch_file launch.yaml -l 0,1,2,3 --conf plugins-config/crtk_config.yaml --registration_config plugins-config/registration_config.yaml --plugins ./plugins/external_plugins/ambf_registration_plugin/build/libregistration_plugin.so
 ```
 [Alternative] Add the following content in your `launch.yaml`.
 ```
@@ -151,5 +151,3 @@ Configure the rostopic names in [world_stereo.yaml](./ADF/world/world_stereo.yam
 ## Future improvements
 
 TODO
-
-* FIX catkin ws

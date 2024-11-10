@@ -9,11 +9,17 @@ plugins: [
    name: crtk_plugin,
    filename: libambf_crtk_simulator_plugin.so
  },
+ # TODO: TF plugin here too.
  {
    path: ./plugins/build,  
    name: keyboard_shortcuts_plugin,
    filename: libkeyboard_shortcuts_plugin.so
- }
+ },
+#  { # Add before experiments
+#    path: ./plugins/build,  
+#    name: peg_gripper_plugin,
+#    filename: libpeg_gripper_plugin.so
+#  }
 ]
 
 multibody configs:
@@ -21,6 +27,6 @@ multibody configs:
   - "ADF/full_new_psm2.yaml" #1
   - "ADF/sensors_actuators_psm2.yaml" #2
   - "ADF/20240909_PegPuzzle.yaml" #3
-  - "ADF/full_new_psm2_registration.yaml" #4
-  - "ADF/full_new_psm2_with_peg.yaml" #5
+  - "ADF/full_new_psm2_registration.yaml" #4 -- NOT WORKING -- DON'T USE
+  - "ADF/full_new_psm2_with_peg.yaml" #5 -- NOT WORKING -- DON'T USE
 

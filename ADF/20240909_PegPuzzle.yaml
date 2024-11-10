@@ -33,7 +33,7 @@ joints:
 - JOINT Puzzle_Board-Poll_R_3
 - JOINT Puzzle_Board-Poll_R_4
 - JOINT Puzzle_Board-Poll_R_5
-- JOINT Puzzle_Origin-Puzzle_Board
+# - JOINT Puzzle_Origin-Puzzle_Board
 high resolution path: ../assets/20240909_PegPuzzle/high_res/
 low resolution path: ../assets/20240909_PegPuzzle/low_res/
 ignore inter-collision: false
@@ -1037,7 +1037,7 @@ BODY Puzzle_Board:
   damping:
     angular: 10000.0
     linear: 10000.0
-  visible: false
+  visible: false  #
   collision groups:
   - 0
   compound collision shape:
@@ -1249,50 +1249,52 @@ BODY Puzzle_Board:
       g: 0.10329
       r: 0.10395
     transparency: 1.0
-BODY Puzzle_Origin:
-  name: Puzzle_Origin
-  mesh: Puzzle_Origin.STL
-  collision mesh type: CONVEX_HULL
-  mass: 0.0
-  inertia:
-    ix: 0.0
-    iy: 0.0
-    iz: 0.0
-  collision margin: 0.001
-  scale: 1.0
-  location:
-    position:
-      x: 0.00049
-      y: -0.00103
-      z: 0.0
-    orientation:
-      r: 0.0
-      p: -0.0
-      y: 0.0
-  inertial offset:
-    position:
-      x: 0.0
-      y: 0.0
-      z: 0.0
-    orientation:
-      r: 0
-      p: 0
-      y: 0
-  passive: false
-  color: random
-  publish children names: false
-  publish joint names: false
-  publish joint positions: false
-  friction:
-    rolling: 0.0
-    static: 0.5
-  restitution: 0.1
-  damping:
-    angular: 0.1
-    linear: 0.04
-  visible: false
-  collision groups:
-  - 5
+
+# BODY Puzzle_Origin: #NOT USED ANY MORE - REPLACED BY TF PLUGIN
+#   name: Puzzle_Origin
+#   mesh: Puzzle_Origin.STL
+#   collision mesh type: CONVEX_HULL
+#   mass: 0.0
+#   inertia:
+#     ix: 0.0
+#     iy: 0.0
+#     iz: 0.0
+#   collision margin: 0.001
+#   scale: 1.0
+#   location:
+#     position:
+#       x: 0.00049
+#       y: -0.00103
+#       z: 0.0
+#     orientation:
+#       r: 0.0
+#       p: -0.0
+#       y: 0.0
+#   inertial offset:
+#     position:
+#       x: 0.0
+#       y: 0.0
+#       z: 0.0
+#     orientation:
+#       r: 0
+#       p: 0
+#       y: 0
+#   passive: false
+#   color: random
+#   publish children names: false
+#   publish joint names: false
+#   publish joint positions: false
+#   friction:
+#     rolling: 0.0
+#     static: 0.5
+#   restitution: 0.1
+#   damping:
+#     angular: 0.1
+#     linear: 0.04
+#   visible: false
+#   collision groups:
+#   - 5
+
 JOINT Puzzle_Board-Poll_L_0:
   name: Puzzle_Board-Poll_L_0
   parent: BODY Puzzle_Board
@@ -1617,30 +1619,31 @@ JOINT Puzzle_Board-Poll_R_5:
   passive: true
   controller output type: VELOCITY
   type: fixed
-JOINT Puzzle_Origin-Puzzle_Board:
-  name: Puzzle_Origin-Puzzle_Board
-  parent: BODY Puzzle_Origin
-  child: BODY Puzzle_Board
-  parent axis:
-    x: 0.0
-    y: 0.0
-    z: 1.0
-  parent pivot:
-    x: -0.00049
-    y: 0.00103
-    z: 0.0
-  child axis:
-    x: 0.0
-    y: 1.0
-    z: -0.0
-  child pivot:
-    x: 0.0
-    y: 0.0
-    z: 0.0
-  joint limits:
-    high: 1.2
-    low: -1.2
-  enable feedback: false
-  passive: true
-  controller output type: VELOCITY
-  type: fixed
+
+# JOINT Puzzle_Origin-Puzzle_Board:
+#   name: Puzzle_Origin-Puzzle_Board
+#   parent: BODY Puzzle_Origin
+#   child: BODY Puzzle_Board
+#   parent axis:
+#     x: 0.0
+#     y: 0.0
+#     z: 1.0
+#   parent pivot:
+#     x: -0.00049
+#     y: 0.00103
+#     z: 0.0
+#   child axis:
+#     x: 0.0
+#     y: 1.0
+#     z: -0.0
+#   child pivot:
+#     x: 0.0
+#     y: 0.0
+#     z: 0.0
+#   joint limits:
+#     high: 1.2
+#     low: -1.2
+#   enable feedback: false
+#   passive: true
+#   controller output type: VELOCITY
+#   type: fixed
