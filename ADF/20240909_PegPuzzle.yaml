@@ -3,36 +3,36 @@
 # Link: https://github.com/WPI-AIM/ambf_addon
 # Generated on: 2024-09-10 09:42:07
 bodies:
-- BODY Peg_1
-- BODY Peg_2
-- BODY Peg_3
-- BODY Poll_L_0
-- BODY Poll_L_1
-- BODY Poll_L_2
-- BODY Poll_L_3
-- BODY Poll_L_4
-- BODY Poll_L_5
-- BODY Poll_R_0
-- BODY Poll_R_1
-- BODY Poll_R_2
-- BODY Poll_R_3
-- BODY Poll_R_4
-- BODY Poll_R_5
-- BODY Puzzle_Board
+  - BODY Peg_1
+  - BODY Peg_2
+  - BODY Peg_3
+  - BODY Poll_L_0
+  - BODY Poll_L_1
+  - BODY Poll_L_2
+  - BODY Poll_L_3
+  - BODY Poll_L_4
+  - BODY Poll_L_5
+  - BODY Poll_R_0
+  - BODY Poll_R_1
+  - BODY Poll_R_2
+  - BODY Poll_R_3
+  - BODY Poll_R_4
+  - BODY Poll_R_5
+  - BODY Puzzle_Board
 # - BODY Puzzle_Origin
 joints:
-- JOINT Puzzle_Board-Poll_L_0
-- JOINT Puzzle_Board-Poll_L_1
-- JOINT Puzzle_Board-Poll_L_2
-- JOINT Puzzle_Board-Poll_L_3
-- JOINT Puzzle_Board-Poll_L_4
-- JOINT Puzzle_Board-Poll_L_5
-- JOINT Puzzle_Board-Poll_R_0
-- JOINT Puzzle_Board-Poll_R_1
-- JOINT Puzzle_Board-Poll_R_2
-- JOINT Puzzle_Board-Poll_R_3
-- JOINT Puzzle_Board-Poll_R_4
-- JOINT Puzzle_Board-Poll_R_5
+  - JOINT Puzzle_Board-Poll_L_0
+  - JOINT Puzzle_Board-Poll_L_1
+  - JOINT Puzzle_Board-Poll_L_2
+  - JOINT Puzzle_Board-Poll_L_3
+  - JOINT Puzzle_Board-Poll_L_4
+  - JOINT Puzzle_Board-Poll_L_5
+  - JOINT Puzzle_Board-Poll_R_0
+  - JOINT Puzzle_Board-Poll_R_1
+  - JOINT Puzzle_Board-Poll_R_2
+  - JOINT Puzzle_Board-Poll_R_3
+  - JOINT Puzzle_Board-Poll_R_4
+  - JOINT Puzzle_Board-Poll_R_5
 # - JOINT Puzzle_Origin-Puzzle_Board
 high resolution path: ../assets/20240909_PegPuzzle/high_res/
 low resolution path: ../assets/20240909_PegPuzzle/low_res/
@@ -40,7 +40,7 @@ ignore inter-collision: false
 gravity:
   x: 0.0
   y: 0.0
-  z: 0.2
+  z: 0.0
 namespace: /ambf/env/
 BODY Peg_1:
   name: Peg_1
@@ -79,69 +79,69 @@ BODY Peg_1:
     linear: 0.4
   visible: true
   collision groups:
-  - 0
+    - 0
   compound collision shape:
-  - name: '1'
-    shape: BOX
-    geometry:
-      x: 0.0005
-      y: 0.012
-      z: 0.003
-    offset:
-      position:
-        x: 0.003599999938160181
-        y: 0.006000000052154064
-        z: 0.006500000134110451
-      orientation:
-        r: 0.0
-        p: 0.0
-        y: -0.1745329201221466
-  - name: '2'
-    shape: BOX
-    geometry:
-      x: 0.0005
-      y: 0.012
-      z: 0.003
-    offset:
-      position:
-        x: 0.00937000010162592
-        y: 0.006000000052154064
-        z: 0.006500000134110451
-      orientation:
-        r: 0.0
-        p: 0.0
-        y: 0.1745329201221466
-  - name: '3'
-    shape: BOX
-    geometry:
-      x: 0.003
-      y: 0.012
-      z: 0.0005
-    offset:
-      position:
-        x: 0.006500000134110451
-        y: 0.006000000052154064
-        z: 0.003599999938160181
-      orientation:
-        r: 0.1745329201221466
-        p: 0.0
-        y: 0.0
-  - name: '4'
-    shape: BOX
-    geometry:
-      x: 0.003
-      y: 0.012
-      z: 0.0005
-    offset:
-      position:
-        x: 0.006500000134110451
-        y: 0.006000000052154064
-        z: 0.009399999864399433
-      orientation:
-        r: -0.1745329201221466
-        p: 0.0
-        y: 0.0
-  use material: true
+    - name: "1"
+      shape: BOX
+      geometry:
+        x: 0.0005
+        y: 0.012
+        z: 0.003
+      offset:
+        position:
+          x: 0.003599999938160181
+          y: 0.006000000052154064
+          z: 0.006500000134110451
+        orientation:
+          r: 0.0
+          p: 0.0
+          y: -0.1745329201221466
+    - name: "2"
+      shape: BOX
+      geometry:
+        x: 0.0005
+        y: 0.012
+        z: 0.003
+      offset:
+        position:
+          x: 0.00937000010162592
+          y: 0.006000000052154064
+          z: 0.006500000134110451
+        orientation:
+          r: 0.0
+          p: 0.0
+          y: 0.1745329201221466
+    - name: "3"
+      shape: BOX
+      geometry:
+        x: 0.003
+        y: 0.012
+        z: 0.0005
+      offset:
+        position:
+          x: 0.006500000134110451
+          y: 0.006000000052154064
+          z: 0.003599999938160181
+        orientation:
+          r: 0.1745329201221466
+          p: 0.0
+          y: 0.0
+    - name: "4"
+      shape: BOX
+      geometry:
+        x: 0.003
+        y: 0.012
+        z: 0.0005
+      offset:
+        position:
+          x: 0.006500000134110451
+          y: 0.006000000052154064
+          z: 0.009399999864399433
+        orientation:
+          r: -0.1745329201221466
+          p: 0.0
+          y: 0.0
+  use material: false
   color components:
     ambient:
       level: 1.0
@@ -191,69 +191,69 @@ BODY Peg_2:
     linear: 0.4
   visible: true
   collision groups:
-  - 0
+    - 0
   compound collision shape:
-  - name: '1'
-    shape: BOX
-    geometry:
-      x: 0.0005
-      y: 0.012
-      z: 0.003
-    offset:
-      position:
-        x: 0.003599999938160181
-        y: 0.006000000052154064
-        z: 0.006500000134110451
-      orientation:
-        r: 0.0
-        p: 0.0
-        y: -0.1745329201221466
-  - name: '2'
-    shape: BOX
-    geometry:
-      x: 0.0005
-      y: 0.012
-      z: 0.003
-    offset:
-      position:
-        x: 0.00937000010162592
-        y: 0.006000000052154064
-        z: 0.006500000134110451
-      orientation:
-        r: 0.0
-        p: 0.0
-        y: 0.1745329201221466
-  - name: '3'
-    shape: BOX
-    geometry:
-      x: 0.003
-      y: 0.012
-      z: 0.0005
-    offset:
-      position:
-        x: 0.006500000134110451
-        y: 0.006000000052154064
-        z: 0.003599999938160181
-      orientation:
-        r: 0.1745329201221466
-        p: 0.0
-        y: 0.0
-  - name: '4'
-    shape: BOX
-    geometry:
-      x: 0.003
-      y: 0.012
-      z: 0.0005
-    offset:
-      position:
-        x: 0.006500000134110451
-        y: 0.006000000052154064
-        z: 0.009399999864399433
-      orientation:
-        r: -0.1745329201221466
-        p: 0.0
-        y: 0.0
-  use material: true
+    - name: "1"
+      shape: BOX
+      geometry:
+        x: 0.0005
+        y: 0.012
+        z: 0.003
+      offset:
+        position:
+          x: 0.003599999938160181
+          y: 0.006000000052154064
+          z: 0.006500000134110451
+        orientation:
+          r: 0.0
+          p: 0.0
+          y: -0.1745329201221466
+    - name: "2"
+      shape: BOX
+      geometry:
+        x: 0.0005
+        y: 0.012
+        z: 0.003
+      offset:
+        position:
+          x: 0.00937000010162592
+          y: 0.006000000052154064
+          z: 0.006500000134110451
+        orientation:
+          r: 0.0
+          p: 0.0
+          y: 0.1745329201221466
+    - name: "3"
+      shape: BOX
+      geometry:
+        x: 0.003
+        y: 0.012
+        z: 0.0005
+      offset:
+        position:
+          x: 0.006500000134110451
+          y: 0.006000000052154064
+          z: 0.003599999938160181
+        orientation:
+          r: 0.1745329201221466
+          p: 0.0
+          y: 0.0
+    - name: "4"
+      shape: BOX
+      geometry:
+        x: 0.003
+        y: 0.012
+        z: 0.0005
+      offset:
+        position:
+          x: 0.006500000134110451
+          y: 0.006000000052154064
+          z: 0.009399999864399433
+        orientation:
+          r: -0.1745329201221466
+          p: 0.0
+          y: 0.0
+  use material: false
   color components:
     ambient:
       level: 1.0
@@ -303,69 +303,69 @@ BODY Peg_3:
     linear: 0.4
   visible: true
   collision groups:
-  - 0
+    - 0
   compound collision shape:
-  - name: '1'
-    shape: BOX
-    geometry:
-      x: 0.0005
-      y: 0.012
-      z: 0.003
-    offset:
-      position:
-        x: 0.003599999938160181
-        y: 0.006000000052154064
-        z: 0.006500000134110451
-      orientation:
-        r: 0.0
-        p: 0.0
-        y: -0.1745329201221466
-  - name: '2'
-    shape: BOX
-    geometry:
-      x: 0.0005
-      y: 0.012
-      z: 0.003
-    offset:
-      position:
-        x: 0.00937000010162592
-        y: 0.006000000052154064
-        z: 0.006500000134110451
-      orientation:
-        r: 0.0
-        p: 0.0
-        y: 0.1745329201221466
-  - name: '3'
-    shape: BOX
-    geometry:
-      x: 0.003
-      y: 0.012
-      z: 0.0005
-    offset:
-      position:
-        x: 0.006500000134110451
-        y: 0.006000000052154064
-        z: 0.003599999938160181
-      orientation:
-        r: 0.1745329201221466
-        p: 0.0
-        y: 0.0
-  - name: '4'
-    shape: BOX
-    geometry:
-      x: 0.003
-      y: 0.012
-      z: 0.0005
-    offset:
-      position:
-        x: 0.006500000134110451
-        y: 0.006000000052154064
-        z: 0.009399999864399433
-      orientation:
-        r: -0.1745329201221466
-        p: 0.0
-        y: 0.0
-  use material: true
+    - name: "1"
+      shape: BOX
+      geometry:
+        x: 0.0005
+        y: 0.012
+        z: 0.003
+      offset:
+        position:
+          x: 0.003599999938160181
+          y: 0.006000000052154064
+          z: 0.006500000134110451
+        orientation:
+          r: 0.0
+          p: 0.0
+          y: -0.1745329201221466
+    - name: "2"
+      shape: BOX
+      geometry:
+        x: 0.0005
+        y: 0.012
+        z: 0.003
+      offset:
+        position:
+          x: 0.00937000010162592
+          y: 0.006000000052154064
+          z: 0.006500000134110451
+        orientation:
+          r: 0.0
+          p: 0.0
+          y: 0.1745329201221466
+    - name: "3"
+      shape: BOX
+      geometry:
+        x: 0.003
+        y: 0.012
+        z: 0.0005
+      offset:
+        position:
+          x: 0.006500000134110451
+          y: 0.006000000052154064
+          z: 0.003599999938160181
+        orientation:
+          r: 0.1745329201221466
+          p: 0.0
+          y: 0.0
+    - name: "4"
+      shape: BOX
+      geometry:
+        x: 0.003
+        y: 0.012
+        z: 0.0005
+      offset:
+        position:
+          x: 0.006500000134110451
+          y: 0.006000000052154064
+          z: 0.009399999864399433
+        orientation:
+          r: -0.1745329201221466
+          p: 0.0
+          y: 0.0
+  use material: false
   color components:
     ambient:
       level: 1.0
@@ -415,8 +415,8 @@ BODY Poll_L_0:
     angular: 0.1
     linear: 0.04
   visible: false
-  collision groups: 
-  - 21
+  collision groups:
+    - 21
   use material: true
   color components:
     ambient:
@@ -467,8 +467,8 @@ BODY Poll_L_1:
     angular: 0.1
     linear: 0.04
   visible: false
-  collision groups: 
-  - 21
+  collision groups:
+    - 21
   use material: true
   color components:
     ambient:
@@ -519,8 +519,8 @@ BODY Poll_L_2:
     angular: 0.1
     linear: 0.04
   visible: false
-  collision groups: 
-  - 21
+  collision groups:
+    - 21
   use material: true
   color components:
     ambient:
@@ -571,8 +571,8 @@ BODY Poll_L_3:
     angular: 0.1
     linear: 0.04
   visible: false
-  collision groups: 
-  - 21
+  collision groups:
+    - 21
   use material: true
   color components:
     ambient:
@@ -623,8 +623,8 @@ BODY Poll_L_4:
     angular: 0.1
     linear: 0.04
   visible: false
-  collision groups: 
-  - 21
+  collision groups:
+    - 21
   use material: true
   color components:
     ambient:
@@ -675,8 +675,8 @@ BODY Poll_L_5:
     angular: 0.1
     linear: 0.04
   visible: false
-  collision groups: 
-  - 21
+  collision groups:
+    - 21
   use material: true
   color components:
     ambient:
@@ -727,8 +727,8 @@ BODY Poll_R_0:
     angular: 0.1
     linear: 0.04
   visible: false
-  collision groups: 
-  - 21
+  collision groups:
+    - 21
   use material: true
   color components:
     ambient:
@@ -779,8 +779,8 @@ BODY Poll_R_1:
     angular: 0.1
     linear: 0.04
   visible: false
-  collision groups: 
-  - 21
+  collision groups:
+    - 21
   use material: true
   color components:
     ambient:
@@ -831,8 +831,8 @@ BODY Poll_R_2:
     angular: 0.1
     linear: 0.04
   visible: false
-  collision groups: 
-  - 21
+  collision groups:
+    - 21
   use material: true
   color components:
     ambient:
@@ -883,8 +883,8 @@ BODY Poll_R_3:
     angular: 0.1
     linear: 0.04
   visible: false
-  collision groups: 
-  - 21
+  collision groups:
+    - 21
   use material: true
   color components:
     ambient:
@@ -935,8 +935,8 @@ BODY Poll_R_4:
     angular: 0.1
     linear: 0.04
   visible: false
-  collision groups: 
-  - 21
+  collision groups:
+    - 21
   use material: true
   color components:
     ambient:
@@ -987,8 +987,8 @@ BODY Poll_R_5:
     angular: 0.1
     linear: 0.04
   visible: false
-  collision groups: 
-  - 21
+  collision groups:
+    - 21
   use material: true
   color components:
     ambient:
@@ -1037,205 +1037,205 @@ BODY Puzzle_Board:
   damping:
     angular: 10000.0
     linear: 10000.0
-  visible: false  #
+  visible: false #
   collision groups:
-  - 0
+    - 0
   compound collision shape:
-  - name: '1'
-    shape: BOX
-    geometry:
-      x: 0.1
-      y: 0.01
-      z: 0.11
-    offset:
-      position:
-        x: 0.05000000074505806
-        y: 0.0020000000949949026
-        z: 0.054999999701976776
-      orientation:
-        r: 0.0
-        p: 0.0
-        y: 0.0
-  - name: '2'
-    shape: CYLINDER
-    geometry:
-      axis: Y
-      height: 0.013
-      radius: 0.0015
-    offset:
-      position:
-        x: 0.009999999776482582
-        y: 0.013500000350177288
-        z: 0.01360000018030405
-      orientation:
-        r: 0.0
-        p: 0.0
-        y: 0.0
-  - name: '3'
-    shape: CYLINDER
-    geometry:
-      axis: Y
-      height: 0.013
-      radius: 0.0015
-    offset:
-      position:
-        x: 0.009999999776482582
-        y: 0.013500000350177288
-        z: 0.035599999129772186
-      orientation:
-        r: 0.0
-        p: 0.0
-        y: 0.0
-  - name: '4'
-    shape: CYLINDER
-    geometry:
-      axis: Y
-      height: 0.013
-      radius: 0.0015
-    offset:
-      position:
-        x: 0.009999999776482582
-        y: 0.013500000350177288
-        z: 0.0575999990105629
-      orientation:
-        r: 0.0
-        p: 0.0
-        y: 0.0
-  - name: '5'
-    shape: CYLINDER
-    geometry:
-      axis: Y
-      height: 0.013
-      radius: 0.0015
-    offset:
-      position:
-        x: 0.03799999877810478
-        y: 0.013500000350177288
-        z: 0.01360000018030405
-      orientation:
-        r: 0.0
-        p: 0.0
-        y: 0.0
-  - name: '6'
-    shape: CYLINDER
-    geometry:
-      axis: Y
-      height: 0.013
-      radius: 0.0015
-    offset:
-      position:
-        x: 0.03799999877810478
-        y: 0.013500000350177288
-        z: 0.035599999129772186
-      orientation:
-        r: 0.0
-        p: 0.0
-        y: 0.0
-  - name: '7'
-    shape: CYLINDER
-    geometry:
-      axis: Y
-      height: 0.013
-      radius: 0.0015
-    offset:
-      position:
-        x: 0.03799999877810478
-        y: 0.013500000350177288
-        z: 0.0575999990105629
-      orientation:
-        r: 0.0
-        p: 0.0
-        y: 0.0
-  - name: '8'
-    shape: CYLINDER
-    geometry:
-      axis: Y
-      height: 0.013
-      radius: 0.0015
-    offset:
-      position:
-        x: 0.0763700008392334
-        y: 0.013500000350177288
-        z: 0.009999999776482582
-      orientation:
-        r: 0.0
-        p: 0.0
-        y: 0.0
-  - name: '9'
-    shape: CYLINDER
-    geometry:
-      axis: Y
-      height: 0.013
-      radius: 0.0015
-    offset:
-      position:
-        x: 0.09300000220537186
-        y: 0.013500000350177288
-        z: 0.02449999935925007
-      orientation:
-        r: 0.0
-        p: 0.0
-        y: 0.0
-  - name: '10'
-    shape: CYLINDER
-    geometry:
-      axis: Y
-      height: 0.013
-      radius: 0.0015
-    offset:
-      position:
-        x: 0.09300000220537186
-        y: 0.013500000350177288
-        z: 0.04659999907016754
-      orientation:
-        r: 0.0
-        p: 0.0
-        y: 0.0
-  - name: '11'
-    shape: CYLINDER
-    geometry:
-      axis: Y
-      height: 0.013
-      radius: 0.0015
-    offset:
-      position:
-        x: 0.0763700008392334
-        y: 0.013500000350177288
-        z: 0.06105000153183937
-      orientation:
-        r: 0.0
-        p: 0.0
-        y: 0.0
-  - name: '12'
-    shape: CYLINDER
-    geometry:
-      axis: Y
-      height: 0.013
-      radius: 0.0015
-    offset:
-      position:
-        x: 0.05999999865889549
-        y: 0.013500000350177288
-        z: 0.04659999907016754
-      orientation:
-        r: 0.0
-        p: 0.0
-        y: 0.0
-  - name: '13'
-    shape: CYLINDER
-    geometry:
-      axis: Y
-      height: 0.013
-      radius: 0.0015
-    offset:
-      position:
-        x: 0.05999999865889549
-        y: 0.013500000350177288
-        z: 0.02449999935925007
-      orientation:
-        r: 0.0
-        p: 0.0
-        y: 0.0
+    - name: "1"
+      shape: BOX
+      geometry:
+        x: 0.1
+        y: 0.01
+        z: 0.11
+      offset:
+        position:
+          x: 0.05000000074505806
+          y: 0.0020000000949949026
+          z: 0.054999999701976776
+        orientation:
+          r: 0.0
+          p: 0.0
+          y: 0.0
+    - name: "2"
+      shape: CYLINDER
+      geometry:
+        axis: Y
+        height: 0.013
+        radius: 0.0015
+      offset:
+        position:
+          x: 0.009999999776482582
+          y: 0.013500000350177288
+          z: 0.01360000018030405
+        orientation:
+          r: 0.0
+          p: 0.0
+          y: 0.0
+    - name: "3"
+      shape: CYLINDER
+      geometry:
+        axis: Y
+        height: 0.013
+        radius: 0.0015
+      offset:
+        position:
+          x: 0.009999999776482582
+          y: 0.013500000350177288
+          z: 0.035599999129772186
+        orientation:
+          r: 0.0
+          p: 0.0
+          y: 0.0
+    - name: "4"
+      shape: CYLINDER
+      geometry:
+        axis: Y
+        height: 0.013
+        radius: 0.0015
+      offset:
+        position:
+          x: 0.009999999776482582
+          y: 0.013500000350177288
+          z: 0.0575999990105629
+        orientation:
+          r: 0.0
+          p: 0.0
+          y: 0.0
+    - name: "5"
+      shape: CYLINDER
+      geometry:
+        axis: Y
+        height: 0.013
+        radius: 0.0015
+      offset:
+        position:
+          x: 0.03799999877810478
+          y: 0.013500000350177288
+          z: 0.01360000018030405
+        orientation:
+          r: 0.0
+          p: 0.0
+          y: 0.0
+    - name: "6"
+      shape: CYLINDER
+      geometry:
+        axis: Y
+        height: 0.013
+        radius: 0.0015
+      offset:
+        position:
+          x: 0.03799999877810478
+          y: 0.013500000350177288
+          z: 0.035599999129772186
+        orientation:
+          r: 0.0
+          p: 0.0
+          y: 0.0
+    - name: "7"
+      shape: CYLINDER
+      geometry:
+        axis: Y
+        height: 0.013
+        radius: 0.0015
+      offset:
+        position:
+          x: 0.03799999877810478
+          y: 0.013500000350177288
+          z: 0.0575999990105629
+        orientation:
+          r: 0.0
+          p: 0.0
+          y: 0.0
+    - name: "8"
+      shape: CYLINDER
+      geometry:
+        axis: Y
+        height: 0.013
+        radius: 0.0015
+      offset:
+        position:
+          x: 0.0763700008392334
+          y: 0.013500000350177288
+          z: 0.009999999776482582
+        orientation:
+          r: 0.0
+          p: 0.0
+          y: 0.0
+    - name: "9"
+      shape: CYLINDER
+      geometry:
+        axis: Y
+        height: 0.013
+        radius: 0.0015
+      offset:
+        position:
+          x: 0.09300000220537186
+          y: 0.013500000350177288
+          z: 0.02449999935925007
+        orientation:
+          r: 0.0
+          p: 0.0
+          y: 0.0
+    - name: "10"
+      shape: CYLINDER
+      geometry:
+        axis: Y
+        height: 0.013
+        radius: 0.0015
+      offset:
+        position:
+          x: 0.09300000220537186
+          y: 0.013500000350177288
+          z: 0.04659999907016754
+        orientation:
+          r: 0.0
+          p: 0.0
+          y: 0.0
+    - name: "11"
+      shape: CYLINDER
+      geometry:
+        axis: Y
+        height: 0.013
+        radius: 0.0015
+      offset:
+        position:
+          x: 0.0763700008392334
+          y: 0.013500000350177288
+          z: 0.06105000153183937
+        orientation:
+          r: 0.0
+          p: 0.0
+          y: 0.0
+    - name: "12"
+      shape: CYLINDER
+      geometry:
+        axis: Y
+        height: 0.013
+        radius: 0.0015
+      offset:
+        position:
+          x: 0.05999999865889549
+          y: 0.013500000350177288
+          z: 0.04659999907016754
+        orientation:
+          r: 0.0
+          p: 0.0
+          y: 0.0
+    - name: "13"
+      shape: CYLINDER
+      geometry:
+        axis: Y
+        height: 0.013
+        radius: 0.0015
+      offset:
+        position:
+          x: 0.05999999865889549
+          y: 0.013500000350177288
+          z: 0.02449999935925007
+        orientation:
+          r: 0.0
+          p: 0.0
+          y: 0.0
   use material: true
   color components:
     ambient:
@@ -1619,7 +1619,6 @@ JOINT Puzzle_Board-Poll_R_5:
   passive: true
   controller output type: VELOCITY
   type: fixed
-
 # JOINT Puzzle_Origin-Puzzle_Board:
 #   name: Puzzle_Origin-Puzzle_Board
 #   parent: BODY Puzzle_Origin
