@@ -4,23 +4,24 @@ color config: ./ADF/color/colors.yaml
 input devices config: ./ADF/input_devices/input_devices.yaml
 
 plugins: [
- {
-   path: ./plugins/external_plugins/ambf_crtk_plugin/build,  
-   name: crtk_plugin,
-   filename: libambf_crtk_simulator_plugin.so
- },
- # TODO: TF plugin here too.
- {
-   path: ./plugins/build,  
-   name: keyboard_shortcuts_plugin,
-   filename: libkeyboard_shortcuts_plugin.so
- },
-#  { # Add before experiments
-#    path: ./plugins/build,  
-#    name: peg_gripper_plugin,
-#    filename: libpeg_gripper_plugin.so
-#  }
-]
+    {
+      path: ./plugins/external_plugins/ambf_crtk_plugin/build,
+      name: crtk_plugin,
+      filename: libambf_crtk_simulator_plugin.so,
+    },
+    # TODO: TF plugin here too.
+    {
+      path: ./plugins/build,
+      name: keyboard_shortcuts_plugin,
+      filename: libkeyboard_shortcuts_plugin.so,
+    },
+    {
+      # Add before experiments
+      path: ./plugins/build,
+      name: peg_gripper_plugin,
+      filename: libpeg_gripper_plugin.so,
+    },
+  ]
 
 multibody configs:
   - "ADF/camera_frame.yaml" #0 #VERY IMPORTANT.
