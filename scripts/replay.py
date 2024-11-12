@@ -52,7 +52,7 @@ class replay(dvrk_teleoperation_ambf):
         # handling clutch during communication loss for the virtual PSM
         self.use_manual_puppet_cp = False
         self.puppet_cp_clutch_loss = None
-        
+
         self.puppet_setpoint_cp_start_of_loss = PyKDL.Frame()
 
     def __comm_loss_cb(self, value):
@@ -148,7 +148,7 @@ class replay(dvrk_teleoperation_ambf):
                 )
                 if not self.comm_loss:
                     if self.replaying:
-                        if len(self.arm_traj) != 0:
+                        if len(self.arm_traj) == 1:
                             self.puppet.servo_cp(self.arm_traj[0])
                         if len(self.arm_traj) <= 2:
                             self.arm_traj = []
@@ -211,7 +211,7 @@ class replay(dvrk_teleoperation_ambf):
                         self.puppet_virtual.jaw.servo_jp(self.puppet_jaw_servo_jp)
                         if not self.comm_loss:
                             if self.replaying:
-                                if len(self.jaw_traj) != 0:
+                                if len(self.jaw_traj) == 1:
                                     self.puppet.jaw.servo_jp(self.jaw_traj[0])
                                 if len(self.jaw_traj) <= 2:
                                     self.jaw_traj = []
@@ -228,7 +228,7 @@ class replay(dvrk_teleoperation_ambf):
                         self.puppet_jaw_servo_jp[0] = 45 * math.pi / 180
                         self.puppet_virtual.jaw.servo_jp(self.puppet_jaw_servo_jp)
         return
-    
+
     def clutch(self, clutch):
         if clutch:
             # keep track of last follow mode
@@ -332,9 +332,11 @@ if __name__ == "__main__":
     cam_opencv_T_base = load_hand_eye_calibration(hand_eye_path)
 
     ral = crtk.ral("teleop_replay")
-    mtm = mtm_teleop(ral, args.mtm, 4 * args.interval) # 4 * 0.005 = 0.02 50hz
-    psm = psm_teleop(ral, args.psm, 4 * args.interval) # 4 * 0.005 = 0.02 
-    psm_virtual = psm_ambf(ral, "/ambf/env/psm2", 2 * args.interval) # 2 * 0.005 = 0.01 100hz
+    mtm = mtm_teleop(ral, args.mtm, 2 * args.interval)  # 4 * 0.005 = 0.02 50hz
+    psm = psm_teleop(ral, args.psm, 2 * args.interval)  # 4 * 0.005 = 0.02
+    psm_virtual = psm_ambf(
+        ral, "/ambf/env/psm2", 2 * args.interval
+    )  # 2 * 0.005 = 0.01 100hz
     application = replay(
         ral,
         mtm,
