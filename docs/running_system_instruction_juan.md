@@ -78,7 +78,7 @@ ambf_simulator --launch_file launch.yaml -l 0,1,2,3 --conf plugins-config/crtk_c
 
 Rosbag record
 ```
-rosbag record -e "/PSM2/(.*)" "/MTML/(.*)" "/ambf/env/psm2/(.*)"  /ambf/env/cameras/cameraL/ImageData/compressed  -o pilot01-baseline
+rosbag record -e "/PSM2/(.*)" "/MTML/(.*)" "/ambf/env/psm2/(.*)"  /ambf/env/cameras/cameraL/ImageData/compressed  /davinci_endoscope/left/image_color/compressed /communication_loss  -O 2024111_pilot01-baseline
 ```
 
 ### FULL system with plugins
