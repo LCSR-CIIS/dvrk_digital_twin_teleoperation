@@ -38,7 +38,7 @@
     \author    <hishida3@jhu.edu>
     \author    Hisashi Ishida
     \date      09.18.2024
-    
+
 */
 //==============================================================================
 
@@ -46,23 +46,25 @@
 
 using namespace std;
 
-afPegGripperPlugin::afPegGripperPlugin(){
+afPegGripperPlugin::afPegGripperPlugin()
+{
     cout << "/*********************************************" << endl;
     cout << "/* AMBF PegGripper Plugin" << endl;
     cout << "/*********************************************" << endl;
 }
 
-int afPegGripperPlugin::init(int argc, char** argv, const afWorldPtr a_afWorld){
+int afPegGripperPlugin::init(int argc, char **argv, const afWorldPtr a_afWorld)
+{
     p_opt::options_description cmd_opts("AMBF_TF_Plugin Command Line Options");
-    cmd_opts.add_options()
-            ("info", "Show Info");
+    cmd_opts.add_options()("info", "Show Info");
 
     p_opt::variables_map var_map;
     p_opt::store(p_opt::command_line_parser(argc, argv).options(cmd_opts).allow_unregistered().run(), var_map);
     p_opt::notify(var_map);
 
-    if(var_map.count("info")){
-        std::cout<< cmd_opts << std::endl;
+    if (var_map.count("info"))
+    {
+        std::cout << cmd_opts << std::endl;
         return -1;
     }
 
@@ -96,15 +98,15 @@ int afPegGripperPlugin::init(int argc, char** argv, const afWorldPtr a_afWorld){
 
     // Set fixed transformation from the gripper to Peg Manually
     m_gripper2peg.setLocalPos(cVector3d(0.006383, 0.023474, -0.003079));
-    cQuaternion qrot(-0.3535,-0.612262,0.3535, 0.612262); //(w,x,y,z)
-    cMatrix3d rot; //(w,x,y,z)
+    cQuaternion qrot(-0.3535, -0.612262, 0.3535, 0.612262); //(w,x,y,z)
+    cMatrix3d rot;                                          //(w,x,y,z)
     qrot.toRotMat(rot);
     m_gripper2peg.setLocalRot(rot);
 
     // Store Goal locations
     afRigidBodyPtr goalPollR1Ptr = m_worldPtr->getRigidBody("BODY Poll_R_1");
     afRigidBodyPtr goalPollR2Ptr = m_worldPtr->getRigidBody("BODY Poll_R_2");
-    afRigidBodyPtr goalPollR3Ptr = m_worldPtr->getRigidBody("BODY Poll_R_3");  
+    afRigidBodyPtr goalPollR3Ptr = m_worldPtr->getRigidBody("BODY Poll_R_3");
 
     m_GoalPtrList.push_back(goalPollR1Ptr);
     m_GoalPtrList.push_back(goalPollR2Ptr);
@@ -113,33 +115,43 @@ int afPegGripperPlugin::init(int argc, char** argv, const afWorldPtr a_afWorld){
     return 1;
 }
 
-void afPegGripperPlugin::keyboardUpdate(GLFWwindow* a_window, int a_key, int a_scancode, int a_action, int a_mods){ 
+void afPegGripperPlugin::keyboardUpdate(GLFWwindow *a_window, int a_key, int a_scancode, int a_action, int a_mods)
+{
 }
 
-void afPegGripperPlugin::graphicsUpdate(){
+void afPegGripperPlugin::graphicsUpdate()
+{
 
-    if (!m_gripperClosed){
-        for (afRigidBodyPtr goalPtr: m_GoalPtrList){
-            if ((goalPtr->getLocalPos() - m_leftGripperJointPtr->getLocalPos()).length() < 0.002){
+    if (!m_gripperClosed)
+    {
+        for (afRigidBodyPtr goalPtr : m_GoalPtrList)
+        {
+            if ((goalPtr->getLocalPos() - m_activePeg->getLocalPos()).length() < 0.02)
+            {
                 m_activePeg->setVisibleFlag(false);
             }
         }
     }
 
-    else{
-            m_activePeg->setVisibleFlag(true);
+    else
+    {
+        m_activePeg->setVisibleFlag(true);
     }
 }
 
-void afPegGripperPlugin::physicsUpdate(double dt){
+void afPegGripperPlugin::physicsUpdate(double dt)
+{
     // Check if the gripper is been closed or not
-    if (m_leftGripperJointPtr->getPosition() < 0.2 &&  m_rightGripperJointPtr->getPosition() < 0.2){
+    if (m_leftGripperJointPtr->getPosition() < 0.2 && m_rightGripperJointPtr->getPosition() < 0.2)
+    {
         m_gripperClosed = true;
 
         // Get closest peg from the tool
         double minDistance = 1000;
-        for (afRigidBodyPtr pegPtr:m_pegs){
-            if (minDistance > (pegPtr->getLocalPos() - m_leftGripperJointPtr->getLocalPos()).length()){
+        for (afRigidBodyPtr pegPtr : m_pegs)
+        {
+            if (minDistance > (pegPtr->getLocalPos() - m_leftGripperJointPtr->getLocalPos()).length())
+            {
                 minDistance = (pegPtr->getLocalPos() - m_leftGripperJointPtr->getLocalPos()).length();
                 m_activePeg = pegPtr;
             }
@@ -147,7 +159,8 @@ void afPegGripperPlugin::physicsUpdate(double dt){
 
         // Check if there is close enough peg
         // if (m_activePeg && minDistance < 1.0){
-        if (m_activePeg){
+        if (m_activePeg)
+        {
 
             // Apply the relative transformation from the gripper
             btTransform command;
@@ -160,15 +173,18 @@ void afPegGripperPlugin::physicsUpdate(double dt){
             m_activePeg->m_bulletRigidBody->setWorldTransform(command);
         }
     }
-    else{
+    else
+    {
         m_gripperClosed = false;
     }
 }
 
-void afPegGripperPlugin::reset(){
+void afPegGripperPlugin::reset()
+{
     cerr << "INFO! PLUGIN RESET CALLED" << endl;
 }
 
-bool afPegGripperPlugin::close(){
+bool afPegGripperPlugin::close()
+{
     return -1;
 }

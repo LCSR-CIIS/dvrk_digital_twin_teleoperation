@@ -45,8 +45,10 @@
 #include <afConversions.h>
 #include <boost/program_options.hpp>
 
-namespace boost{
-    namespace program_options{
+namespace boost
+{
+    namespace program_options
+    {
         class variables_map;
     }
 }
@@ -56,44 +58,41 @@ namespace p_opt = boost::program_options;
 using namespace std;
 using namespace ambf;
 
-class afPegGripperPlugin: public afSimulatorPlugin{
-    public:
-        afPegGripperPlugin();
-        virtual int init(int argc, char** argv, const afWorldPtr a_afWorld) override;
-        virtual void keyboardUpdate(GLFWwindow* a_window, int a_key, int a_scancode, int a_action, int a_mods) override;
-        virtual void graphicsUpdate() override;
-        virtual void physicsUpdate(double dt) override;
-        virtual void reset() override;
-        virtual bool close() override;
+class afPegGripperPlugin : public afSimulatorPlugin
+{
+public:
+    afPegGripperPlugin();
+    virtual int init(int argc, char **argv, const afWorldPtr a_afWorld) override;
+    virtual void keyboardUpdate(GLFWwindow *a_window, int a_key, int a_scancode, int a_action, int a_mods) override;
+    virtual void graphicsUpdate() override;
+    virtual void physicsUpdate(double dt) override;
+    virtual void reset() override;
+    virtual bool close() override;
 
-    protected:
-
+protected:
     // private:
-        // Pointer to the world
-        afWorldPtr m_worldPtr;
+    // Pointer to the world
+    afWorldPtr m_worldPtr;
 
-        // Pointer for left/right gripper
-        afRigidBodyPtr m_leftGripperPtr, m_rightGripperPtr;
-        afJointPtr m_leftGripperJointPtr, m_rightGripperJointPtr;
+    // Pointer for left/right gripper
+    afRigidBodyPtr m_leftGripperPtr, m_rightGripperPtr;
+    afJointPtr m_leftGripperJointPtr, m_rightGripperJointPtr;
 
-        // Flag for gripper close
-        bool m_gripperClosed = false;
+    // Flag for gripper close
+    bool m_gripperClosed = false;
 
-        // Pointer for peg
-        afRigidBodyPtr m_peg1Ptr, m_peg2Ptr, m_peg3Ptr;
-        afRigidBodyPtr m_activePeg = nullptr;
+    // Pointer for peg
+    afRigidBodyPtr m_peg1Ptr, m_peg2Ptr, m_peg3Ptr;
+    afRigidBodyPtr m_activePeg = nullptr;
 
+    vector<afRigidBodyPtr> m_pegs;
+    vector<afRigidBodyPtr> m_GoalPtrList;
 
-        vector<afRigidBodyPtr> m_pegs;
-        vector<afRigidBodyPtr> m_GoalPtrList;
+    // Transform for gripper to peg while holding
+    cTransform m_gripper2peg;
 
-        // Transform for gripper to peg while holding
-        cTransform m_gripper2peg;
-
-        // Path
-        string m_current_filepath;
-
+    // Path
+    string m_current_filepath;
 };
-
 
 AF_REGISTER_SIMULATOR_PLUGIN(afPegGripperPlugin)
