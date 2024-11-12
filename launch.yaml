@@ -22,7 +22,6 @@ plugins: [
       filename: libkeyboard_shortcuts_plugin.so,
     },
     {
-      # Add before experiments
       path: ./plugins/build,
       name: peg_gripper_plugin,
       filename: libpeg_gripper_plugin.so,

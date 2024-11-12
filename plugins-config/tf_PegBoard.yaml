@@ -20,8 +20,8 @@ TF World-PegBoard:
     # position: {x: 0.0446072, y: -0.0971228, z: -0.234197}
     # orientation: {r: -3.09255, p: 2.49033, y: 0.0572561}
 
-    position: { x: 0.0335411, y: -0.0954433, z: -0.210001 }
-    orientation: { r: -3.03974, p: 2.5211, y: 0.0349929 }
+    position: { x: 0.0274942, y: -0.0894745, z: -0.202935 }
+    orientation: { r: -3.11756, p: 2.49614, y: 0.0666239 }
 
 TF PegBoard-PegBoard:
   parent: Puzzle_Board # World: AMBF world origin or Name of rigidBody

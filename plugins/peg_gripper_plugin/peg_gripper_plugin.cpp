@@ -126,7 +126,7 @@ void afPegGripperPlugin::graphicsUpdate()
     {
         for (afRigidBodyPtr goalPtr : m_GoalPtrList)
         {
-            if ((goalPtr->getLocalPos() - m_activePeg->getLocalPos()).length() < 0.02)
+            if ((goalPtr->getLocalPos() - m_activePeg->getLocalPos()).length() < 1.0)
             {
                 m_activePeg->setVisibleFlag(false);
             }

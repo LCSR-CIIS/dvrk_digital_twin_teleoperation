@@ -79,7 +79,7 @@ BODY Peg_1:
     linear: 0.4
   visible: true
   collision groups:
-    - 21
+    - 19
   compound collision shape:
     - name: "1"
       shape: BOX
@@ -191,7 +191,7 @@ BODY Peg_2:
     linear: 0.4
   visible: true
   collision groups:
-    - 21
+    - 19
   compound collision shape:
     - name: "1"
       shape: BOX
@@ -303,7 +303,7 @@ BODY Peg_3:
     linear: 0.4
   visible: true
   collision groups:
-    - 21
+    - 19
   compound collision shape:
     - name: "1"
       shape: BOX
