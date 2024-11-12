@@ -704,7 +704,7 @@ JOINT base link-yaw link:
   controller output type: VELOCITY
   type: revolute
   max motor impulse: 0.05000000074505806
-  damping: 5.0
+  damping: 0.001
   offset: 1.5707997084
 JOINT main insertion link-tool roll link:
   name: main insertion link-tool roll link
@@ -762,7 +762,7 @@ JOINT pitch end link-main insertion link:
   controller output type: VELOCITY
   type: prismatic
   max motor impulse: 2000.0
-  damping: 100.0
+  damping: 0.005
   offset: -3.133156538
 JOINT tool pitch link-tool yaw link:
   name: tool pitch link-tool yaw link
@@ -792,7 +792,7 @@ JOINT tool pitch link-tool yaw link:
   controller output type: VELOCITY
   type: revolute
   max motor impulse: 50.0
-  damping: 0.0
+  damping: 0.005
   offset: -1.5746283531
 JOINT tool roll link-tool pitch link:
   name: tool roll link-tool pitch link
@@ -922,5 +922,5 @@ JOINT yaw link-pitch end link:
   controller output type: VELOCITY
   type: revolute
   max motor impulse: 0.05000000074505806
-  damping: 0.0
+  damping: 0.005
   offset: -1.5707997084
