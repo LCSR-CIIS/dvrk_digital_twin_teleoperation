@@ -63,8 +63,10 @@ class replay(dvrk_teleoperation_ambf):
     def handle_comm_loss(self, comm_loss):
         if comm_loss:
             self.recording = True
+            self.replaying = False
             self.puppet_setpoint_cp_start_of_loss = self.puppet_setpoint_cp
         else:
+            self.recording = False
             self.replaying = True
             self.puppet_setpoint_cp_start_of_loss = None
 
@@ -148,7 +150,7 @@ class replay(dvrk_teleoperation_ambf):
                 )
                 if not self.comm_loss:
                     if self.replaying:
-                        if len(self.arm_traj) == 1:
+                        if len(self.arm_traj) != 0:
                             self.puppet.servo_cp(self.arm_traj[0])
                         if len(self.arm_traj) <= 2:
                             self.arm_traj = []
@@ -211,7 +213,7 @@ class replay(dvrk_teleoperation_ambf):
                         self.puppet_virtual.jaw.servo_jp(self.puppet_jaw_servo_jp)
                         if not self.comm_loss:
                             if self.replaying:
-                                if len(self.jaw_traj) == 1:
+                                if len(self.jaw_traj) != 0:
                                     self.puppet.jaw.servo_jp(self.jaw_traj[0])
                                 if len(self.jaw_traj) <= 2:
                                     self.jaw_traj = []
@@ -332,8 +334,8 @@ if __name__ == "__main__":
     cam_opencv_T_base = load_hand_eye_calibration(hand_eye_path)
 
     ral = crtk.ral("teleop_replay")
-    mtm = mtm_teleop(ral, args.mtm, 2 * args.interval)  # 4 * 0.005 = 0.02 50hz
-    psm = psm_teleop(ral, args.psm, 2 * args.interval)  # 4 * 0.005 = 0.02
+    mtm = mtm_teleop(ral, args.mtm, 4 * args.interval)  # 4 * 0.005 = 0.02 50hz
+    psm = psm_teleop(ral, args.psm, 4 * args.interval)  # 4 * 0.005 = 0.02
     psm_virtual = psm_ambf(
         ral, "/ambf/env/psm2", 2 * args.interval
     )  # 2 * 0.005 = 0.01 100hz
