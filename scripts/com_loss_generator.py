@@ -2,9 +2,10 @@ import rospy
 from std_msgs.msg import Bool
 from numpy import random
 import time
+import click
 
 
-def com_loss_publisher():
+def com_loss_publisher(ar_overlay):
     pub = rospy.Publisher("communication_loss", Bool, queue_size=1)
     pub_ar = rospy.Publisher("ar_activate", Bool, queue_size=1)
     rospy.init_node("communication_loss_talker", anonymous=True)
@@ -34,13 +35,15 @@ def com_loss_publisher():
         if (not comm_loss) and i == int(comm_good_period * hz):
             comm_loss = True
             pub.publish(comm_loss)
-            pub_ar.publish(comm_loss)
+            if ar_overlay:
+                pub_ar.publish(comm_loss)
             i = 0
 
         if comm_loss and i == int(comm_loss_period * hz):
             comm_loss = False
             pub.publish(comm_loss)
-            pub_ar.publish(comm_loss)
+            if ar_overlay:
+                pub_ar.publish(comm_loss)
             i = 0
 
             comm_good_period = random.normal(comm_good_mean, comm_good_std)
@@ -52,7 +55,11 @@ def com_loss_publisher():
         rate.sleep()
 
 
-if __name__ == "__main__":
+@click.command()
+@click.option(
+    "--ar_overlay", "-a", default=False, help="Toggle AR overlay on/off with comm loss", type=bool
+)
+def main(ar_overlay):
     print("COMMUNICATION LOSS GENERATOR")
     # print("Please enter your seed:")
     # time.sleep(2)
@@ -62,6 +69,10 @@ if __name__ == "__main__":
 
     # random.seed(num_seed)
     try:
-        com_loss_publisher()
+        com_loss_publisher(ar_overlay)
     except rospy.ROSInterruptException:
         pass
+
+
+if __name__ == "__main__":
+    main()
