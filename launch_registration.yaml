@@ -1,30 +1,19 @@
 # This is the base file for Coordination Application
-world config: ./ADF/world/world_stereo.yaml
+world config: ./ADF/world/world_registration.yaml
 color config: ./ADF/color/colors.yaml
 input devices config: ./ADF/input_devices/input_devices.yaml
 
-plugins: [
+plugins:
+  [
     {
       path: ./plugins/external_plugins/ambf_crtk_plugin/build,
       name: crtk_plugin,
       filename: libambf_crtk_simulator_plugin.so,
     },
-    # TODO: TF plugin here too.
     {
-      path: ./plugins/build,
-      name: keyboard_shortcuts_plugin,
-      filename: libkeyboard_shortcuts_plugin.so,
-    },
-    {
-      path: ./plugins/external_plugins/ambf_tf_plugin/build,
-      name: ambf_tf_plugin,
-      filename: libambf_tf_plugin.so,
-    },
-    {
-      # Add before experiments
-      path: ./plugins/build,
-      name: peg_gripper_plugin,
-      filename: libpeg_gripper_plugin.so,
+      path: ./plugins/external_plugins/ambf_registration_plugin/build,
+      name: registration_plugin,
+      filename: libregistration_plugin.so,
     },
   ]
 

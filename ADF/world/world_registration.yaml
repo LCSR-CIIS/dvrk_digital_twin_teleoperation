@@ -1,0 +1,181 @@
+enclosure size: { length: 10.0, width: 10.0, height: 3.0 }
+lights: [light2, model_light]
+cameras: [cameraL, cameraR, model_camera]
+environment: "./checkered_floor.yaml"
+namespace: /ambf/env/
+max iterations: 50
+gravity: { x: 0.0, y: 0.0, z: -9.8 }
+shaders:
+  path: ../../ambf_shaders/
+  vertex: "shader.vs"
+  fragment: "shader.fs"
+
+light1:
+  namespace: lights/
+  name: light1
+  location: { x: 0.0, y: 0.5, z: 2.5 }
+  direction: { x: 0, y: 0, z: -1.0 }
+  spot exponent: 0.3
+  shadow quality: 0
+  cutoff angle: 0.7
+
+light2:
+  namespace: lights/
+  name: light2
+  location: { x: 0.0, y: 0.0, z: 0.0 }
+  direction: { x: 0, y: 0.0, z: 1.0 }
+  attenuation: { constant: 0.8, linear: 0.8, quadratic: 0.0 }
+  spot exponent: 0.9 #Not used in the SRC
+  shadow quality: 5
+  cutoff angle: 1.6
+  parent: BODY CameraFrame
+
+light3:
+  namespace: lights/
+  name: light3
+  location: { x: 0.00, y: 0.0, z: 5.5 }
+  direction: { x: 0, y: 0, z: -1.0 }
+  spot exponent: 0.3 #Not used in the SRC
+  shadow quality: 0
+  cutoff angle: 1.0
+  parent: BODY CameraFrame
+
+# CAMERA COMMON CONFIG
+cam common configs:
+  clipping plane: &cam_common_clipping_plane
+    near: 0.001
+    far: 10.0
+  field of view: &cam_common_fov 0.6
+  publish image resolution: &cam_common_pub_img_res {
+      width: 1300,
+      height: 1024,
+    } # davinci endoscope
+  publish depth resolution:
+    &cam_common_pub_depth_res { width: 640, height: 512 }
+
+  # Plugin config
+  left_cam_rostopic: &left_cam_rostopic "/davinci_endoscope/left/image_rect_color"
+  left_cam_info_rostopic: &left_cam_info_rostopic "/davinci_endoscope/left/camera_info"
+
+  right_cam_rostopic: &right_cam_rostopic "/davinci_endoscope/right/image_rect_color"
+  right_cam_info_rostopic: &right_cam_info_rostopic "/davinci_endoscope/right/camera_info"
+
+cameraL:
+  namespace: cameras/
+  name: cameraL
+  # camera is set at the ECM tip in the hand-eye script.
+  location: { x: 0.0, y: 0.0, z: 0.0 }
+  look at: { x: 0.0, y: 0.0, z: -1.0 }
+  up: { x: 0.0, y: 1.0, z: 0.0 }
+  clipping plane: *cam_common_clipping_plane
+  field view angle: *cam_common_fov
+  visible: True
+  monitor: 1
+  parent: BODY CameraFrame
+  publish image: True
+  publish image interval: 1
+  publish image resolution: *cam_common_pub_img_res
+  publish depth: False
+  publish depth resolution: *cam_common_pub_depth_res
+  multipass: False # Set to True to enable shadows
+  mouse control multipliers:
+    { pan: 0.1, rotate: 1.0, scroll: 0.1, arcball: 0.1 }
+  ## PLUGIN CONFIG
+  # plugins:
+  #   [
+  #     {
+  #       name: camera_projection_override,
+  #       path: ../../plugins/build/,
+  #       filename: libcamera_projection_override.so,
+  #     },
+  #     {
+  #       name: ar_ros_plugin,
+  #       path: ../../plugins/build/,
+  #       filename: libar_ros_plugin.so,
+  #     },
+  #   ]
+  ## daVinci Endoscope config
+  ar-ros plugin config:
+    rostopic: *left_cam_rostopic
+    set_window_size_from_cam_info: True #If false use publish image resolution
+
+  camera-override plugin config:
+    ## Option 1 takes priority over option 2 if both are defined.
+    # option 1: set from rostopic.
+    rostopic camera info: *left_cam_info_rostopic
+    # option 2: set from matrix in ADF - calculate_projection_matrix.py
+    # From projection matrix
+    projection matrix:
+      [
+        [2.53274, 0., 0., 0.],
+        [0., 3.21651, 0., 0.],
+        [0., 0., -1.0002, -0.002],
+        [0., 0., -1., 0.],
+      ]
+
+cameraR:
+  namespace: cameras/
+  name: cameraR
+  # From Jingkai script
+  # location: { x: 0.00412108186, y: -0.0000892636808, z: 0.000028263996 }
+  # look at: { x: -0.00716592943, y: -0.00899776239, z: -0.999933845 }
+  ## Approximation using only the baseline.
+  location: { x: 0.00662, y: 0.00, z: 0.00 }
+  look at: { x: 0.0, y: 0.0, z: -1.0 }
+
+  up: { x: 0.0, y: 1.0, z: 0.0 }
+  clipping plane: *cam_common_clipping_plane
+  field view angle: *cam_common_fov
+  monitor: 2 #3
+  visible: True
+  parent: BODY CameraFrame
+  publish image: True
+  publish image interval: 1
+  publish image resolution: *cam_common_pub_img_res
+  publish depth: False
+  publish depth resolution: *cam_common_pub_depth_res
+  multipass: False # Set to True to enable shadows
+  mouse control multipliers:
+    { pan: 0.1, rotate: 1.0, scroll: 0.1, arcball: 0.1 }
+  ## PLUGIN CONFIG
+  # plugins:
+  #   [
+  #     {
+  #       name: ar_ros_plugin,
+  #       path: ../../plugins/build/,
+  #       filename: libar_ros_plugin.so,
+  #     },
+  #     {
+  #       name: camera_projection_override,
+  #       path: ../../plugins/build/,
+  #       filename: libcamera_projection_override.so,
+  #     },
+  #   ]
+  ## daVinci Endoscope config
+  ar-ros plugin config:
+    rostopic: *right_cam_rostopic
+
+  camera-override plugin config:
+    rostopic camera info: *right_cam_info_rostopic
+    projection matrix: #Specify if needed.
+
+  model_camera:
+    namespace: cameras/
+    name: main_camera
+    location: { x: 0.5, y: 0.0, z: -0.25 }
+    look at: { x: 0.0, y: 0.0, z: -0.5 }
+    up: { x: 0.0, y: 0.0, z: 1.0 }
+    clipping plane: { near: 0.0, far: 3.0 }
+    field view angle: 0.7 # so that focal length is approximately 1000px and phantom is 250 mm away
+    monitor: 0
+    # multipass: true
+    visible: true
+
+  model_light:
+    namespace: lights/
+    name: model_light
+    location: { x: 0.0, y: 0.0, z: 3.5 }
+    direction: { x: 0.0, y: 0.0, z: -1.0 }
+    spot exponent: 0.3
+    shadow quality: 0
+    cutoff angle: 10

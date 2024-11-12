@@ -83,7 +83,8 @@ rosbag record -e "/PSM2/(.*)" "/MTML/(.*)" "/ambf/env/psm2/(.*)"  /ambf/env/came
 
 ### FULL system with plugins
 ```
-ambf_simulator --launch_file launch.yaml -l 0,1,2,3 --conf plugins-config/crtk_config.yaml --override_max_comm_freq 200 -p 200 -t 1 --plugins ./plugins/external_plugins/ambf_tf_plugin/build/libambf_tf_plugin.so --tf_list plugins-config/tf_PegBoard.yaml
+ambf_simulator --launch_file launch.yaml -l 0,1,2,3 --override_max_comm_freq 200 -p 200 -t 1 --conf plugins-config/crtk_config.yaml  --tf_list plugins-config/tf_PegBoard.yaml
+
 ```
 * ` --override_max_comm_freq 200 -p 200 -t 1` this seems important for the AR plugin to work properly.
 * board visibility is set to false.
