@@ -76,10 +76,16 @@ class afPegGripperPlugin: public afSimulatorPlugin{
         afRigidBodyPtr m_leftGripperPtr, m_rightGripperPtr;
         afJointPtr m_leftGripperJointPtr, m_rightGripperJointPtr;
 
+        // Flag for gripper close
+        bool m_gripperClosed = false;
+
         // Pointer for peg
         afRigidBodyPtr m_peg1Ptr, m_peg2Ptr, m_peg3Ptr;
+        afRigidBodyPtr m_activePeg = nullptr;
+
 
         vector<afRigidBodyPtr> m_pegs;
+        vector<afRigidBodyPtr> m_GoalPtrList;
 
         // Transform for gripper to peg while holding
         cTransform m_gripper2peg;
