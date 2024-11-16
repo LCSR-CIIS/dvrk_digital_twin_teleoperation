@@ -71,7 +71,7 @@ BODY base link:
     linear: 0.0399999991
   visible: true
   collision groups:
-  - 0
+    - 0
   collision shape: CONE
   collision geometry:
     axis: Y
@@ -137,38 +137,38 @@ BODY main insertion link:
     linear: 0.0399999991
   visible: true
   collision groups:
-  - 0
+    - 0
   compound collision shape:
-  - name: '1'
-    shape: BOX
-    geometry:
-      x: 0.1019999981
-      y: 0.0340000018
-      z: 0.075000003
-    offset:
-      position:
-        x: 0.007000000216066837
-        y: 0.0
-        z: 0.0
-      orientation:
-        r: 0.0
-        p: 0.0
-        y: 0.0
-  - name: '2'
-    shape: BOX
-    geometry:
-      x: 0.1199999973
-      y: 0.0120000001
-      z: 0.075000003
-    offset:
-      position:
-        x: 0.0
-        y: -0.023000000044703484
-        z: 0.0
-      orientation:
-        r: 0.0
-        p: 0.0
-        y: 0.0
+    - name: "1"
+      shape: BOX
+      geometry:
+        x: 0.1019999981
+        y: 0.0340000018
+        z: 0.075000003
+      offset:
+        position:
+          x: 0.007000000216066837
+          y: 0.0
+          z: 0.0
+        orientation:
+          r: 0.0
+          p: 0.0
+          y: 0.0
+    - name: "2"
+      shape: BOX
+      geometry:
+        x: 0.1199999973
+        y: 0.0120000001
+        z: 0.075000003
+      offset:
+        position:
+          x: 0.0
+          y: -0.023000000044703484
+          z: 0.0
+        orientation:
+          r: 0.0
+          p: 0.0
+          y: 0.0
   use material: false
   color components:
     ambient:
@@ -220,53 +220,53 @@ BODY pitch end link:
     linear: 0.0399999991
   visible: true
   collision groups:
-  - 1
+    - 1
   compound collision shape:
-  - name: '1'
-    shape: BOX
-    geometry:
-      x: 0.0405000001
-      y: 0.4652499855
-      z: 0.0775600001
-    offset:
-      position:
-        x: -0.04899999871850014
-        y: -0.3021650016307831
-        z: 0.0
-      orientation:
-        r: 0.0
-        p: 0.0
-        y: 0.0
-  - name: '2'
-    shape: CYLINDER
-    geometry:
-      axis: Y
-      height: 0.1650000066
-      radius: 0.0080000004
-    offset:
-      position:
-        x: 0.0
-        y: -0.03999999910593033
-        z: 0.0
-      orientation:
-        r: 0.0
-        p: 0.0
-        y: 0.0
-  - name: '3'
-    shape: BOX
-    geometry:
-      x: 0.0799999982
-      y: 0.0579999983
-      z: 0.0759999976
-    offset:
-      position:
-        x: -0.029999999329447746
-        y: -0.09300000220537186
-        z: 0.0
-      orientation:
-        r: 0.0
-        p: 0.0
-        y: 0.0
+    - name: "1"
+      shape: BOX
+      geometry:
+        x: 0.0405000001
+        y: 0.4652499855
+        z: 0.0775600001
+      offset:
+        position:
+          x: -0.04899999871850014
+          y: -0.3021650016307831
+          z: 0.0
+        orientation:
+          r: 0.0
+          p: 0.0
+          y: 0.0
+    - name: "2"
+      shape: CYLINDER
+      geometry:
+        axis: Y
+        height: 0.1650000066
+        radius: 0.0080000004
+      offset:
+        position:
+          x: 0.0
+          y: -0.03999999910593033
+          z: 0.0
+        orientation:
+          r: 0.0
+          p: 0.0
+          y: 0.0
+    - name: "3"
+      shape: BOX
+      geometry:
+        x: 0.0799999982
+        y: 0.0579999983
+        z: 0.0759999976
+      offset:
+        position:
+          x: -0.029999999329447746
+          y: -0.09300000220537186
+          z: 0.0
+        orientation:
+          r: 0.0
+          p: 0.0
+          y: 0.0
   use material: false
   color components:
     ambient:
@@ -318,7 +318,7 @@ BODY tool gripper left link:
     linear: 0.0399999991
   visible: true
   collision groups:
-  - 10
+    - 10
   collision shape: BOX
   collision geometry:
     x: 0.0008
@@ -384,7 +384,7 @@ BODY tool gripper right link:
     linear: 0.0399999991
   visible: true
   collision groups:
-  - 11
+    - 11
   collision shape: BOX
   collision geometry:
     x: 0.0008
@@ -450,7 +450,7 @@ BODY tool pitch link:
     linear: 0.0399999991
   visible: true
   collision groups:
-  - 3
+    - 3
   collision shape: CAPSULE
   collision geometry:
     axis: X
@@ -516,7 +516,7 @@ BODY tool roll link:
     linear: 0.0399999991
   visible: true
   collision groups:
-  - 2
+    - 2
   collision shape: CYLINDER
   collision geometry:
     axis: Z
@@ -582,7 +582,7 @@ BODY tool yaw link:
     linear: 0.0399999991
   visible: true
   collision groups:
-  - 4
+    - 4
   collision shape: CYLINDER
   collision geometry:
     axis: Z
@@ -648,7 +648,7 @@ BODY yaw link:
     linear: 0.0399999991
   visible: true
   collision groups:
-  - 0
+    - 0
   collision shape: CONE
   collision geometry:
     axis: Z

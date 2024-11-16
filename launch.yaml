@@ -4,7 +4,7 @@ color config: ./ADF/color/colors.yaml
 input devices config: ./ADF/input_devices/input_devices.yaml
 
 plugins: [
-    # External plugins 
+    # External plugins
     {
       path: ./plugins/external_plugins/ambf_crtk_plugin/build,
       name: crtk_plugin,
