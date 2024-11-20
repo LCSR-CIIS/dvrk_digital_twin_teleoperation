@@ -1,4 +1,4 @@
-# dVRK Digital Twin for Telesurgery under Intermittent Communication
+# DVRK Digital Twin Teleoperation
 
 - [Teleoperation under communication loss](#teleoperation-under-communication-loss)
   - [Usage: teleoperation of virtual and real PSM arm](#usage-teleoperation-of-virtual-and-real-psm-arm)
