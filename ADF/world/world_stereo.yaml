@@ -65,6 +65,10 @@ cameraL:
   name: cameraL
   # camera is set at the ECM tip in the hand-eye script.
   location: { x: 0.0, y: 0.0, z: 0.0 }
+
+  # Adjust the location to improve the AR overlay. For example:
+  # location: { x: -0.005, y: 0.0, z: 0.0 }
+
   look at: { x: 0.0, y: 0.0, z: -1.0 }
   up: { x: 0.0, y: 1.0, z: 0.0 }
   clipping plane: *cam_common_clipping_plane

@@ -97,7 +97,9 @@ int afPegGripperPlugin::init(int argc, char **argv, const afWorldPtr a_afWorld)
     m_pegs.push_back(m_peg3Ptr);
 
     // Set fixed transformation from the gripper to Peg Manually
-    m_gripper2peg.setLocalPos(cVector3d(0.006383, 0.023474, -0.003079));
+    // m_gripper2peg.setLocalPos(cVector3d(0.006383, 0.023474, -0.003079));  // Grasping PEG from the tip of the handle 
+
+    m_gripper2peg.setLocalPos(cVector3d(0.006383, 0.023474-0.004, -0.003079-0.0005)); // Grasping completely from the handle
     cQuaternion qrot(-0.3535, -0.612262, 0.3535, 0.612262); //(w,x,y,z)
     cMatrix3d rot;                                          //(w,x,y,z)
     qrot.toRotMat(rot);
