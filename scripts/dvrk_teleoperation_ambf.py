@@ -134,7 +134,7 @@ class dvrk_teleoperation_ambf:
         self.rotation_locked = False
         self.translation_locked = False
         self.align_master = True
-        self.scale = 0.3
+        self.scale = 0.35
         self.jaw_ignore = False
         self.jaw_rate = 4 * math.pi
         self.jaw_rate_back_from_clutch = 0.2 * math.pi
@@ -142,8 +142,8 @@ class dvrk_teleoperation_ambf:
         self.gripper_zero = 0
         self.jaw_min = -20 * math.pi / 180
         self.jaw_max = 80 * math.pi / 180
-        self.operator_orientation_tolerance = 5 * math.pi / 180
-        self.operator_gripper_threshold = 5 * math.pi / 180
+        self.operator_orientation_tolerance = 10 * math.pi / 180
+        self.operator_gripper_threshold = 10 * math.pi / 180
         self.operator_roll_threshold = 3 * math.pi / 180
         self.operator_is_active = False
         self.tolerance_back_from_clutch = 2 * math.pi / 180

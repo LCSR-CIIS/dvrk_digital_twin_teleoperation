@@ -337,7 +337,7 @@ if __name__ == "__main__":
     mtm = mtm_teleop(ral, args.mtm, 4 * args.interval)  # 4 * 0.005 = 0.02 50hz
     psm = psm_teleop(ral, args.psm, 4 * args.interval)  # 4 * 0.005 = 0.02
     psm_virtual = psm_ambf(
-        ral, "/ambf/env/psm2", 2 * args.interval
+        ral, "/ambf/env/psm2", 4 * args.interval
     )  # 2 * 0.005 = 0.01 100hz
     application = replay(
         ral,
