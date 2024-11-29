@@ -43,7 +43,7 @@ ambf_simulator --launch_file launch.yaml -l 0,1,2,3 --override_max_comm_freq 200
 
 4. Launch simultaneous teleoperation of real and virtual PSM (requires hand-eye calibration):
 ```
-python dvrk_teleoperation_ambf.py -m MTMR -H ~/temp/ar_test2/PSM2-registration-open-cv.json
+python dvrk_teleoperation_ambf.py -m MTML -H ~/temp/ar_test2/PSM2-registration-open-cv.json
 ```
 see [camera_registration_from_SUJ.md](./docs/camera_registration_from_SUJ.md) for more information on how to generate the hand-eye calibration file.
 
@@ -187,6 +187,7 @@ Lastly, in order to apply this registrarion result, add the following options wh
 * The AR plugin will generated a segmentation fault if a rosbag recording the videos is launched in the same computer running AMBF.
 * The AR plugin will sometimes fails and freeze the video. Check for the line `cout << "INFO! Initilizing rosImageTexture" << endl;` to debug the error.
 * Improve building of external plugins with a single build command. Currently, each plugin needs to be built separately. 
+* Implement a way of rehoming the MTM with python teleoperation script. During teleoperation, MTM will end up in weird configurations and the only way to get out of that is by turning off the system. Anton's C++ code will do this automatically when powering on the MTMs.
 
 ## Future features
 
