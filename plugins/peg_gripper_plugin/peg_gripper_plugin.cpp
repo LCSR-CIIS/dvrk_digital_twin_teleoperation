@@ -96,9 +96,12 @@ int afPegGripperPlugin::init(int argc, char **argv, const afWorldPtr a_afWorld)
     m_pegs.push_back(m_peg2Ptr);
     m_pegs.push_back(m_peg3Ptr);
 
-    // Set fixed transformation from the gripper to Peg Manually
-    // m_gripper2peg.setLocalPos(cVector3d(0.006383, 0.023474, -0.003079));  // Grasping PEG from the tip of the handle 
+    for (afRigidBodyPtr pegPtr : m_pegs){
+        pegPtr->setVisibleFlag(false);
+    }
 
+    // Set fixed transformation from the gripper to Peg Manually
+    // m_gripper2peg.setLocalPos(cVector3d(0.006383, 0.023474, -0.003079));  // Grasping PEG from the tip of the hand
     m_gripper2peg.setLocalPos(cVector3d(0.006383, 0.023474-0.004, -0.003079-0.0005)); // Grasping completely from the handle
     cQuaternion qrot(-0.3535, -0.612262, 0.3535, 0.612262); //(w,x,y,z)
     cMatrix3d rot;                                          //(w,x,y,z)
@@ -114,7 +117,14 @@ int afPegGripperPlugin::init(int argc, char **argv, const afWorldPtr a_afWorld)
     m_GoalPtrList.push_back(goalPollR2Ptr);
     m_GoalPtrList.push_back(goalPollR3Ptr);
 
+    // ROS related
+    ros_node_handle = afROSNode::getNode();
+    peg_visibility_subscriber = ros_node_handle->subscribe("/peg_visibility", 2, &afPegGripperPlugin::peg_visibility_callback, this);
+
     return 1;
+}
+void afPegGripperPlugin::peg_visibility_callback(const std_msgs::Bool::ConstPtr &msg){
+    m_flag_visible = msg->data;
 }
 
 void afPegGripperPlugin::keyboardUpdate(GLFWwindow *a_window, int a_key, int a_scancode, int a_action, int a_mods)
@@ -131,14 +141,25 @@ void afPegGripperPlugin::graphicsUpdate()
             if ((goalPtr->getLocalPos() - m_activePeg->getLocalPos()).length() < 1.0)
             {
                 m_activePeg->setVisibleFlag(false);
+            m_activePeg->m_visualMesh->setShowEnabled(false);
+
             }
         }
     }
 
-    else
-    {
+    else if (m_gripperClosed && m_flag_visible)
+    {   
         m_activePeg->setVisibleFlag(true);
+        m_activePeg->m_visualMesh->setShowEnabled(true);
     }
+
+    else    
+    {
+        m_activePeg->m_visualMesh->setShowEnabled(false);
+        m_activePeg->setVisibleFlag(false);
+    }
+
+
 }
 
 void afPegGripperPlugin::physicsUpdate(double dt)

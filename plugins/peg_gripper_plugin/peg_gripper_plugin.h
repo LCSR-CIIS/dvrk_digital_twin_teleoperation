@@ -44,6 +44,8 @@
 #include <afFramework.h>
 #include <afConversions.h>
 #include <boost/program_options.hpp>
+#include <ambf_server/RosComBase.h>
+
 
 namespace boost
 {
@@ -69,6 +71,8 @@ public:
     virtual void reset() override;
     virtual bool close() override;
 
+    void peg_visibility_callback(const std_msgs::Bool::ConstPtr &msg);
+
 protected:
     // private:
     // Pointer to the world
@@ -93,6 +97,13 @@ protected:
 
     // Path
     string m_current_filepath;
+
+    // ROS
+    ros::NodeHandle *ros_node_handle;
+    ros::Subscriber peg_visibility_subscriber;
+    bool m_flag_visible = false;
+
+
 };
 
 AF_REGISTER_SIMULATOR_PLUGIN(afPegGripperPlugin)
