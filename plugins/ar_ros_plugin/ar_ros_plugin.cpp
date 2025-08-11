@@ -41,10 +41,17 @@
 */
 //==============================================================================
 
-#include "ar_ros_plugin.h"
+#include "ar_ros_plugin.hpp"
 #include <ambf_server/RosComBase.h>
 #include <yaml-cpp/yaml.h>
-
+#if AMBF_ROS2
+#include <rclcpp/rclcpp.hpp>
+#include <std_msgs/msg/bool.hpp>
+#include <sensor_msgs/msg/image.hpp>
+#include <rclcpp_action/rclcpp_action.hpp>
+#endif
+#include <cv_bridge/cv_bridge.h>
+#include <image_transport/image_transport.hpp>
 using namespace std;
 
 //------------------------------------------------------------------------------
@@ -65,20 +72,20 @@ string get_current_filepath()
     return g_current_filepath;
 }
 
-afCameraHMD::afCameraHMD()
+afARPlugin::afARPlugin()
 {
     empty_world = new cWorld();
 }
 
 // PLUGIN ENTRY POINT
-int afCameraHMD::init(const afBaseObjectPtr a_afObjectPtr, const afBaseObjectAttribsPtr a_objectAttribs)
+int afARPlugin::init(const afBaseObjectPtr a_afObjectPtr, const afBaseObjectAttribsPtr a_objectAttribs)
 {
 
     g_current_filepath = get_current_filepath();
-    initilize_ros_subscribers(a_objectAttribs);
 
     // Camera config
     m_camera = (afCameraPtr)a_afObjectPtr;
+    initialize_ros_subscribers(m_camera);
     m_camera->setOverrideRendering(true);
     ar_world = m_camera->getInternalCamera()->getParentWorld();
     set_window_size_to_pub_resolution(a_objectAttribs);
@@ -103,12 +110,11 @@ int afCameraHMD::init(const afBaseObjectPtr a_afObjectPtr, const afBaseObjectAtt
     return 1;
 }
 
-void afCameraHMD::graphicsUpdate()
+void afARPlugin::graphicsUpdate()
 {
     static bool first_time = true;
     if (first_time)
     {
-        // makeFullScreen();
         cout << "First rendering!" << endl;
         first_time = false;
     }
@@ -134,27 +140,26 @@ void afCameraHMD::graphicsUpdate()
     m_camera->getInternalCamera()->setParentWorld(ar_world);
 }
 
-void afCameraHMD::physicsUpdate(double dt)
+void afARPlugin::physicsUpdate(double dt)
 {
 }
 
-void afCameraHMD::reset()
+void afARPlugin::reset()
 {
 }
 
-bool afCameraHMD::close()
+bool afARPlugin::close()
 {
     return true;
 }
 
-void afCameraHMD::updateHMDParams()
+void afARPlugin::updateHMDParams()
 {
     GLint id = m_shaderPgm->getId();
-    // cerr << "INFO! Shader ID " << id << endl;
     glUseProgram(id);
 }
 
-void afCameraHMD::makeFullScreen()
+void afARPlugin::makeFullScreen()
 {
     const GLFWvidmode *mode = glfwGetVideoMode(m_camera->m_monitor);
     int w = 2880;
@@ -173,12 +178,12 @@ void afCameraHMD::makeFullScreen()
     cerr << "\t Making " << m_camera->getName() << " fullscreen \n";
 }
 
-void afCameraHMD::ar_activate_callback(const std_msgs::Bool::ConstPtr &msg)
+void afARPlugin::ar_activate_callback(AMBF_RAL_MSG_PTR(std_msgs, Bool) msg)
 {
     activate_ar = msg->data;
 }
 
-void afCameraHMD::left_img_callback(const sensor_msgs::ImageConstPtr &msg)
+void afARPlugin::img_callback(AMBF_RAL_MSG_PTR(sensor_msgs, Image) msg)
 {
     try
     {
@@ -186,10 +191,12 @@ void afCameraHMD::left_img_callback(const sensor_msgs::ImageConstPtr &msg)
     }
     catch (cv_bridge::Exception &e)
     {
-        ROS_ERROR("Could not convert");
+        #if AMBF_ROS1
+        ROS_ERROR(rclcpp::get_logger("af_ar_plugin"), "Encountered error: '%s'.", e.what());
+        #elif AMBF_ROS2
+        RCLCPP_ERROR(rclcpp::get_logger("af_ar_plugin"), "Encountered error: '%s'.", e.what());
+        #endif
     }
-
-    // process_and_set_ros_texture();
 
     // Visualize the ros image
     // cv::imshow("Left img", img_ptr->image);
@@ -203,11 +210,11 @@ void img_ptr_deep_copy(cv_bridge::CvImagePtr &img_ptr, cv_bridge::CvImagePtr &im
     img_ptr_copy->header = img_ptr->header;
 }
 
-void afCameraHMD::process_and_set_ros_texture()
+void afARPlugin::process_and_set_ros_texture()
 {
     if (img_ptr != nullptr)
     {
-        cv_bridge::CvImagePtr img_ptr_copy = boost::make_shared<cv_bridge::CvImage>();
+        cv_bridge::CvImagePtr img_ptr_copy = std::make_shared<cv_bridge::CvImage>();
         
         img_ptr_deep_copy(img_ptr, img_ptr_copy);
 
@@ -221,13 +228,11 @@ void afCameraHMD::process_and_set_ros_texture()
         {
             cout << "INFO! Initilizing rosImageTexture" << endl;
             // For ZED 2i and AMBF rostopics -
-            // TODO:Note img fmt should probably not be hard-coded.
             ros_texture->m_image->erase();
+            GLenum format = (img_ptr_copy->image.channels() == 3) ? GL_RGB : GL_RGBA;
             ros_texture->m_image->allocate(img_ptr_copy->image.cols, img_ptr_copy->image.rows, GL_RGBA, GL_UNSIGNED_BYTE);
             ros_texture->m_image->setData(img_ptr_copy->image.data, ros_image_size);
 
-            // Save for debugging
-            // ros_texture->saveToFile("rosImageTexture_juan.png");
         }
         else
         {
@@ -237,12 +242,9 @@ void afCameraHMD::process_and_set_ros_texture()
     }
 }
 
-void afCameraHMD::set_window_size_to_pub_resolution(const afBaseObjectAttribsPtr a_objectAttribs)
+void afARPlugin::set_window_size_to_pub_resolution(const afBaseObjectAttribsPtr a_objectAttribs)
 {
     YAML::Node specificationDataNode;
-    // Print yaml data
-    // cerr << "INFO! SPECIFICATION DATA " << a_objectAttribs->getSpecificationData().m_rawData << endl;
-
     specificationDataNode = YAML::Load(a_objectAttribs->getSpecificationData().m_rawData);
 
     YAML::Node publish_img_res_node = specificationDataNode["publish image resolution"];
@@ -250,44 +252,41 @@ void afCameraHMD::set_window_size_to_pub_resolution(const afBaseObjectAttribsPtr
     m_width = publish_img_res_node["width"].as<int>();
     m_height = publish_img_res_node["height"].as<int>();
 
-    // cout << "Width: " << m_width << " Height: " << m_height << endl;
 }
 
-string afCameraHMD::read_rostopic_from_config(const afBaseObjectAttribsPtr a_objectAttribs)
+string afARPlugin::read_rostopic_from_config(const afBaseObjectAttribsPtr a_objectAttribs)
 {
     YAML::Node specificationDataNode;
 
     specificationDataNode = YAML::Load(a_objectAttribs->getSpecificationData().m_rawData);
 
     YAML::Node publish_img_res_node = specificationDataNode["ar-ros plugin config"];
-
     string rostopic = publish_img_res_node["rostopic"].as<string>();
-
     cout << "INFO! reading images from rostopic: " << rostopic << endl;
 
     return rostopic;
 }
 
-void afCameraHMD::initilize_ros_subscribers(const afBaseObjectAttribsPtr a_objectAttribs)
+void afARPlugin::initialize_ros_subscribers()
 {
-
+    #if AMBF_ROS1
     ros_node_handle = afROSNode::getNode();
+    string rostopic = read_rostopic_from_config(a_objectAttribs);
+    img_subscriber = ros_node_handle->subscribe(rostopic, 2, &afARPlugin::img_callback, this);
+    ar_activate_subscriber = ros_node_handle->subscribe("/ar_activate", 2, &afARPlugin::ar_activate_callback, this);
 
+    #elif AMBF_ROS2
+    ros_node_handle = afROSNode::getNode(m_camera->getNamespace() + m_camera->getName());
     string rostopic = read_rostopic_from_config(a_objectAttribs);
 
-    img_subscriber = ros_node_handle->subscribe(rostopic, 2, &afCameraHMD::left_img_callback, this);
-
-    ar_activate_subscriber = ros_node_handle->subscribe("/ar_activate", 2, &afCameraHMD::ar_activate_callback, this);
-
-    // Ambf camera
-    // img_subscriber = ros_node_handle->subscribe("/ambf/env/cameras/stereoL/ImageData", 2, &afCameraHMD::left_img_callback, this);
-    // right_sub = ros_node_handle->subscribe("/ambf/env/cameras/stereoR/ImageData", 2, &afCameraHMD::right_img_callback, this);
-    // Zed mini
-    // img_subscriber = ros_node_handle->subscribe("/zedm/zed_node/left/image_rect_color", 2, &afCameraHMD::left_img_callback, this);
-    // right_sub = ros_node_handle->subscribe("/zedm/zed_node/right/image_rect_color", 2, &afCameraHMD::right_img_callback, this);
+    ambf_ral::create_subscriber<AMBF_RAL_MSG(sensor_msgs, Image), afARPlugin>
+        (img_subscriber, ros_node_handle,  rostopic, 1, &afARPlugin::img_callback, this);
+    ambf_ral::create_subscriber<AMBF_RAL_MSG(std_msgs, Bool), afARPlugin>
+        (ar_activate_subscriber, ros_node_handle, "/ar_activate", 1, &afARPlugin::ar_activate_callback, this);
+    #endif
 }
 
-void afCameraHMD::load_bg_quad_shaders()
+void afARPlugin::load_bg_quad_shaders()
 {
     afShaderAttributes shaderAttribs;
     shaderAttribs.m_shaderDefined = true;
@@ -297,7 +296,7 @@ void afCameraHMD::load_bg_quad_shaders()
     m_shaderPgm = afShaderUtils::createFromAttribs(&shaderAttribs, "TEST", "VR_CAM");
 }
 
-void afCameraHMD::create_screen_filling_quad()
+void afARPlugin::create_screen_filling_quad()
 {
 
     // Load an initial texture that can be displayed while the first ros image is received
@@ -309,7 +308,6 @@ void afCameraHMD::create_screen_filling_quad()
     }
     else if(m_width == 640)
     {
-
         // Texture witht the same resolution as the zed mini
         texture_path = g_current_filepath + "/../textures/sample640x360.jpg";
     }

@@ -51,7 +51,19 @@ see [camera_registration_from_SUJ.md](./docs/camera_registration_from_SUJ.md) fo
 ## Setup and installation
 
 ### 0. Install AMBF and Surgical robotics challenge.
-TODO.
+Instruction for ROS2:
+```bash
+mkdir ros2_ws # Create ros2_ws
+cd ros2_ws
+cd src
+git clone git@github.com:adnanmunawar/ambf.git
+cd ambf
+git checkout devel # switch to devel branch
+cd .. # go back to src 
+git clone git@github.com:LCSR-CIIS/ambf_crtk_plugin.git
+cd ambf_crtk_plugin
+cd ..
+```
 
 ### 1. Compile and setup external plugins 
 1. Compile and setup [CRTK plugin][crtkplug], [tf plugin][tfplug] and [registration plugin][regplug].  
@@ -101,7 +113,7 @@ plugins/
 ```
 
 ### 2. Compile internal plugins
-
+Instruction for ROS1
 Compile plugins inside the plugins folder with:
 ```bash
 cd plugins
@@ -109,6 +121,15 @@ mkdir build
 cmake ..
 make -j7
 ```
+
+Instruction for ROS2:
+```bash
+cd ~/ambf_ws
+colcon build
+source install/setup.bash
+```
+
+If the software for ZED camera is not already setup, your build will likely fail. See [here](https://www.stereolabs.com/developers/release) to set it up. The ROS AR plugin expects images to be published from a ROS topic. Therefore, if using ZED cameras, it is necessary to use a ROS wrapper around ZED camera outputs. See [here](https://github.com/stereolabs/zed-ros2-wrapper) to set up the ROS2 wrapper, or search for the ROS1 wrapper if applicable. It is possible to use another camera (ie webcam) to publish the images, but the ROS AR plugin expects certain-named topics.
 
 ### 3. Scene configuration
 Configure the rostopic names of your endoscopic video in [world_stereo.yaml](./ADF/world/world_stereo.yaml)
@@ -192,7 +213,7 @@ Lastly, in order to apply this registrarion result, add the following options wh
 ## Future features
 
 * Implement trasparency on AMBF objects.
-* Migration to ROS2
+* In ROS AR plugin, fix the hack so that we don't need to hard code the initial placeholder image while waiting for first published image
 
 ## Citation 
 

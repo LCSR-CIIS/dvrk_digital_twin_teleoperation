@@ -1,8 +1,12 @@
 #include "projection_override.h"
 #include <string>
 #include <ambf_server/RosComBase.h>
+#if AMBF_ROS1
 #include <sensor_msgs/CameraInfo.h>
-
+#elif AMBF_ROS2
+#include <sensor_msgs/msg/camera_info.hpp>
+#include <future>
+#endif
 using namespace std;
 
 //------------------------------------------------------------------------------
@@ -23,8 +27,6 @@ bool afCameraProjectionOverride::computeProjectionFromIntrinsics(const afCameraI
     double s = a_attribs->m_s;
     double W = a_attribs->width;
     double H = a_attribs->height;
-    // double image_center_x = W / 2.;
-    // double image_center_y = H / 2.;
     double n = a_nearPlane;
     double f = a_farPlane;
 
@@ -74,23 +76,70 @@ bool afCameraProjectionOverride::setProjectionFromYaml(YAML::Node projectionMatr
     return true;
 }
 
-bool get_camera_instrinsic_from_rostopic(string camera_info_topic, afCameraIntrinsics &cam_instrinsics)
+#if AMBF_ROS2
+sensor_msgs::msg::CameraInfo::SharedPtr wait_for_camera_info(
+    const std::shared_ptr<rclcpp::Node>& node,
+    const std::string& topic,
+    std::chrono::seconds timeout = std::chrono::seconds(2))
 {
+    auto prom = std::make_shared<std::promise<sensor_msgs::msg::CameraInfo::SharedPtr>>();
+    auto future = prom->get_future();
 
-    ros::NodeHandle *ros_node_handle = afROSNode::getNode();
+    auto sub = node->create_subscription<sensor_msgs::msg::CameraInfo>(
+        topic,
+        10,
+        [prom](sensor_msgs::msg::CameraInfo::SharedPtr msg) {
+            if (prom) {
+                prom->set_value(msg);
+            }
+        });
 
-    boost::shared_ptr<const sensor_msgs::CameraInfo> msg;
-    msg = ros::topic::waitForMessage<sensor_msgs::CameraInfo>(camera_info_topic, *ros_node_handle, ros::Duration(2));
+    // Spin until future is ready or timeout
+    auto start = std::chrono::steady_clock::now();
+    rclcpp::Rate rate(100);
+    while (rclcpp::ok() && future.wait_for(std::chrono::milliseconds(1)) != std::future_status::ready) {
+        rclcpp::spin_some(node);
+        if (std::chrono::steady_clock::now() - start > timeout) {
+            RCLCPP_WARN(node->get_logger(), "Timeout waiting for CameraInfo message on topic %s", topic.c_str());
+            return nullptr;
+        }
+        rate.sleep();
+    }
 
+    return future.get();
+}
+#endif
+
+bool afCameraProjectionOverride::get_camera_instrinsic_from_rostopic(string camera_info_topic, afCameraIntrinsics &cam_instrinsics)
+{
+    #if AMBF_ROS1
+        ros::NodeHandle *ros_node_handle = afROSNode::getNode();
+
+        boost::shared_ptr<const sensor_msgs::CameraInfo> msg;
+        msg = ros::topic::waitForMessage<sensor_msgs::CameraInfo>(camera_info_topic, *ros_node_handle, ros::Duration(2));
+    #elif AMBF_ROS2
+        ambf_ral::node_ptr_t ros_node_handle = afROSNode::getNodeAndRegister(m_camera->getQualifiedName());
+        std::shared_ptr<const sensor_msgs::msg::CameraInfo> msg;
+        
+        msg = wait_for_camera_info(ros_node_handle, camera_info_topic);
+    #endif
     if (msg)
     {
         cam_instrinsics.width = msg->width;
         cam_instrinsics.height = msg->height;
+        #if AMBF_ROS1
         cam_instrinsics.m_fx = msg->P[0];
         cam_instrinsics.m_s  = msg->P[1];
         cam_instrinsics.m_cx = msg->P[2];
         cam_instrinsics.m_fy = msg->P[5];
         cam_instrinsics.m_cy = msg->P[6];
+        #elif AMBF_ROS2
+        cam_instrinsics.m_fx = msg->p[0];
+        cam_instrinsics.m_s  = msg->p[1];
+        cam_instrinsics.m_cx = msg->p[2];
+        cam_instrinsics.m_fy = msg->p[5];
+        cam_instrinsics.m_cy = msg->p[6];
+        #endif
         cam_instrinsics.m_defined = true;
         cerr << "INFO! Camera Intrinsics " << endl;
         cerr << "fx: " << cam_instrinsics.m_fx << endl;

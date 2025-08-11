@@ -37,59 +37,118 @@
 # $Date: 08/29/2024 $
 # $Rev:  $
 
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.5)
 project(volumetric_plugin)
 
+# Use C++11
 set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-find_package(AMBF)
-find_package(Boost COMPONENTS program_options filesystem)
+# Find dependencies
+find_package(Boost REQUIRED COMPONENTS program_options filesystem)
+find_package(AMBF REQUIRED)
+find_package(cv_bridge REQUIRED)
+find_package(image_transport REQUIRED)
+
+set (ROS1_depends ambf_server)
+find_package (catkin QUIET
+  COMPONENTS ${ROS1_depends})
+
+if (catkin_FOUND)
+    message ("Found ROS 1")
+    set (AMBF_ROS_VERSION 1)
+    include_directories(include ${catkin_INCLUDE_DIRS})
+
+    catkin_package(
+      INCLUDE_DIRS .
+      LIBRARIES ${PROJECT_NAME}
+      CATKIN_DEPENDS
+    )
+
+else(catkin_FOUND)
+  # look for ROS2
+  set (AMBF_ROS_VERSION 2)
+  find_package (ament_cmake QUIET)
+  if (ament_cmake_FOUND)
+      set (AMBF_ROS_VERSION 2)
+      message ("Found ROS 2")
+      set (ROS2_depends
+        rclcpp geometry_msgs sensor_msgs
+        ambf_msgs ambf_server)
+
+      foreach (_dep ${ROS2_depends})
+        find_package (${_dep} REQUIRED)
+      endforeach()
+
+      # include_directories(include)
+  endif (ament_cmake_FOUND)
+
+endif(catkin_FOUND)
 
 include_directories(${AMBF_INCLUDE_DIRS})
 include_directories(${Boost_INCLUDE_DIRS})
-include_directories(${catkin_INCLUDE_DIRS})
 
-link_directories(${AMBF_LIBRARY_DIRS})
-
+# link_directories(${AMBF_LIBRARY_DIRS})
 add_definitions(${AMBF_DEFINITIONS})
 
-message("---> LIBS " ${catkin_INCLUDE_DIRS})
+# Plugin: ar_ros_plugin
+add_library(ar_ros_plugin SHARED
+  ar_ros_plugin/ar_ros_plugin.cpp
+  ar_ros_plugin/ar_ros_plugin.hpp
+)
+ament_target_dependencies (ar_ros_plugin cv_bridge image_transport)
 
-# # Camera overwrite plugin
+# Plugin: projection_override
 add_library(camera_projection_override SHARED
     camera_projection_override/projection_override.cpp
-    camera_projection_override/projection_override.h)
+    camera_projection_override/projection_override.h
+)
 
-target_link_libraries(camera_projection_override ${AMBF_LIBRARIES})
-set_property(TARGET camera_projection_override PROPERTY POSITION_INDEPENDENT_CODE TRUE)
+# # Object Plugins
+# add_library(ambf_crtk_object_plugin SHARED
+#     src/utils/afCRTKInterface.cpp
+#     src/utils/afCRTKInterface.h
+#     src/utils/CRTK_base_plugin.cpp
+#     src/utils/CRTK_base_plugin.h   
+#     src/object_plugin/CRTK_object_plugin.cpp
+#     src/object_plugin/CRTK_object_plugin.h
+#     )
 
-# # AR plugin
-add_library(ar_ros_plugin SHARED
-    ar_ros_plugin/ar_ros_plugin.cpp
-    ar_ros_plugin/ar_ros_plugin.h)
+set (ROS_AR_PLUGINS ar_ros_plugin camera_projection_override)
+# set (ROS_AR_PLUGINS ambf_crtk_simulator_plugin ambf_crtk_model_plugin ambf_crtk_object_plugin )
+if (AMBF_ROS_VERSION EQUAL 1)
 
-target_link_libraries(ar_ros_plugin ${AMBF_LIBRARIES})
-set_property(TARGET ar_ros_plugin PROPERTY POSITION_INDEPENDENT_CODE TRUE)
+  foreach (_plugin ${ROS_AR_PLUGINS})
+    add_dependencies (${_plugin} ${catkin_EXPORTED_TARGETS})
+    target_link_libraries (${_plugin} ${catkin_LIBRARIES} ${AMBF_LIBRARIES})
+  endforeach ()
 
-# # Test rendering override
-add_library(test_rendering_override SHARED
-    test_rendering_override/test_rendering_override.cpp
-    test_rendering_override/test_rendering_override.h)
+else ()
 
-target_link_libraries(test_rendering_override ${AMBF_LIBRARIES})
-set_property(TARGET test_rendering_override PROPERTY POSITION_INDEPENDENT_CODE TRUE)
+  install (
+    TARGETS ${ROS_AR_PLUGINS}
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    RUNTIME DESTINATION bin
+    )
 
-# # Peg Gripper plugin
-add_library(peg_gripper_plugin SHARED
-    peg_gripper_plugin/peg_gripper_plugin.cpp
-    peg_gripper_plugin/peg_gripper_plugin.h)
+  foreach (_plugin ${ROS_AR_PLUGINS})
+    ament_target_dependencies (${_plugin} ambf_server ${ROS2_depends})
+  endforeach ()
+  ament_package ()
 
-target_link_libraries(peg_gripper_plugin ${AMBF_LIBRARIES})
-set_property(TARGET peg_gripper_plugin PROPERTY POSITION_INDEPENDENT_CODE TRUE)
+endif()
 
-# # Keyboard shorcuts plugin
-add_library(keyboard_shortcuts_plugin SHARED 
-    keyboard_shortcuts_plugin/keyboard_shortcuts.cpp 
-    keyboard_shortcuts_plugin/keyboard_shortcuts.h)
-target_link_libraries(keyboard_shortcuts_plugin ${AMBF_LIBRARIES})
-set_property(TARGET keyboard_shortcuts_plugin PROPERTY POSITION_INDEPENDENT_CODE TRUE)
+# # Plugin: peg_gripper_plugin
+# add_library(peg_gripper_plugin SHARED
+#   peg_gripper_plugin/peg_gripper_plugin.cpp
+#   peg_gripper_plugin/peg_gripper_plugin.h
+# )
+# target_link_libraries(peg_gripper_plugin ${AMBF_LIBRARIES})
+
+# # Plugin: keyboard_shortcuts_plugin
+# add_library(keyboard_shortcuts_plugin SHARED
+#   keyboard_shortcuts_plugin/keyboard_shortcuts.cpp
+#   keyboard_shortcuts_plugin/keyboard_shortcuts.h
+# )
+# target_link_libraries(keyboard_shortcuts_plugin ${AMBF_LIBRARIES})

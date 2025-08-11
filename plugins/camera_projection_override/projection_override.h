@@ -2,9 +2,17 @@
 #define GL_SILENCE_DEPRECATION
 #include <afFramework.h>
 #include <yaml-cpp/yaml.h>
+#include <ambf_server/ambf_ral_config.h>
 
 using namespace std;
 using namespace ambf;
+#if AMBF_ROS2
+#include <std_msgs/msg/bool.hpp>
+#include <rclcpp/rclcpp.hpp>
+
+#include <ambf_server/ambf_ral.h>
+#include <ambf_server/RosComBase.h>
+#endif
 
 class afCameraIntrinsics;
 
@@ -20,6 +28,8 @@ public:
     bool computeProjectionFromIntrinsics(const afCameraIntrinsics *a_attribs, double a_nearPlane, double a_farPlane);
     bool setProjectionFromYaml(YAML::Node projectionMatrixNode);
  
+    bool get_camera_instrinsic_from_rostopic(string camera_info_topic, afCameraIntrinsics &cam_instrinsics);
+
 protected:
     afCameraPtr m_camera;
     cTransform m_customProjectionMatrix;
