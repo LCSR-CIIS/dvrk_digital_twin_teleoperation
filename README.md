@@ -197,5 +197,12 @@ Lastly, in order to apply this registrarion result, add the following options wh
 ## Citation 
 
 ```
-TODO
+@inproceedings{wang2025digital,
+  title={A digital twin for telesurgery under intermittent communication},
+  author={Wang, Junxiang and Barragan, Juan Antonio and Ishida, Hisashi and Guo, Jingkai and Ku, Yu-Chun and Kazanzides, Peter},
+  booktitle={2025 International Symposium on Medical Robotics (ISMR)},
+  pages={218--224},
+  year={2025},
+  organization={IEEE}
+}
 ```
